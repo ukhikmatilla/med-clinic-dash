@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,7 +24,21 @@ export function useDashboardData() {
   
   // Keep only Najot Shifo
   const allClinics = [
-    { id: 1, name: "Najot Shifo", admin: "@najot", doctors: 10, patients: 800, subscription: "01.06.2025", hasGCalendar: true },
+    { 
+      id: 1, 
+      name: "Najot Shifo", 
+      admin: "@najot", 
+      email: "admin@najotshifo.uz",
+      doctors: 10, 
+      patients: 800, 
+      subscription: "01.06.2025", 
+      subscriptionActive: true, // Added the missing property
+      hasGCalendar: true,
+      plan: "CRM + Telegram",
+      doctorsLimit: 20,
+      telegramBotId: "@najot_shifo_bot",
+      timezone: "Ташкент (UTC+5)"
+    },
   ];
   
   // Integration errors
