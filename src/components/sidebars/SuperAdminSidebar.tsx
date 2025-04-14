@@ -1,6 +1,14 @@
 
-import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { useLocation } from "react-router-dom";
+import { 
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarFooter
+} from "@/components/ui/sidebar";
 import { 
   BarChart3, 
   Building2, 
@@ -10,6 +18,7 @@ import {
   FileText, 
   Link2
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { icon: <BarChart3 className="mr-2 h-4 w-4" />, label: "Дэшборд", href: "/super-admin" },
@@ -25,40 +34,46 @@ export function SuperAdminSidebar() {
   const location = useLocation();
   
   return (
-    <div className="flex flex-col h-full py-4">
-      <div className="px-4 py-4 mb-4 text-center">
+    <div className="flex flex-col h-full">
+      <div className="px-4 py-4 text-center">
         <h1 className="text-xl font-bold text-sidebar-foreground">Медицинская CRM</h1>
         <p className="text-xs text-sidebar-foreground/80">Панель Супер Админа</p>
       </div>
       
-      <nav className="space-y-1 px-2">
-        {navItems.map((item) => {
-          const isActive = location.pathname === item.href;
-          
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                "flex items-center px-3 py-2 text-sm rounded-md transition-colors",
-                isActive
-                  ? "bg-sidebar-primary text-sidebar-primary-foreground font-medium"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              )}
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      <SidebarGroup>
+        <SidebarGroupLabel>Управление</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.href;
+              
+              return (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={isActive}
+                    tooltip={item.label}
+                  >
+                    <a href={item.href} className={cn("flex items-center")}>
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
       
-      <div className="mt-auto px-4 py-4">
-        <div className="rounded-md bg-medical-light-blue p-3">
-          <p className="text-xs font-medium text-sidebar-foreground">Лицензия активна</p>
-          <p className="text-xs text-sidebar-foreground/80">Корпоративный тариф</p>
+      <SidebarFooter>
+        <div className="p-2">
+          <div className="rounded-md bg-medical-light-blue p-3">
+            <p className="text-xs font-medium text-sidebar-foreground">Лицензия активна</p>
+            <p className="text-xs text-sidebar-foreground/80">Корпоративный тариф</p>
+          </div>
         </div>
-      </div>
+      </SidebarFooter>
     </div>
   );
 }
