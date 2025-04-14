@@ -40,6 +40,7 @@ import { SubscriptionAlert } from "@/components/dashboard/SubscriptionAlert";
 import { ClinicsSection } from "@/components/dashboard/ClinicsSection";
 import { IntegrationErrorsTable } from "@/components/dashboard/IntegrationErrorsTable";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { Building2, UserRound, Users, CalendarClock } from "lucide-react";
 
 export function SuperAdminDashboard() {
   const { toast } = useToast();
@@ -70,13 +71,13 @@ export function SuperAdminDashboard() {
     { id: 1, clinic: "Najot Shifo", type: "Google Calendar", error: "Ошибка авторизации", date: "14.04.2025" },
   ];
   
-  // Recent activity feed
+  // Recent activity feed - fix the type explicitly
   const activityFeed = [
-    { id: 1, type: "subscription", message: "Клиника Najot Shifo продлила подписку", date: "14.04.2025", time: "09:45" },
-    { id: 2, type: "doctor", message: "Добавлен врач: Ортиков Ш.О.", date: "13.04.2025", time: "15:30" },
-    { id: 3, type: "error", message: "Ошибка интеграции Google Calendar", date: "13.04.2025", time: "11:20" },
-    { id: 4, type: "patient", message: "Зарегистрирован новый пациент", date: "12.04.2025", time: "14:15" },
-    { id: 5, type: "appointment", message: "Отменен прием №245", date: "12.04.2025", time: "10:05" },
+    { id: 1, type: "subscription" as const, message: "Клиника Najot Shifo продлила подписку", date: "14.04.2025", time: "09:45" },
+    { id: 2, type: "doctor" as const, message: "Добавлен врач: Ортиков Ш.О.", date: "13.04.2025", time: "15:30" },
+    { id: 3, type: "error" as const, message: "Ошибка интеграции Google Calendar", date: "13.04.2025", time: "11:20" },
+    { id: 4, type: "patient" as const, message: "Зарегистрирован новый пациент", date: "12.04.2025", time: "14:15" },
+    { id: 5, type: "appointment" as const, message: "Отменен прием №245", date: "12.04.2025", time: "10:05" },
   ];
   
   // Subscriptions ending soon
