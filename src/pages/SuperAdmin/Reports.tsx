@@ -12,21 +12,23 @@ import { ReportCard } from "@/components/reports/ReportCard";
 import { AnalyticsCharts } from "@/components/reports/AnalyticsCharts";
 import { KpiCards } from "@/components/reports/KpiCards";
 import { ExpiringSubscriptionsTable } from "@/components/reports/ExpiringSubscriptionsTable";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { ErrorsSection } from "@/components/dashboard/ErrorsSection";
 import { useIntegrationsData } from "@/hooks/useIntegrationsData";
+import { CreateReportDialog } from "@/components/reports/CreateReportDialog";
 
 export default function SuperAdminReports() {
   const [period, setPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   const { reports, isLoading, refreshReport, analytics } = useReportsData(period);
   const { errors } = useIntegrationsData();
+  const [createReportOpen, setCreateReportOpen] = useState(false);
   
   const handlePeriodChange = (value: string) => {
     setPeriod(value as 'week' | 'month' | 'quarter' | 'year');
   };
   
   const handleCreateReport = () => {
-    toast.info("Функция создания отчетов в разработке");
+    setCreateReportOpen(true);
   };
   
   // Find the activity report to extract KPI data
@@ -144,9 +146,69 @@ export default function SuperAdminReports() {
                 </div>
               </CardContent>
             </Card>
+            
+            {/* Report History Section */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>История созданных отчётов</CardTitle>
+                <CardDescription>
+                  Ваши ранее созданные отчёты
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="py-2 px-4 text-left">Название отчёта</th>
+                        <th className="py-2 px-4 text-left">Дата создания</th>
+                        <th className="py-2 px-4 text-left">Автор</th>
+                        <th className="py-2 px-4 text-left">Тип</th>
+                        <th className="py-2 px-4 text-left">Формат</th>
+                        <th className="py-2 px-4 text-left">Действия</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b hover:bg-muted/50">
+                        <td className="py-2 px-4">Финансовый / март</td>
+                        <td className="py-2 px-4">01.04.2025</td>
+                        <td className="py-2 px-4">SuperAdmin</td>
+                        <td className="py-2 px-4">Финансовый</td>
+                        <td className="py-2 px-4">XLSX</td>
+                        <td className="py-2 px-4">
+                          <Button variant="ghost" size="sm">
+                            <Download className="h-4 w-4 mr-2" />
+                            Скачать
+                          </Button>
+                        </td>
+                      </tr>
+                      <tr className="border-b hover:bg-muted/50">
+                        <td className="py-2 px-4">Активность / февраль</td>
+                        <td className="py-2 px-4">01.03.2025</td>
+                        <td className="py-2 px-4">SuperAdmin</td>
+                        <td className="py-2 px-4">Активность</td>
+                        <td className="py-2 px-4">PDF</td>
+                        <td className="py-2 px-4">
+                          <Button variant="ghost" size="sm">
+                            <Download className="h-4 w-4 mr-2" />
+                            Скачать
+                          </Button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Create Report Dialog */}
+      <CreateReportDialog 
+        open={createReportOpen}
+        onOpenChange={setCreateReportOpen}
+      />
     </SidebarLayout>
   );
 }
