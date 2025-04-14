@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ClinicFormFields } from "../form/ClinicFormFields";
 import { useClinicForm, type Clinic } from "../form/useClinicForm";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface EditClinicDialogProps {
   open: boolean;
@@ -25,17 +25,14 @@ export function EditClinicDialog({
   clinic,
   onSave
 }: EditClinicDialogProps) {
-  const { toast } = useToast();
   const { formData, errors, validateForm, handleChange } = useClinicForm(clinic);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
-      toast({
-        title: "Ошибка валидации",
-        description: "Пожалуйста, проверьте правильность заполнения полей",
-        variant: "destructive"
+      toast.error("Ошибка валидации", {
+        description: "Пожалуйста, проверьте правильность заполнения полей"
       });
       return;
     }
@@ -59,8 +56,7 @@ export function EditClinicDialog({
     onSave(updatedClinic);
     onOpenChange(false);
     
-    toast({
-      title: "Успешно сохранено",
+    toast.success("Успешно сохранено", {
       description: "Информация о клинике обновлена"
     });
   };

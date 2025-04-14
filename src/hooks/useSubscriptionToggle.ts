@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface UseSubscriptionToggleOptions {
   clinicId: string;
@@ -39,7 +39,6 @@ export function useSubscriptionToggle({
 }: UseSubscriptionToggleOptions) {
   const [isToggling, setIsToggling] = useState(false);
   const [value, setValue] = useState(initialValue);
-  const { toast } = useToast();
 
   const toggle = async (newValue: boolean) => {
     if (isToggling) return;
@@ -49,18 +48,15 @@ export function useSubscriptionToggle({
       const result = await toggleAutoRenewalApi(clinicId, newValue);
       setValue(result);
       
-      toast({
-        title: "Автопродление обновлено",
+      toast.success("Автопродление обновлено", {
         description: `Автопродление ${result ? "включено" : "отключено"}`
       });
       
       onSuccess?.(result);
       return result;
     } catch (error) {
-      toast({
-        title: "Ошибка",
-        description: "Не удалось обновить статус автопродления",
-        variant: "destructive"
+      toast.error("Ошибка", {
+        description: "Не удалось обновить статус автопродления"
       });
       throw error;
     } finally {

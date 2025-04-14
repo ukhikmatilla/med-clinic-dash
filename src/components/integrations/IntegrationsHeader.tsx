@@ -2,12 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function IntegrationsHeader() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
   
   const handleRefresh = () => {
@@ -16,8 +15,7 @@ export function IntegrationsHeader() {
     // Simulate a refresh - in a real app this would call an API
     setTimeout(() => {
       setIsRefreshing(false);
-      toast({
-        title: "Обновлено",
+      toast.success("Обновлено", {
         description: "Статусы интеграций успешно обновлены"
       });
     }, 800);

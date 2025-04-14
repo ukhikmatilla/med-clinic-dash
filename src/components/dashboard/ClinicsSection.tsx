@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { AddEditClinicDialog } from "@/components/clinics/AddEditClinicDialog";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 interface Clinic {
   id: number;
@@ -30,7 +30,6 @@ interface ClinicsSectionProps {
 }
 
 export function ClinicsSection({ clinics: initialClinics }: ClinicsSectionProps) {
-  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [clinics, setClinics] = useState(initialClinics);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -51,8 +50,7 @@ export function ClinicsSection({ clinics: initialClinics }: ClinicsSectionProps)
     setClinics([...clinics, newClinic]);
     setIsAddDialogOpen(false);
     
-    toast({
-      title: "Клиника добавлена",
+    toast.success("Клиника добавлена", {
       description: "Новая клиника была успешно добавлена в систему",
     });
   };
@@ -72,8 +70,7 @@ export function ClinicsSection({ clinics: initialClinics }: ClinicsSectionProps)
     }
     setEditingClinic(null);
     
-    toast({
-      title: "Клиника обновлена",
+    toast.success("Клиника обновлена", {
       description: "Данные клиники были успешно обновлены",
     });
   };
@@ -81,8 +78,7 @@ export function ClinicsSection({ clinics: initialClinics }: ClinicsSectionProps)
   const handleDeleteClinic = (id: number) => {
     setClinics(clinics.filter(clinic => clinic.id !== id));
     
-    toast({
-      title: "Клиника удалена",
+    toast.success("Клиника удалена", {
       description: "Клиника была успешно удалена из системы",
     });
   };

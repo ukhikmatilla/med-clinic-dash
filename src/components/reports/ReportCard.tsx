@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Download, RefreshCw, FileText, BarChart, Users, AlertTriangle } from "lucide-react";
 import { ReportData } from "@/types/subscription";
 import { formatDate } from "@/lib/utils";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 interface ReportCardProps {
   report: ReportData;
