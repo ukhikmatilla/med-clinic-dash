@@ -15,6 +15,7 @@ import Register from "./pages/Auth/Register";
 import SuperAdminDashboard from "./pages/SuperAdmin/Dashboard";
 import SuperAdminClinics from "./pages/SuperAdmin/Clinics";
 import SuperAdminClinicProfile from "./pages/SuperAdmin/ClinicProfile";
+import SuperAdminIntegrations from "./pages/SuperAdmin/Integrations";
 import SuperAdminSubscriptions from "./pages/SuperAdmin/Subscriptions";
 import SuperAdminReports from "./pages/SuperAdmin/Reports";
 
@@ -41,7 +42,7 @@ const App = () => (
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
           <Route path="/super-admin/clinics" element={<SuperAdminClinics />} />
           <Route path="/super-admin/clinic/:id" element={<SuperAdminClinicProfile />} />
-          <Route path="/super-admin/integrations" element={<NotFound />} />
+          <Route path="/super-admin/integrations" element={<SuperAdminIntegrations />} />
           <Route path="/super-admin/subscriptions" element={<SuperAdminSubscriptions />} />
           <Route path="/super-admin/reports" element={<SuperAdminReports />} />
           <Route path="/super-admin/settings" element={<NotFound />} />
