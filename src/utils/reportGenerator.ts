@@ -5,21 +5,28 @@ import * as XLSX from "xlsx";
 import { ReportData } from "@/types/subscription";
 import { formatDate } from "@/lib/utils";
 
-// Extend jsPDF types to include autoTable method
+// Extend jsPDF types to include autoTable method and internal properties
 declare module "jspdf" {
   interface jsPDF {
     autoTable: (options: any) => jsPDF;
+    internal: {
+      getNumberOfPages: () => number;
+      pageSize: {
+        width: number;
+        height: number;
+      };
+    };
   }
 }
 
-// Custom colors for reports
+// Custom colors for reports - using RGB arrays
 const REPORT_COLORS = {
-  primary: [60, 90, 200],
-  secondary: [80, 150, 80],
-  tertiary: [150, 90, 180],
-  text: [40, 40, 40],
-  subText: [80, 80, 80],
-  border: [200, 200, 200]
+  primary: [60, 90, 200] as [number, number, number],
+  secondary: [80, 150, 80] as [number, number, number],
+  tertiary: [150, 90, 180] as [number, number, number],
+  text: [40, 40, 40] as [number, number, number],
+  subText: [80, 80, 80] as [number, number, number],
+  border: [200, 200, 200] as [number, number, number]
 };
 
 // Helper function to add company header to PDF
