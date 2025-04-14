@@ -41,8 +41,6 @@ const App = () => (
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
           <Route path="/super-admin/clinics" element={<SuperAdminClinics />} />
           <Route path="/super-admin/clinic/:id" element={<SuperAdminClinicProfile />} />
-          <Route path="/super-admin/doctors" element={<NotFound />} />
-          <Route path="/super-admin/patients" element={<NotFound />} />
           <Route path="/super-admin/integrations" element={<NotFound />} />
           <Route path="/super-admin/subscriptions" element={<SuperAdminSubscriptions />} />
           <Route path="/super-admin/reports" element={<SuperAdminReports />} />

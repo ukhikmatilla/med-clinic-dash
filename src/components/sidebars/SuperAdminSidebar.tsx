@@ -13,8 +13,6 @@ import {
 import { 
   BarChart3, 
   Building2, 
-  Users, 
-  User, 
   Settings, 
   FileText, 
   Link2,
@@ -27,8 +25,6 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { icon: <BarChart3 className="mr-2 h-4 w-4" />, label: "Дэшборд", href: "/super-admin" },
   { icon: <Building2 className="mr-2 h-4 w-4" />, label: "Клиники", href: "/super-admin/clinics" },
-  { icon: <User className="mr-2 h-4 w-4" />, label: "Врачи", href: "/super-admin/doctors" },
-  { icon: <Users className="mr-2 h-4 w-4" />, label: "Пациенты", href: "/super-admin/patients" },
   { icon: <Link2 className="mr-2 h-4 w-4" />, label: "Интеграции", href: "/super-admin/integrations" },
   { icon: <CreditCard className="mr-2 h-4 w-4" />, label: "Подписки", href: "/super-admin/subscriptions" },
   { icon: <FileText className="mr-2 h-4 w-4" />, label: "Отчёты", href: "/super-admin/reports" },
