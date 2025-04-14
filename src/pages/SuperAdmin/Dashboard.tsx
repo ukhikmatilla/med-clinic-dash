@@ -33,12 +33,18 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { StatisticsCard } from "@/components/dashboard/StatisticsCard";
+import { LicenseInfoCard } from "@/components/dashboard/LicenseInfoCard";
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { SubscriptionAlert } from "@/components/dashboard/SubscriptionAlert";
+import { ClinicsSection } from "@/components/dashboard/ClinicsSection";
+import { IntegrationErrorsTable } from "@/components/dashboard/IntegrationErrorsTable";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 
 export function SuperAdminDashboard() {
   const { toast } = useToast();
   const [lastUpdated, setLastUpdated] = useState("14.04.2025 10:22");
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   
   // Simplified stats to reflect only Najot Shifo
   const stats = {
@@ -58,12 +64,6 @@ export function SuperAdminDashboard() {
   const allClinics = [
     { id: 1, name: "Najot Shifo", admin: "@najot", doctors: 10, patients: 800, subscription: "01.06.2025", hasGCalendar: true },
   ];
-  
-  // Filter clinics based on search query
-  const recentClinics = allClinics.filter(clinic => 
-    clinic.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    clinic.admin.toLowerCase().includes(searchQuery.toLowerCase())
-  );
   
   // Integration errors
   const integrationErrors = [
@@ -140,288 +140,60 @@ export function SuperAdminDashboard() {
     <SidebarLayout sidebar={<SuperAdminSidebar />}>
       <div className="p-2 sm:p-6">
         {/* Header with refresh */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-2">
-          <h1 className="text-xl sm:text-2xl font-bold">Дэшборд</h1>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Последнее обновление: {lastUpdated}</span>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleRefresh} 
-              disabled={isRefreshing}
-              className="flex items-center"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Обновить
-            </Button>
-          </div>
-        </div>
+        <DashboardHeader 
+          lastUpdated={lastUpdated}
+          isRefreshing={isRefreshing}
+          onRefresh={handleRefresh}
+        />
         
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <Card className="bg-white">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Всего клиник</CardTitle>
-              <Building2 className="h-4 w-4 text-medical-dark" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-xl sm:text-2xl font-bold">{stats.clinics}</div>
-            </CardContent>
-          </Card>
+          <StatisticsCard
+            title="Всего клиник"
+            value={stats.clinics}
+            icon={<Building2 />}
+          />
           
-          <Card className="bg-white">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Всего врачей</CardTitle>
-              <UserRound className="h-4 w-4 text-medical-dark" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <div className="text-xl sm:text-2xl font-bold">{stats.doctors}</div>
-                <div className="flex items-center text-xs font-medium">
-                  {stats.doctorsTrend === "up" ? (
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
-                  )}
-                  <span className={stats.doctorsTrend === "up" ? "text-green-500" : "text-red-500"}>
-                    {stats.doctorsChange}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatisticsCard
+            title="Всего врачей"
+            value={stats.doctors}
+            icon={<UserRound />}
+            change={stats.doctorsChange}
+            trend={stats.doctorsTrend as "up" | "down"}
+          />
           
-          <Card className="bg-white">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Всего пациентов</CardTitle>
-              <Users className="h-4 w-4 text-medical-dark" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <div className="text-xl sm:text-2xl font-bold">{stats.patients}</div>
-                <div className="flex items-center text-xs font-medium">
-                  {stats.patientsTrend === "up" ? (
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
-                  )}
-                  <span className={stats.patientsTrend === "up" ? "text-green-500" : "text-red-500"}>
-                    {stats.patientsChange}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatisticsCard
+            title="Всего пациентов"
+            value={stats.patients}
+            icon={<Users />}
+            change={stats.patientsChange}
+            trend={stats.patientsTrend as "up" | "down"}
+          />
           
-          <Card className="bg-white">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Приёмов сегодня</CardTitle>
-              <CalendarClock className="h-4 w-4 text-medical-dark" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col">
-                <div className="text-xl sm:text-2xl font-bold">{stats.appointments}</div>
-                <div className="flex items-center text-xs font-medium">
-                  {stats.appointmentsTrend === "up" ? (
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
-                  )}
-                  <span className={stats.appointmentsTrend === "up" ? "text-green-500" : "text-red-500"}>
-                    {stats.appointmentsChange}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <StatisticsCard
+            title="Приёмов сегодня"
+            value={stats.appointments}
+            icon={<CalendarClock />}
+            change={stats.appointmentsChange}
+            trend={stats.appointmentsTrend as "up" | "down"}
+          />
         </div>
         
-        {/* License Usage Card */}
+        {/* License Usage Card and Activity Feed */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-          <Card className="bg-white">
-            <CardHeader>
-              <CardTitle className="text-lg font-medium flex items-center">
-                <Package className="h-5 w-5 mr-2 text-medical-dark" />
-                Лицензии и использование
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-2 text-sm">
-                <span className="text-muted-foreground">Лицензия:</span>
-                <span className="font-medium text-green-600 flex items-center">
-                  <Check className="h-3.5 w-3.5 mr-1" />
-                  {licenseInfo.status}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 text-sm">
-                <span className="text-muted-foreground">Тип:</span>
-                <span className="font-medium">{licenseInfo.type}</span>
-              </div>
-              <div className="grid grid-cols-2 text-sm">
-                <span className="text-muted-foreground">Клиник:</span>
-                <span className="font-medium">{licenseInfo.clinics.current} / {licenseInfo.clinics.max}</span>
-              </div>
-              <div className="grid grid-cols-2 text-sm">
-                <span className="text-muted-foreground">Врачей:</span>
-                <span className="font-medium">{licenseInfo.doctors.current} / {licenseInfo.doctors.max}</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Activity Feed */}
-          <Card className="bg-white lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-medium flex items-center">
-                <FileText className="h-5 w-5 mr-2 text-medical-dark" />
-                Последние действия
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0 max-h-[270px] overflow-y-auto">
-              <div className="divide-y">
-                {activityFeed.map((activity) => (
-                  <div key={activity.id} className="p-3 flex items-start">
-                    <div className="mr-3 mt-0.5">
-                      {getActivityIcon(activity.type)}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm">{activity.message}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {activity.date} • {activity.time}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <LicenseInfoCard {...licenseInfo} />
+          <ActivityFeed activities={activityFeed} />
         </div>
         
         {/* Expiring Subscriptions Alert */}
-        {expiringSubscriptions.length > 0 && (
-          <Alert className="mb-6 sm:mb-8 bg-amber-50 border-amber-200">
-            <AlertTriangle className="h-4 w-4 text-amber-500" />
-            <AlertTitle className="text-amber-700">Внимание: Заканчивающиеся подписки</AlertTitle>
-            <AlertDescription className="text-amber-600">
-              У клиники "{expiringSubscriptions[0].clinic}" подписка заканчивается через {expiringSubscriptions[0].expiresIn} ({expiringSubscriptions[0].expiryDate})
-              <div className="mt-2">
-                <Button variant="outline" size="sm">Посмотреть список</Button>
-              </div>
-            </AlertDescription>
-          </Alert>
-        )}
+        <SubscriptionAlert subscriptions={expiringSubscriptions} />
         
         {/* Recent Clinics Section with Search */}
-        <div className="mb-3 sm:mb-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
-            <h2 className="text-lg sm:text-xl font-semibold">Последние клиники</h2>
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Поиск клиник..."
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
-            {recentClinics.length > 0 ? (
-              recentClinics.map(clinic => (
-                <Card key={clinic.id} className="bg-white">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-base sm:text-lg">{clinic.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2 text-xs sm:text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Админ:</span>
-                      <span>{clinic.admin}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Врачей:</span>
-                      <span>{clinic.doctors}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Пациентов:</span>
-                      <span>{clinic.patients}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Подписка:</span>
-                      <span className="flex items-center">
-                        <Check className="mr-1 h-3 w-3 text-green-500" /> 
-                        Оплачено до {clinic.subscription}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">GCalendar:</span>
-                      <span>
-                        {clinic.hasGCalendar ? 
-                          <Check className="h-4 w-4 text-green-500" /> : 
-                          <XCircle className="h-4 w-4 text-red-500" />}
-                      </span>
-                    </div>
-                    <div className="pt-2 flex justify-end space-x-2">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Search className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-8 text-muted-foreground">
-                Не найдено клиник, соответствующих запросу
-              </div>
-            )}
-          </div>
-        </div>
+        <ClinicsSection clinics={allClinics} />
         
         {/* Integration Errors */}
         <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Ошибки интеграций</h2>
-        <Card className="bg-white mb-6 sm:mb-8">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[180px]">Клиника</TableHead>
-                    <TableHead>Тип</TableHead>
-                    <TableHead>Ошибка</TableHead>
-                    <TableHead>Дата</TableHead>
-                    <TableHead className="text-right">Действия</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {integrationErrors.length > 0 ? (
-                    integrationErrors.map(error => (
-                      <TableRow key={error.id}>
-                        <TableCell className="font-medium">{error.clinic}</TableCell>
-                        <TableCell>{error.type}</TableCell>
-                        <TableCell className="text-red-500">{error.error}</TableCell>
-                        <TableCell>{error.date}</TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="link" size="sm">Исправить</Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center">
-                        Нет ошибок интеграций
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+        <IntegrationErrorsTable errors={integrationErrors} />
       </div>
     </SidebarLayout>
   );
