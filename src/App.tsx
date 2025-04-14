@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,8 @@ import Register from "./pages/Auth/Register";
 import SuperAdminDashboard from "./pages/SuperAdmin/Dashboard";
 import SuperAdminClinics from "./pages/SuperAdmin/Clinics";
 import SuperAdminClinicProfile from "./pages/SuperAdmin/ClinicProfile";
+import SuperAdminSubscriptions from "./pages/SuperAdmin/Subscriptions";
+import SuperAdminReports from "./pages/SuperAdmin/Reports";
 
 // Clinic Admin Pages
 import ClinicAdminDashboard from "./pages/ClinicAdmin/Dashboard";
@@ -41,6 +44,8 @@ const App = () => (
           <Route path="/super-admin/doctors" element={<NotFound />} />
           <Route path="/super-admin/patients" element={<NotFound />} />
           <Route path="/super-admin/integrations" element={<NotFound />} />
+          <Route path="/super-admin/subscriptions" element={<SuperAdminSubscriptions />} />
+          <Route path="/super-admin/reports" element={<SuperAdminReports />} />
           <Route path="/super-admin/settings" element={<NotFound />} />
           <Route path="/super-admin/logs" element={<NotFound />} />
           

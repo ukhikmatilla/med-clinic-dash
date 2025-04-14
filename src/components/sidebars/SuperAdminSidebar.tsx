@@ -7,7 +7,8 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
-  SidebarFooter
+  SidebarFooter,
+  SidebarSeparator
 } from "@/components/ui/sidebar";
 import { 
   BarChart3, 
@@ -16,7 +17,10 @@ import {
   User, 
   Settings, 
   FileText, 
-  Link2
+  Link2,
+  CreditCard,
+  LogOut,
+  Stethoscope
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,8 +30,10 @@ const navItems = [
   { icon: <User className="mr-2 h-4 w-4" />, label: "Врачи", href: "/super-admin/doctors" },
   { icon: <Users className="mr-2 h-4 w-4" />, label: "Пациенты", href: "/super-admin/patients" },
   { icon: <Link2 className="mr-2 h-4 w-4" />, label: "Интеграции", href: "/super-admin/integrations" },
-  { icon: <Settings className="mr-2 h-4 w-4" />, label: "Настройки", href: "/super-admin/settings" },
+  { icon: <CreditCard className="mr-2 h-4 w-4" />, label: "Подписки", href: "/super-admin/subscriptions" },
+  { icon: <FileText className="mr-2 h-4 w-4" />, label: "Отчёты", href: "/super-admin/reports" },
   { icon: <FileText className="mr-2 h-4 w-4" />, label: "Логи и ошибки", href: "/super-admin/logs" },
+  { icon: <Settings className="mr-2 h-4 w-4" />, label: "Настройки", href: "/super-admin/settings" },
 ];
 
 export function SuperAdminSidebar() {
@@ -36,7 +42,10 @@ export function SuperAdminSidebar() {
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-4 text-center">
-        <h1 className="text-xl font-bold text-sidebar-foreground">Медицинская CRM</h1>
+        <div className="flex items-center justify-center mb-2">
+          <Stethoscope className="h-6 w-6 text-medical-light-blue mr-2" />
+          <h1 className="text-xl font-bold text-sidebar-foreground">Медицинская CRM</h1>
+        </div>
         <p className="text-xs text-sidebar-foreground/80">Панель Супер Админа</p>
       </div>
       
@@ -66,10 +75,24 @@ export function SuperAdminSidebar() {
         </SidebarGroupContent>
       </SidebarGroup>
       
+      <div className="mt-auto">
+        <SidebarSeparator className="my-2" />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Выйти">
+              <a href="/login" className={cn("flex items-center text-red-500")}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Выйти</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </div>
+      
       <SidebarFooter>
         <div className="p-2">
           <div className="rounded-md bg-medical-light-blue p-3">
-            <p className="text-xs font-medium text-sidebar-foreground">Лицензия активна</p>
+            <p className="text-xs font-medium text-sidebar-foreground">Лицензия: активна</p>
             <p className="text-xs text-sidebar-foreground/80">Корпоративный тариф</p>
           </div>
         </div>
