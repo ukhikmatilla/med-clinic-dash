@@ -12,22 +12,43 @@ declare module "jspdf" {
   }
 }
 
+// Custom colors for reports
+const REPORT_COLORS = {
+  primary: [60, 90, 200],
+  secondary: [80, 150, 80],
+  tertiary: [150, 90, 180],
+  text: [40, 40, 40],
+  subText: [80, 80, 80],
+  border: [200, 200, 200]
+};
+
 // Helper function to add company header to PDF
 const addCompanyHeader = (doc: jsPDF, title: string) => {
+  // Add logo placeholder (in a real app, you would add a real logo)
+  doc.setDrawColor(...REPORT_COLORS.primary);
+  doc.setFillColor(...REPORT_COLORS.primary);
+  doc.rect(14, 15, 12, 12, "F");
+  
+  // Add title and subtitle
   doc.setFontSize(20);
-  doc.setTextColor(40, 40, 40);
-  doc.text("MedicalCRM", 14, 22);
+  doc.setTextColor(...REPORT_COLORS.text);
+  doc.text("MedicalCRM", 30, 22);
   
   doc.setFontSize(12);
-  doc.setTextColor(80, 80, 80);
-  doc.text(title, 14, 30);
+  doc.setTextColor(...REPORT_COLORS.subText);
+  doc.text(title, 14, 36);
   
   doc.setFontSize(10);
-  doc.text(`Сгенерировано: ${new Date().toLocaleDateString("ru-RU")}`, 14, 36);
+  doc.text(`Сгенерировано: ${new Date().toLocaleDateString("ru-RU")}`, 14, 42);
   
   // Add horizontal line
-  doc.setDrawColor(200, 200, 200);
-  doc.line(14, 40, 196, 40);
+  doc.setDrawColor(...REPORT_COLORS.border);
+  doc.line(14, 46, 196, 46);
+};
+
+// Format currency amounts
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat("ru-RU").format(amount) + " сум";
 };
 
 // Generate Financial Report PDF
@@ -43,7 +64,7 @@ export const generateFinancialReportPDF = (
   
   // Add revenue summary
   doc.setFontSize(14);
-  doc.text("Доход по тарифам", 14, 50);
+  doc.text("Доход по тарифам", 14, 56);
   
   // Calculate total revenue
   const totalRevenue = revenueData.reduce(
@@ -53,11 +74,11 @@ export const generateFinancialReportPDF = (
   
   // Add revenue summary
   doc.setFontSize(11);
-  doc.text(`Общий доход: ${new Intl.NumberFormat("ru-RU").format(totalRevenue)} сум`, 14, 58);
+  doc.text(`Общий доход: ${formatCurrency(totalRevenue)}`, 14, 64);
   
   // Add payments table
   doc.setFontSize(14);
-  doc.text("Таблица платежей", 14, 68);
+  doc.text("Таблица платежей", 14, 74);
   
   // Define the columns for the payments table
   const columns = [
@@ -71,14 +92,15 @@ export const generateFinancialReportPDF = (
   
   // Add the table
   doc.autoTable({
-    startY: 72,
+    startY: 78,
     head: [columns.map(col => col.header)],
     body: paymentData.map(row => 
       columns.map(col => row[col.dataKey as keyof typeof row])
     ),
     theme: "grid",
-    headStyles: { fillColor: [60, 60, 200], textColor: 255 },
+    headStyles: { fillColor: REPORT_COLORS.primary, textColor: 255 },
     styles: { font: "helvetica", fontSize: 10 },
+    alternateRowStyles: { fillColor: [245, 245, 255] }
   });
   
   // Footer with page numbers
@@ -110,17 +132,17 @@ export const generateSubscriptionsReportPDF = (
   
   // Add subscription stats
   doc.setFontSize(14);
-  doc.text("Статистика подписок", 14, 50);
+  doc.text("Статистика подписок", 14, 56);
   
   // Add stats summary
   doc.setFontSize(11);
-  doc.text(`Активные подписки: ${stats.activeSubscriptions}`, 14, 58);
-  doc.text(`С автопродлением: ${stats.autoRenewal} (${stats.activePercentage}%)`, 14, 64);
-  doc.text(`Истекающие в ближайшие 30 дней: ${stats.expiringCount}`, 14, 70);
+  doc.text(`Активные подписки: ${stats.activeSubscriptions}`, 14, 64);
+  doc.text(`С автопродлением: ${stats.autoRenewal} (${stats.activePercentage}%)`, 14, 70);
+  doc.text(`Истекающие в ближайшие 30 дней: ${stats.expiringCount}`, 14, 76);
   
   // Add subscriptions table
   doc.setFontSize(14);
-  doc.text("Таблица подписок", 14, 80);
+  doc.text("Таблица подписок", 14, 86);
   
   // Define the columns for the subscriptions table
   const columns = [
@@ -133,7 +155,7 @@ export const generateSubscriptionsReportPDF = (
   
   // Add the table
   doc.autoTable({
-    startY: 84,
+    startY: 90,
     head: [columns.map(col => col.header)],
     body: subscriptionData.map(row => [
       row.clinic,
@@ -143,8 +165,9 @@ export const generateSubscriptionsReportPDF = (
       row.tariff,
     ]),
     theme: "grid",
-    headStyles: { fillColor: [60, 130, 60], textColor: 255 },
+    headStyles: { fillColor: REPORT_COLORS.secondary, textColor: 255 },
     styles: { font: "helvetica", fontSize: 10 },
+    alternateRowStyles: { fillColor: [245, 255, 245] }
   });
   
   // Footer with page numbers
@@ -176,18 +199,18 @@ export const generateActivityReportPDF = (
   
   // Add activity stats
   doc.setFontSize(14);
-  doc.text("Статистика активности", 14, 50);
+  doc.text("Статистика активности", 14, 56);
   
   // Add stats summary
   doc.setFontSize(11);
-  doc.text(`Новые клиники: ${stats.newClinics}`, 14, 58);
-  doc.text(`Новые врачи: ${stats.newDoctors}`, 14, 64);
-  doc.text(`Новые пациенты: ${stats.newPatients}`, 14, 70);
-  doc.text(`Всего приёмов: ${stats.totalAppointments}`, 14, 76);
+  doc.text(`Новые клиники: ${stats.newClinics}`, 14, 64);
+  doc.text(`Новые врачи: ${stats.newDoctors}`, 14, 70);
+  doc.text(`Новые пациенты: ${stats.newPatients}`, 14, 76);
+  doc.text(`Всего приёмов: ${stats.totalAppointments}`, 14, 82);
   
   // Add activity table
   doc.setFontSize(14);
-  doc.text("Активность клиник", 14, 86);
+  doc.text("Активность клиник", 14, 92);
   
   // Define the columns for the activity table
   const columns = [
@@ -200,7 +223,7 @@ export const generateActivityReportPDF = (
   
   // Add the table
   doc.autoTable({
-    startY: 90,
+    startY: 96,
     head: [columns.map(col => col.header)],
     body: clinicActivityData.map(row => [
       row.clinic,
@@ -210,8 +233,9 @@ export const generateActivityReportPDF = (
       formatDate(row.lastActive),
     ]),
     theme: "grid",
-    headStyles: { fillColor: [100, 80, 180], textColor: 255 },
+    headStyles: { fillColor: REPORT_COLORS.tertiary, textColor: 255 },
     styles: { font: "helvetica", fontSize: 10 },
+    alternateRowStyles: { fillColor: [250, 245, 255] }
   });
   
   // Footer with page numbers
@@ -228,6 +252,44 @@ export const generateActivityReportPDF = (
   }
   
   return doc;
+};
+
+// Generate preview for PDF report
+export const generateReportPreview = (
+  reportType: "financial" | "subscriptions" | "activity",
+  data: any,
+  period: string = "Текущий период"
+): string => {
+  let doc: jsPDF;
+  
+  switch (reportType) {
+    case "financial":
+      doc = generateFinancialReportPDF(
+        data.revenueData || [],
+        data.paymentData || [],
+        period
+      );
+      break;
+    case "subscriptions":
+      doc = generateSubscriptionsReportPDF(
+        data.subscriptionData || [],
+        data.stats || {},
+        period
+      );
+      break;
+    case "activity":
+      doc = generateActivityReportPDF(
+        data.clinicActivityData || [],
+        data.stats || {},
+        period
+      );
+      break;
+    default:
+      throw new Error("Unsupported report type");
+  }
+  
+  // Generate data URL for preview
+  return doc.output('dataurlstring');
 };
 
 // Generate Excel report for any data

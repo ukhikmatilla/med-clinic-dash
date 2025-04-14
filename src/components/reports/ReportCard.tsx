@@ -1,6 +1,7 @@
+
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, FileText, BarChart, Users, AlertTriangle, ExternalLink } from "lucide-react";
+import { Download, RefreshCw, FileText, BarChart, Users, AlertTriangle, ExternalLink, Eye } from "lucide-react";
 import { ReportData } from "@/types/subscription";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/popover";
 import { generateAndDownloadReport } from "@/utils/reportGenerator";
 import { ReportFormatSelector } from "./ReportFormatSelector";
+import { ReportPreviewDialog } from "./ReportPreviewDialog";
 
 interface ReportCardProps {
   report: ReportData;
@@ -24,6 +26,7 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
   const navigate = useNavigate();
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadOpen, setDownloadOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   
   const handleExport = async (format: "pdf" | "excel" | "csv") => {
     setIsDownloading(true);
@@ -128,9 +131,23 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
         return <FileText className="h-8 w-8 text-primary" />;
     }
   };
+  
+  const getReportTitle = () => {
+    switch (report.type) {
+      case "financial":
+        return "Финансовый отчет";
+      case "subscriptions":
+        return "Отчет по подпискам";
+      case "activity":
+        return "Отчет по активности";
+      default:
+        return "Отчет";
+    }
+  };
 
   // Determine if this report type has a detailed view
   const hasDetailedView = ["financial", "subscriptions", "activity"].includes(report.type);
+  const reportData = getReportData(report);
 
   return (
     <Card className={hasDetailedView ? "cursor-pointer hover:border-primary/50 transition-colors" : ""} 
@@ -147,6 +164,20 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             <span className="sr-only">Обновить отчет</span>
           </Button>
+          
+          {(report.type === "financial" || report.type === "subscriptions" || report.type === "activity") && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent card click event
+                setPreviewOpen(true);
+              }}
+            >
+              <Eye className="h-4 w-4" />
+              <span className="sr-only">Предпросмотр отчета</span>
+            </Button>
+          )}
           
           <Popover open={downloadOpen} onOpenChange={setDownloadOpen}>
             <PopoverTrigger asChild>
@@ -230,6 +261,18 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
           </p>
         </div>
       </CardContent>
+      
+      {/* Preview dialog */}
+      {(report.type === "financial" || report.type === "subscriptions" || report.type === "activity") && (
+        <ReportPreviewDialog
+          open={previewOpen}
+          onClose={() => setPreviewOpen(false)}
+          reportType={report.type}
+          reportData={reportData}
+          period="Текущий период"
+          title={getReportTitle()}
+        />
+      )}
     </Card>
   );
 }

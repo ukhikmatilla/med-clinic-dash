@@ -4,7 +4,7 @@ import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { SuperAdminSidebar } from "@/components/sidebars/SuperAdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, FileText, Save } from "lucide-react";
+import { ArrowLeft, Download, FileText, Eye, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { PeriodFilter } from "@/components/reports/PeriodFilter";
 import { useReportsData } from "@/hooks/useReportsData";
@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { DateRange } from "@/types/subscription";
 import { generateAndDownloadReport } from "@/utils/reportGenerator";
 import { ReportFormatSelector } from "@/components/reports/ReportFormatSelector";
+import { ReportPreviewDialog } from "@/components/reports/ReportPreviewDialog";
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
 
@@ -23,6 +24,7 @@ export default function SuperAdminFinancialReport() {
   const [customDateRange, setCustomDateRange] = useState<DateRange | null>(null);
   const { analytics } = useReportsData(period);
   const [isExporting, setIsExporting] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   
   const handlePeriodChange = (value: string) => {
     setPeriod(value as 'week' | 'month' | 'quarter' | 'year');
@@ -46,6 +48,12 @@ export default function SuperAdminFinancialReport() {
     { name: 'CRM', value: 350000 },
     { name: 'CRM + Telegram', value: 750000 },
   ];
+  
+  // Prepare report data
+  const reportData = {
+    revenueData: analytics.revenueData,
+    paymentData: paymentData
+  };
 
   // Handle export
   const handleExport = async (format: "pdf" | "excel" | "csv") => {
@@ -60,10 +68,7 @@ export default function SuperAdminFinancialReport() {
       await generateAndDownloadReport(
         "financial",
         format,
-        {
-          revenueData: analytics.revenueData,
-          paymentData: paymentData
-        },
+        reportData,
         periodLabel
       );
     } catch (error) {
@@ -91,6 +96,14 @@ export default function SuperAdminFinancialReport() {
             <h1 className="text-3xl font-bold tracking-tight">Финансовый отчёт</h1>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPreviewOpen(true)}
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Предпросмотр
+            </Button>
             <PeriodFilter 
               onPeriodChange={handlePeriodChange} 
               onCustomDateChange={handleCustomDateChange} 
@@ -99,6 +112,10 @@ export default function SuperAdminFinancialReport() {
             <ReportFormatSelector 
               onExport={handleExport}
               disabled={isExporting}
+              reportType="financial"
+              reportData={reportData}
+              period={period === 'week' ? 'Неделя' : period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год'}
+              reportTitle="Финансовый отчет"
             />
           </div>
         </div>
@@ -260,10 +277,24 @@ export default function SuperAdminFinancialReport() {
           <ReportFormatSelector 
             onExport={handleExport}
             disabled={isExporting}
+            reportType="financial"
+            reportData={reportData}
+            period={period === 'week' ? 'Неделя' : period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год'}
+            reportTitle="Финансовый отчет"
             label="Скачать полный отчет"
           />
         </div>
       </div>
+      
+      {/* Preview Dialog */}
+      <ReportPreviewDialog
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        reportType="financial"
+        reportData={reportData}
+        period={period === 'week' ? 'Неделя' : period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год'}
+        title="Финансовый отчет"
+      />
     </SidebarLayout>
   );
 }
