@@ -20,7 +20,8 @@ interface Clinic {
   hasGCalendar: boolean;
   plan?: string;
   doctorsLimit?: number;
-  telegramBotId?: string;
+  telegramBotPatient?: string;
+  telegramBotDoctor?: string;
   timezone?: string;
 }
 

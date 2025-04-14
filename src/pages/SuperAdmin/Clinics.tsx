@@ -42,7 +42,8 @@ interface Clinic {
   hasGCalendar: boolean;
   plan?: string;
   doctorsLimit?: number;
-  telegramBotId?: string;
+  telegramBotPatient?: string;
+  telegramBotDoctor?: string;
   timezone?: string;
 }
 
@@ -64,7 +65,8 @@ export function SuperAdminClinics() {
       hasGCalendar: true,
       plan: "CRM + Telegram",
       doctorsLimit: 20,
-      telegramBotId: "@najot_shifo_bot",
+      telegramBotPatient: "@najot_med_bot",
+      telegramBotDoctor: "@najot_doctor_bot", 
       timezone: "Ташкент (UTC+5)"
     },
   ]);

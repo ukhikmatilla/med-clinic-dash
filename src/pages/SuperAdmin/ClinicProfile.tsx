@@ -28,9 +28,15 @@ export function SuperAdminClinicProfile() {
     },
     integrations: {
       googleCalendar: true,
-      telegramBot: {
-        connected: true,
-        id: "@najot_med_bot"
+      telegramBots: {
+        patient: {
+          connected: true,
+          id: "@najot_med_bot"
+        },
+        doctor: {
+          connected: true,
+          id: "@najot_doctor_bot"
+        }
       }
     }
   };
@@ -273,13 +279,32 @@ export function SuperAdminClinicProfile() {
                         <Button variant="outline" size="sm">⚙️ Настроить</Button>
                       </td>
                     </tr>
-                    <tr>
-                      <td className="py-4">Telegram Bot</td>
+                    <tr className="border-b">
+                      <td className="py-4">Telegram Bot (пациенты)</td>
                       <td className="py-4">
-                        {clinic.integrations.telegramBot.connected ? (
+                        {clinic.integrations.telegramBots.patient.connected ? (
                           <div className="flex items-center">
                             <Check className="mr-2 h-4 w-4 text-green-500" />
-                            <span>Подключен {clinic.integrations.telegramBot.id}</span>
+                            <span>Подключен {clinic.integrations.telegramBots.patient.id}</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <XCircle className="mr-2 h-4 w-4 text-red-500" />
+                            <span>Не подключен</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-4 text-right">
+                        <Button variant="outline" size="sm">🔗 Проверить ID</Button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-4">Telegram Bot (врачи)</td>
+                      <td className="py-4">
+                        {clinic.integrations.telegramBots.doctor.connected ? (
+                          <div className="flex items-center">
+                            <Check className="mr-2 h-4 w-4 text-green-500" />
+                            <span>Подключен {clinic.integrations.telegramBots.doctor.id}</span>
                           </div>
                         ) : (
                           <div className="flex items-center">

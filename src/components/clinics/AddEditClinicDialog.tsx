@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,8 @@ interface Clinic {
   hasGCalendar: boolean;
   plan?: string;
   doctorsLimit?: number;
-  telegramBotId?: string;
+  telegramBotPatient?: string; // New field for patient bot
+  telegramBotDoctor?: string;  // New field for doctor bot
   timezone?: string;
 }
 
@@ -46,7 +46,8 @@ export function AddEditClinicDialog({
     plan: clinic?.plan || "CRM",
     doctorsLimit: clinic?.doctorsLimit?.toString() || "10",
     subscription: clinic?.subscription || "",
-    telegramBotId: clinic?.telegramBotId || "",
+    telegramBotPatient: clinic?.telegramBotPatient || "",
+    telegramBotDoctor: clinic?.telegramBotDoctor || "",
     timezone: clinic?.timezone || "Ташкент (UTC+5)",
     hasGCalendar: clinic?.hasGCalendar || false,
   });
@@ -72,6 +73,15 @@ export function AddEditClinicDialog({
     
     if (!formData.subscription.trim()) {
       newErrors.subscription = "Срок подписки обязателен";
+    }
+    
+    // Telegram Bot ID validation - should start with @ if provided
+    if (formData.telegramBotPatient && !formData.telegramBotPatient.startsWith("@")) {
+      newErrors.telegramBotPatient = "Telegram Bot ID должен начинаться с @";
+    }
+
+    if (formData.telegramBotDoctor && !formData.telegramBotDoctor.startsWith("@")) {
+      newErrors.telegramBotDoctor = "Telegram Bot ID должен начинаться с @";
     }
     
     setErrors(newErrors);
@@ -104,7 +114,8 @@ export function AddEditClinicDialog({
       hasGCalendar: formData.hasGCalendar,
       plan: formData.plan,
       doctorsLimit: isNaN(doctorsLimitNumber) ? undefined : doctorsLimitNumber,
-      telegramBotId: formData.telegramBotId,
+      telegramBotPatient: formData.telegramBotPatient,
+      telegramBotDoctor: formData.telegramBotDoctor,
       timezone: formData.timezone
     };
     
@@ -208,13 +219,27 @@ export function AddEditClinicDialog({
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="telegramBotId">Telegram Bot ID</Label>
+              <Label htmlFor="telegramBotPatient">Telegram Bot (пациенты)</Label>
               <Input
-                id="telegramBotId"
-                value={formData.telegramBotId}
-                onChange={(e) => handleChange("telegramBotId", e.target.value)}
+                id="telegramBotPatient"
+                value={formData.telegramBotPatient}
+                onChange={(e) => handleChange("telegramBotPatient", e.target.value)}
                 placeholder="@bot_name"
+                className={errors.telegramBotPatient ? "border-red-500" : ""}
               />
+              {errors.telegramBotPatient && <p className="text-xs text-red-500">{errors.telegramBotPatient}</p>}
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="telegramBotDoctor">Telegram Bot (врачи)</Label>
+              <Input
+                id="telegramBotDoctor"
+                value={formData.telegramBotDoctor}
+                onChange={(e) => handleChange("telegramBotDoctor", e.target.value)}
+                placeholder="@bot_name"
+                className={errors.telegramBotDoctor ? "border-red-500" : ""}
+              />
+              {errors.telegramBotDoctor && <p className="text-xs text-red-500">{errors.telegramBotDoctor}</p>}
             </div>
             
             <div className="grid gap-2">
