@@ -1,4 +1,3 @@
-
 import jsPDF from "jspdf";
 // Import the autotable plugin properly
 import { jsPDF as jsPDFType } from "jspdf";
@@ -14,25 +13,13 @@ declare module "jspdf" {
   interface jsPDF {
     autoTable: (options: UserOptions) => jsPDF;
   }
-  
-  // Instead of redeclaring the internal interface, we'll augment it
-  // by adding the missing property to jsPDF
-  interface jsPDF {
-    internal: {
-      getNumberOfPages: () => number;
-      events?: any;
-      scaleFactor?: number;
-      pageSize: {
-        width: number;
-        height: number;
-        getWidth: () => number;
-        getHeight: () => number;
-      };
-      pages?: number[];
-      getEncryptor?: (objectId: number) => (data: string) => string;
-    }
-  }
 }
+
+// We need to add the getNumberOfPages method to the jsPDF internal object
+// Get the original type of 'internal' and add the missing property
+type jsPDFInternal = jsPDF['internal'] & {
+  getNumberOfPages: () => number;
+};
 
 // Custom colors for reports - using RGB arrays
 const REPORT_COLORS = {
@@ -127,7 +114,7 @@ export const generateFinancialReportPDF = (
     });
     
     // Footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = (doc.internal as unknown as jsPDFInternal).getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(10);
@@ -199,7 +186,7 @@ export const generateSubscriptionsReportPDF = (
     });
     
     // Footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = (doc.internal as unknown as jsPDFInternal).getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(10);
@@ -272,7 +259,7 @@ export const generateActivityReportPDF = (
     });
     
     // Footer with page numbers
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = (doc.internal as unknown as jsPDFInternal).getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(10);
