@@ -1,5 +1,4 @@
 
-import { useState, useEffect } from 'react';
 import { 
   ReportData, 
   ReportType, 
@@ -11,7 +10,8 @@ import {
   FinancialReportData,
   SubscriptionReportData,
   ActivityReportData,
-  PaymentHistory
+  PaymentHistory,
+  DateRange  // Add this import from the types file
 } from '@/types/subscription';
 
 // Mock data for reports - this would be replaced with actual API calls
