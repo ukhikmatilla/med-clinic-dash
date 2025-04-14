@@ -13,7 +13,6 @@ import {
 import { 
   BarChart3, 
   Building2, 
-  Settings, 
   FileText, 
   Link2,
   CreditCard,
@@ -28,8 +27,6 @@ const navItems = [
   { icon: <Link2 className="mr-2 h-4 w-4" />, label: "Интеграции", href: "/super-admin/integrations" },
   { icon: <CreditCard className="mr-2 h-4 w-4" />, label: "Подписки", href: "/super-admin/subscriptions" },
   { icon: <FileText className="mr-2 h-4 w-4" />, label: "Отчёты", href: "/super-admin/reports" },
-  { icon: <FileText className="mr-2 h-4 w-4" />, label: "Логи и ошибки", href: "/super-admin/logs" },
-  { icon: <Settings className="mr-2 h-4 w-4" />, label: "Настройки", href: "/super-admin/settings" },
 ];
 
 export function SuperAdminSidebar() {
