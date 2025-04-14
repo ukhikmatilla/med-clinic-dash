@@ -1,15 +1,13 @@
 
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { SuperAdminSidebar } from "@/components/sidebars/SuperAdminSidebar";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, XCircle, ToggleLeft, ToggleRight } from "lucide-react";
+import { ClinicInfo } from "@/components/clinics/profile/ClinicInfo";
+import { SubscriptionInfo } from "@/components/clinics/profile/SubscriptionInfo";
+import { DoctorsTab } from "@/components/clinics/profile/DoctorsTab";
+import { ServicesTab } from "@/components/clinics/profile/ServicesTab";
+import { IntegrationsTab } from "@/components/clinics/profile/IntegrationsTab";
 
 export function SuperAdminClinicProfile() {
   // This would come from your API in a real application
@@ -53,84 +51,20 @@ export function SuperAdminClinicProfile() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          {/* Clinic Info */}
-          <Card className="bg-white md:col-span-2">
-            <CardHeader>
-              <CardTitle>Информация о клинике</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Описание</h3>
-                <p>{clinic.description}</p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Админ</h3>
-                  <p>{clinic.admin}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Количество врачей</h3>
-                  <p>{clinic.doctors}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted-foreground mb-1">Количество пациентов</h3>
-                  <p>{clinic.patients}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <ClinicInfo 
+            name={clinic.name}
+            description={clinic.description}
+            admin={clinic.admin}
+            doctors={clinic.doctors}
+            patients={clinic.patients}
+          />
           
-          {/* Subscription Info */}
-          <Card className="bg-white">
-            <CardHeader>
-              <CardTitle>Подписка</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-medical-light-blue p-3 rounded-md">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Статус:</span>
-                  <span className="flex items-center font-medium">
-                    <Check className="mr-1 h-3 w-3 text-green-500" /> 
-                    Активна
-                  </span>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Тип тарифа</h3>
-                <p>{clinic.subscription.plan}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Действует до</h3>
-                <p>{clinic.subscription.expiryDate}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-1">Автопродление</h3>
-                <div className="flex items-center">
-                  {clinic.subscription.autoRenewal ? (
-                    <>
-                      <ToggleRight className="mr-2 h-5 w-5 text-primary" />
-                      <span>ВКЛ</span>
-                    </>
-                  ) : (
-                    <>
-                      <ToggleLeft className="mr-2 h-5 w-5 text-muted-foreground" />
-                      <span>ВЫКЛ</span>
-                    </>
-                  )}
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-2">
-                <Button>Продлить</Button>
-                <Button variant="outline">Изменить тариф</Button>
-                <Button variant="outline" className="text-destructive hover:text-destructive">Отключить</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <SubscriptionInfo 
+            status={clinic.subscription.status}
+            expiryDate={clinic.subscription.expiryDate}
+            plan={clinic.subscription.plan}
+            autoRenewal={clinic.subscription.autoRenewal}
+          />
         </div>
         
         <Tabs defaultValue="doctors">
@@ -141,186 +75,18 @@ export function SuperAdminClinicProfile() {
           </TabsList>
           
           <TabsContent value="doctors">
-            <Card className="bg-white">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Врачи</CardTitle>
-                  <Button size="sm">Добавить врача</Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-muted/50">
-                        <th className="text-left py-3 px-4 font-medium text-sm">ФИО</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Специальность(и)</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Telegram ID</th>
-                        <th className="text-left py-3 px-4 font-medium text-sm">Расписание</th>
-                        <th className="text-center py-3 px-4 font-medium text-sm">Статус</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-t">
-                        <td className="py-3 px-4">Ортиков Шерзод Одилбекович</td>
-                        <td className="py-3 px-4 text-sm">Дерматолог, Косметолог</td>
-                        <td className="py-3 px-4 text-sm">—</td>
-                        <td className="py-3 px-4 text-sm">Пн–Сб 14:00–17:00</td>
-                        <td className="py-3 px-4 text-sm text-center">
-                          <Check className="mx-auto h-4 w-4 text-green-500" />
-                        </td>
-                      </tr>
-                      <tr className="border-t">
-                        <td className="py-3 px-4">Рахимжонова Сайёра Файзуллаевна</td>
-                        <td className="py-3 px-4 text-sm">УЗИ-специалист</td>
-                        <td className="py-3 px-4 text-sm">—</td>
-                        <td className="py-3 px-4 text-sm">Пн–Сб 09:30–16:00</td>
-                        <td className="py-3 px-4 text-sm text-center">
-                          <Check className="mx-auto h-4 w-4 text-green-500" />
-                        </td>
-                      </tr>
-                      <tr className="border-t">
-                        <td className="py-3 px-4">Каримова Дилором Эргашевна</td>
-                        <td className="py-3 px-4 text-sm">Акушер, Гинеколог</td>
-                        <td className="py-3 px-4 text-sm">—</td>
-                        <td className="py-3 px-4 text-sm">Пн–Пт 09:00–14:00</td>
-                        <td className="py-3 px-4 text-sm text-center">
-                          <Check className="mx-auto h-4 w-4 text-green-500" />
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+            <DoctorsTab />
           </TabsContent>
           
           <TabsContent value="services">
-            <Card className="bg-white">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>Услуги</CardTitle>
-                  <Button size="sm">Добавить услугу</Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-medium mb-2">🧬 Анализы</h3>
-                    <ul className="space-y-1">
-                      <li className="flex justify-between">
-                        <span>Общий анализ крови + СОЭ</span>
-                        <span className="font-medium">50 000 сум</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>Концентрация гемоглобина (HGB)</span>
-                        <span className="font-medium">28 000 сум</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>Глюкоза натощак</span>
-                        <span className="font-medium">34 000 сум</span>
-                      </li>
-                    </ul>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-medium mb-2">🦴 УЗИ</h3>
-                    <ul className="space-y-1">
-                      <li className="flex justify-between">
-                        <span>УЗИ щитовидной железы</span>
-                        <span className="font-medium">90 000 сум</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>УЗИ для беременных</span>
-                        <span className="font-medium">106 000–202 000 сум</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>УЗИ сердца</span>
-                        <span className="font-medium">168 000 сум</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ServicesTab />
           </TabsContent>
           
           <TabsContent value="integrations">
-            <Card className="bg-white">
-              <CardHeader>
-                <CardTitle>Интеграции</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-3 font-medium">Интеграция</th>
-                      <th className="text-left py-3 font-medium">Статус</th>
-                      <th className="text-right py-3 font-medium">Действие</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b">
-                      <td className="py-4">Google Calendar</td>
-                      <td className="py-4">
-                        {clinic.integrations.googleCalendar ? (
-                          <div className="flex items-center">
-                            <Check className="mr-2 h-4 w-4 text-green-500" />
-                            <span>Подключено</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center">
-                            <XCircle className="mr-2 h-4 w-4 text-red-500" />
-                            <span>Не подключено</span>
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-4 text-right">
-                        <Button variant="outline" size="sm">⚙️ Настроить</Button>
-                      </td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="py-4">Telegram Bot (пациенты)</td>
-                      <td className="py-4">
-                        {clinic.integrations.telegramBots.patient.connected ? (
-                          <div className="flex items-center">
-                            <Check className="mr-2 h-4 w-4 text-green-500" />
-                            <span>Подключен {clinic.integrations.telegramBots.patient.id}</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center">
-                            <XCircle className="mr-2 h-4 w-4 text-red-500" />
-                            <span>Не подключен</span>
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-4 text-right">
-                        <Button variant="outline" size="sm">🔗 Проверить ID</Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="py-4">Telegram Bot (врачи)</td>
-                      <td className="py-4">
-                        {clinic.integrations.telegramBots.doctor.connected ? (
-                          <div className="flex items-center">
-                            <Check className="mr-2 h-4 w-4 text-green-500" />
-                            <span>Подключен {clinic.integrations.telegramBots.doctor.id}</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center">
-                            <XCircle className="mr-2 h-4 w-4 text-red-500" />
-                            <span>Не подключен</span>
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-4 text-right">
-                        <Button variant="outline" size="sm">🔗 Проверить ID</Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </CardContent>
-            </Card>
+            <IntegrationsTab 
+              googleCalendar={clinic.integrations.googleCalendar}
+              telegramBots={clinic.integrations.telegramBots}
+            />
           </TabsContent>
         </Tabs>
       </div>
