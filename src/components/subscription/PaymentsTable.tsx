@@ -26,7 +26,7 @@ export function PaymentsTable({ payments }: PaymentsTableProps) {
   };
 
   // Рендер статуса платежа с иконкой
-  const renderStatus = (status: string, isInvoice: boolean = false) => {
+  const renderStatus = (status: string) => {
     switch (status) {
       case 'success':
         return (
@@ -61,6 +61,24 @@ export function PaymentsTable({ payments }: PaymentsTableProps) {
     }
   };
 
+  // Рендер источника платежа
+  const renderPaymentSource = (source?: string) => {
+    if (!source) return 'Платёж';
+    
+    switch (source) {
+      case 'payme':
+        return 'Payme';
+      case 'click':
+        return 'Click';
+      case 'bot':
+        return 'Бот Telegram';
+      case 'manual':
+        return 'Вручную';
+      default:
+        return source;
+    }
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -70,7 +88,7 @@ export function PaymentsTable({ payments }: PaymentsTableProps) {
             <TableHead>Сумма</TableHead>
             <TableHead>Тариф</TableHead>
             <TableHead>Статус</TableHead>
-            <TableHead>Тип</TableHead>
+            <TableHead>Источник</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -79,7 +97,7 @@ export function PaymentsTable({ payments }: PaymentsTableProps) {
               <TableCell>{formatDate(payment.date)}</TableCell>
               <TableCell>{payment.amount}</TableCell>
               <TableCell>{payment.planName}</TableCell>
-              <TableCell>{renderStatus(payment.status, payment.invoiceGenerated)}</TableCell>
+              <TableCell>{renderStatus(payment.status)}</TableCell>
               <TableCell>
                 {payment.invoiceGenerated ? (
                   <div className="flex items-center text-gray-600">
@@ -87,7 +105,7 @@ export function PaymentsTable({ payments }: PaymentsTableProps) {
                     <span>Счёт</span>
                   </div>
                 ) : (
-                  <span>Платёж</span>
+                  <span>{renderPaymentSource(payment.source)}</span>
                 )}
               </TableCell>
             </TableRow>

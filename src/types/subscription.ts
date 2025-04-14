@@ -9,6 +9,7 @@ export interface Subscription {
   doctorsUsed: number;
   doctorsLimit: number;
   trialActive: boolean;
+  status: 'active' | 'expired';
 }
 
 export interface PaymentHistory {
@@ -18,6 +19,9 @@ export interface PaymentHistory {
   planName: string;
   status: 'success' | 'pending' | 'failed' | 'awaiting';
   invoiceGenerated?: boolean;
+  clinicId: string;
+  clinicName: string;
+  source: 'payme' | 'click' | 'manual' | 'bot';
 }
 
 export type SubscriptionPlan = 'CRM' | 'CRM + Telegram';
@@ -77,14 +81,79 @@ export interface RevenueData {
 
 export interface ClinicActivity {
   clinicName: string;
+  clinicId: string;
   appointments: number;
   patients: number;
   doctors: number;
   lastActive: string;
+  integrations: string[];
 }
 
 export interface IntegrationData {
   month: string;
   googleCalendar: number;
   telegram: number;
+}
+
+export interface IntegrationLog {
+  id: string;
+  clinicId: string;
+  integrationType: 'google_calendar' | 'telegram';
+  event: string;
+  status: 'success' | 'error';
+  message: string;
+  timestamp: string;
+}
+
+export interface ReportFilters {
+  period: 'week' | 'month' | 'quarter' | 'year';
+  customDateRange?: DateRange;
+}
+
+export interface FinancialReportData {
+  revenueData: RevenueData[];
+  paymentData: PaymentHistory[];
+  tariffDistribution: {
+    name: string;
+    value: number;
+  }[];
+  paymentSources: {
+    source: string;
+    percentage: number;
+  }[];
+}
+
+export interface SubscriptionReportData {
+  subscriptionData: {
+    clinic: string;
+    clinicId: string;
+    expiry: string;
+    autoRenewal: boolean;
+    status: string;
+    tariff: string;
+  }[];
+  stats: {
+    activeSubscriptions: number;
+    autoRenewal: number;
+    activePercentage: number;
+    expiringCount: number;
+  };
+  expiringSubscriptions: {
+    clinicName: string;
+    clinicId: string;
+    expiryDate: string;
+    daysLeft: number;
+  }[];
+  trends: SubscriptionTrend[];
+}
+
+export interface ActivityReportData {
+  clinicActivityData: ClinicActivity[];
+  stats: {
+    newClinics: number;
+    newDoctors: number;
+    newPatients: number;
+    totalAppointments: number;
+  };
+  integrationLogs: IntegrationLog[];
 }

@@ -2,7 +2,12 @@
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, RefreshCw, FileText, BarChart, Users, AlertTriangle, ExternalLink, Eye } from "lucide-react";
-import { ReportData } from "@/types/subscription";
+import { 
+  ReportData, 
+  FinancialReportData, 
+  SubscriptionReportData, 
+  ActivityReportData 
+} from "@/types/subscription";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +36,7 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
   const handleExport = async (format: "pdf" | "excel" | "csv") => {
     setIsDownloading(true);
     try {
-      const data = getReportData(report);
+      const data = report.data;
       await generateAndDownloadReport(
         report.type as any,
         format,
@@ -45,48 +50,6 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
       toast.error("Не удалось загрузить отчет");
     } finally {
       setIsDownloading(false);
-    }
-  };
-
-  const getReportData = (report: ReportData) => {
-    // Prepare data based on report type
-    switch (report.type) {
-      case "financial":
-        return {
-          revenueData: report.data.revenue || [],
-          paymentData: [
-            { date: '01.04.2025', clinic: 'Najot Shifo', tariff: 'CRM + Telegram', amount: '250,000 сум', status: 'Успешно', method: 'Payme (бот)' },
-            { date: '01.03.2025', clinic: 'Najot Shifo', tariff: 'CRM + Telegram', amount: '250,000 сум', status: 'Успешно', method: 'Payme (бот)' },
-          ]
-        };
-      case "subscriptions":
-        return {
-          subscriptionData: [
-            { clinic: 'Najot Shifo', expiry: '15.05.2025', autoRenewal: true, status: 'Активна', tariff: 'CRM + Telegram' },
-            { clinic: 'Medlife', expiry: '05.05.2025', autoRenewal: false, status: 'Активна', tariff: 'CRM' },
-          ],
-          stats: {
-            activeSubscriptions: report.data.activeSubscriptions || 42,
-            autoRenewal: report.data.autoRenewal || 28,
-            activePercentage: Math.round((report.data.autoRenewal / report.data.activeSubscriptions) * 100) || 66,
-            expiringCount: report.data.expiringSubscriptions?.length || 2
-          }
-        };
-      case "activity":
-        return {
-          clinicActivityData: [
-            { clinic: 'Najot Shifo', doctors: 10, patients: 800, appointments: 156, integrations: ['Google Calendar', 'Telegram'], lastActive: '2025-04-14T10:23:00' },
-            { clinic: 'Medlife', doctors: 8, patients: 650, appointments: 120, integrations: ['Telegram'], lastActive: '2025-04-13T15:45:00' },
-          ],
-          stats: {
-            newClinics: report.data.newClinics || 3,
-            newDoctors: report.data.newDoctors || 12,
-            newPatients: report.data.newPatients || 87,
-            totalAppointments: report.data.totalAppointments || 156
-          }
-        };
-      default:
-        return report.data;
     }
   };
 
@@ -147,7 +110,6 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
 
   // Determine if this report type has a detailed view
   const hasDetailedView = ["financial", "subscriptions", "activity"].includes(report.type);
-  const reportData = getReportData(report);
 
   return (
     <Card className={hasDetailedView ? "cursor-pointer hover:border-primary/50 transition-colors" : ""} 
@@ -268,7 +230,7 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
           open={previewOpen}
           onClose={() => setPreviewOpen(false)}
           reportType={report.type}
-          reportData={reportData}
+          reportData={report.data}
           period="Текущий период"
           title={getReportTitle()}
         />

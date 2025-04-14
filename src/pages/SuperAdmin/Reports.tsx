@@ -16,10 +16,15 @@ import { toast } from "sonner";
 import { ErrorsSection } from "@/components/dashboard/ErrorsSection";
 import { useIntegrationsData } from "@/hooks/useIntegrationsData";
 import { CreateReportDialog } from "@/components/reports/CreateReportDialog";
+import { DateRange } from "@/types/subscription";
 
 export default function SuperAdminReports() {
   const [period, setPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const { reports, isLoading, refreshReport, analytics } = useReportsData(period);
+  const [customDateRange, setCustomDateRange] = useState<DateRange | null>(null);
+  const { reports, isLoading, refreshReport, analytics, getReportByType } = useReportsData(
+    period, 
+    customDateRange?.from && customDateRange?.to ? customDateRange : undefined
+  );
   const { errors } = useIntegrationsData();
   const [createReportOpen, setCreateReportOpen] = useState(false);
   
@@ -31,18 +36,18 @@ export default function SuperAdminReports() {
     setCreateReportOpen(true);
   };
   
-  // Find the activity report to extract KPI data
-  const activityReport = reports.find(report => report.type === 'activity');
-  const subscriptionsReport = reports.find(report => report.type === 'subscriptions');
+  // Find the reports by type to extract data
+  const activityReport = getReportByType('activity');
+  const subscriptionsReport = getReportByType('subscriptions');
   
   // Extract KPI data
   const kpiData = {
-    activeSubscriptions: subscriptionsReport?.data?.activeSubscriptions || 0,
-    autoRenewal: subscriptionsReport?.data?.autoRenewal || 0,
-    newClinics: activityReport?.data?.newClinics || 0,
-    newDoctors: activityReport?.data?.newDoctors || 0,
-    newPatients: activityReport?.data?.newPatients || 0,
-    totalAppointments: activityReport?.data?.totalAppointments || 0,
+    activeSubscriptions: subscriptionsReport?.data?.stats?.activeSubscriptions || 0,
+    autoRenewal: subscriptionsReport?.data?.stats?.autoRenewal || 0,
+    newClinics: activityReport?.data?.stats?.newClinics || 0,
+    newDoctors: activityReport?.data?.stats?.newDoctors || 0,
+    newPatients: activityReport?.data?.stats?.newPatients || 0,
+    totalAppointments: activityReport?.data?.stats?.totalAppointments || 0,
   };
 
   return (

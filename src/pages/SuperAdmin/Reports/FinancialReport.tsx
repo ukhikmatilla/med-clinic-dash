@@ -11,7 +11,7 @@ import { useReportsData } from "@/hooks/useReportsData";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { DateRange } from "@/types/subscription";
+import { DateRange, FinancialReportData } from "@/types/subscription";
 import { generateAndDownloadReport } from "@/utils/reportGenerator";
 import { ReportFormatSelector } from "@/components/reports/ReportFormatSelector";
 import { ReportPreviewDialog } from "@/components/reports/ReportPreviewDialog";
@@ -22,9 +22,18 @@ export default function SuperAdminFinancialReport() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   const [customDateRange, setCustomDateRange] = useState<DateRange | null>(null);
-  const { analytics } = useReportsData(period);
+  const { analytics, getReportByType } = useReportsData(period, customDateRange?.from && customDateRange?.to ? customDateRange : undefined);
   const [isExporting, setIsExporting] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  
+  // Get the financial report data
+  const financialReport = getReportByType("financial");
+  const financialData = financialReport?.data as FinancialReportData || {
+    revenueData: [],
+    paymentData: [],
+    tariffDistribution: [],
+    paymentSources: []
+  };
   
   const handlePeriodChange = (value: string) => {
     setPeriod(value as 'week' | 'month' | 'quarter' | 'year');
@@ -35,26 +44,6 @@ export default function SuperAdminFinancialReport() {
     // In a real app, we would fetch data for the custom date range here
   };
   
-  // Mock payment data for the table
-  const paymentData = [
-    { date: '01.04.2025', clinic: 'Najot Shifo', tariff: 'CRM + Telegram', amount: '250,000 сум', status: 'Успешно', method: 'Payme (бот)' },
-    { date: '01.03.2025', clinic: 'Najot Shifo', tariff: 'CRM + Telegram', amount: '250,000 сум', status: 'Успешно', method: 'Payme (бот)' },
-    { date: '01.02.2025', clinic: 'Medlife', tariff: 'CRM', amount: '150,000 сум', status: 'Успешно', method: 'Наличные' },
-    { date: '15.01.2025', clinic: 'Health Plus', tariff: 'CRM + Telegram', amount: '250,000 сум', status: 'Успешно', method: 'Click' },
-  ];
-  
-  // Prepare data for pie chart
-  const tariffData = [
-    { name: 'CRM', value: 350000 },
-    { name: 'CRM + Telegram', value: 750000 },
-  ];
-  
-  // Prepare report data
-  const reportData = {
-    revenueData: analytics.revenueData,
-    paymentData: paymentData
-  };
-
   // Handle export
   const handleExport = async (format: "pdf" | "excel" | "csv") => {
     setIsExporting(true);
@@ -68,7 +57,7 @@ export default function SuperAdminFinancialReport() {
       await generateAndDownloadReport(
         "financial",
         format,
-        reportData,
+        financialData,
         periodLabel
       );
     } catch (error) {
@@ -113,7 +102,7 @@ export default function SuperAdminFinancialReport() {
               onExport={handleExport}
               disabled={isExporting}
               reportType="financial"
-              reportData={reportData}
+              reportData={financialData}
               period={period === 'week' ? 'Неделя' : period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год'}
               reportTitle="Финансовый отчет"
             />
@@ -154,7 +143,7 @@ export default function SuperAdminFinancialReport() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={tariffData}
+                        data={financialData.tariffDistribution}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
@@ -163,7 +152,7 @@ export default function SuperAdminFinancialReport() {
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {tariffData.map((entry, index) => (
+                        {financialData.tariffDistribution.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
@@ -184,20 +173,17 @@ export default function SuperAdminFinancialReport() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={[
-                          { name: 'Бот', value: 45 },
-                          { name: 'Админка', value: 40 },
-                          { name: 'Вручную', value: 15 }
-                        ]}
+                        data={financialData.paymentSources}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ source, percentage }) => `${source}: ${percentage}%`}
                         outerRadius={80}
                         fill="#8884d8"
-                        dataKey="value"
+                        dataKey="percentage"
+                        nameKey="source"
                       >
-                        {tariffData.map((entry, index) => (
+                        {financialData.paymentSources.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                       </Pie>
@@ -249,18 +235,24 @@ export default function SuperAdminFinancialReport() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paymentData.map((payment, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{payment.date}</TableCell>
-                      <TableCell>{payment.clinic}</TableCell>
-                      <TableCell>{payment.tariff}</TableCell>
+                  {financialData.paymentData.map((payment, index) => (
+                    <TableRow key={payment.id || index}>
+                      <TableCell>{new Date(payment.date).toLocaleDateString('ru-RU')}</TableCell>
+                      <TableCell>{payment.clinicName}</TableCell>
+                      <TableCell>{payment.planName}</TableCell>
                       <TableCell>{payment.amount}</TableCell>
                       <TableCell>
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          {payment.status}
+                          {payment.status === 'success' ? 'Успешно' : 
+                           payment.status === 'pending' ? 'В обработке' : 
+                           payment.status === 'awaiting' ? 'Ожидает оплаты' : 'Ошибка'}
                         </span>
                       </TableCell>
-                      <TableCell>{payment.method}</TableCell>
+                      <TableCell>
+                        {payment.source === 'payme' ? 'Payme' : 
+                         payment.source === 'click' ? 'Click' : 
+                         payment.source === 'bot' ? 'Payme (бот)' : 'Вручную'}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -278,7 +270,7 @@ export default function SuperAdminFinancialReport() {
             onExport={handleExport}
             disabled={isExporting}
             reportType="financial"
-            reportData={reportData}
+            reportData={financialData}
             period={period === 'week' ? 'Неделя' : period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год'}
             reportTitle="Финансовый отчет"
             label="Скачать полный отчет"
@@ -291,7 +283,7 @@ export default function SuperAdminFinancialReport() {
         open={previewOpen}
         onClose={() => setPreviewOpen(false)}
         reportType="financial"
-        reportData={reportData}
+        reportData={financialData}
         period={period === 'week' ? 'Неделя' : period === 'month' ? 'Месяц' : period === 'quarter' ? 'Квартал' : 'Год'}
         title="Финансовый отчет"
       />

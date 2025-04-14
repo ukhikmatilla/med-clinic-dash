@@ -12,7 +12,8 @@ const mockSubscription: Subscription = {
   autoRenewal: true,
   doctorsUsed: 10,
   doctorsLimit: 20,
-  trialActive: false
+  trialActive: false,
+  status: 'active'
 };
 
 // Мок-данные для истории платежей
@@ -22,21 +23,30 @@ const mockPayments: PaymentHistory[] = [
     date: "2025-04-01",
     amount: "250,000 сум",
     planName: "CRM + Telegram",
-    status: "success"
+    status: "success",
+    clinicId: "clinic_najot",
+    clinicName: "Najot Shifo",
+    source: "payme"
   },
   {
     id: "pay_2",
     date: "2025-03-01",
     amount: "250,000 сум",
     planName: "CRM + Telegram",
-    status: "success"
+    status: "success",
+    clinicId: "clinic_najot",
+    clinicName: "Najot Shifo",
+    source: "bot"
   },
   {
     id: "pay_3",
     date: "2025-02-01",
     amount: "250,000 сум",
     planName: "CRM + Telegram",
-    status: "success"
+    status: "success",
+    clinicId: "clinic_najot",
+    clinicName: "Najot Shifo",
+    source: "payme"
   }
 ];
 
@@ -97,7 +107,10 @@ export function useSubscriptionData() {
       date: new Date().toISOString().split('T')[0],
       amount: "250,000 сум",
       planName: subscription.planName,
-      status: "success"
+      status: "success",
+      clinicId: subscription.clinicId,
+      clinicName: subscription.clinicName,
+      source: "manual"
     };
     
     setPayments([newPayment, ...payments]);
@@ -159,7 +172,10 @@ export function useSubscriptionData() {
       amount: formattedAmount,
       planName: invoiceData.tariff,
       status: "awaiting",
-      invoiceGenerated: true
+      invoiceGenerated: true,
+      clinicId: subscription.clinicId,
+      clinicName: subscription.clinicName,
+      source: "manual"
     };
     
     setPayments([newInvoice, ...payments]);
