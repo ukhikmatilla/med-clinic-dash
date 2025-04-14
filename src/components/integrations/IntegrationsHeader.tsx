@@ -18,7 +18,7 @@ export function IntegrationsHeader() {
       setIsRefreshing(false);
       toast({
         title: "Обновлено",
-        description: "Данные интеграций успешно обновлены"
+        description: "Статусы интеграций успешно обновлены"
       });
     }, 800);
   };

@@ -25,8 +25,8 @@ export function TelegramBotCard({ type, username, status }: TelegramBotCardProps
       toast({
         title: `Telegram Bot (${type === "patient" ? 'пациенты' : 'врачи'})`,
         description: status === "ok" 
-          ? "Бот активен и корректно настроен" 
-          : "Обнаружены проблемы с webhook'ом",
+          ? "Webhook активен" 
+          : "Ошибка: Webhook недоступен",
         variant: status === "ok" ? "default" : "destructive"
       });
     }, 1000);
