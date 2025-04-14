@@ -12,6 +12,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { DateRange } from "@/types/subscription";
+import { generateAndDownloadReport } from "@/utils/reportGenerator";
+import { ReportFormatSelector } from "@/components/reports/ReportFormatSelector";
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042'];
 
@@ -20,6 +22,7 @@ export default function SuperAdminFinancialReport() {
   const [period, setPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   const [customDateRange, setCustomDateRange] = useState<DateRange | null>(null);
   const { analytics } = useReportsData(period);
+  const [isExporting, setIsExporting] = useState(false);
   
   const handlePeriodChange = (value: string) => {
     setPeriod(value as 'week' | 'month' | 'quarter' | 'year');
@@ -28,13 +31,6 @@ export default function SuperAdminFinancialReport() {
   const handleCustomDateChange = (range: DateRange) => {
     setCustomDateRange(range);
     // In a real app, we would fetch data for the custom date range here
-  };
-  
-  const handleDownload = (format: 'excel' | 'csv' | 'pdf') => {
-    toast.info(`Загрузка отчета в формате ${format.toUpperCase()}...`);
-    setTimeout(() => {
-      toast.success(`Отчет успешно скачан в формате ${format.toUpperCase()}`);
-    }, 1000);
   };
   
   // Mock payment data for the table
@@ -50,6 +46,33 @@ export default function SuperAdminFinancialReport() {
     { name: 'CRM', value: 350000 },
     { name: 'CRM + Telegram', value: 750000 },
   ];
+
+  // Handle export
+  const handleExport = async (format: "pdf" | "excel" | "csv") => {
+    setIsExporting(true);
+    try {
+      const periodLabel = customDateRange 
+        ? `${new Date(customDateRange.from).toLocaleDateString()} - ${new Date(customDateRange.to).toLocaleDateString()}`
+        : period === 'week' ? 'Неделя' 
+        : period === 'month' ? 'Месяц'
+        : period === 'quarter' ? 'Квартал' : 'Год';
+      
+      await generateAndDownloadReport(
+        "financial",
+        format,
+        {
+          revenueData: analytics.revenueData,
+          paymentData: paymentData
+        },
+        periodLabel
+      );
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Ошибка при экспорте отчета");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <SidebarLayout sidebar={<SuperAdminSidebar />}>
@@ -67,11 +90,17 @@ export default function SuperAdminFinancialReport() {
             </Button>
             <h1 className="text-3xl font-bold tracking-tight">Финансовый отчёт</h1>
           </div>
-          <PeriodFilter 
-            onPeriodChange={handlePeriodChange} 
-            onCustomDateChange={handleCustomDateChange} 
-            defaultValue={period}
-          />
+          <div className="flex items-center gap-2">
+            <PeriodFilter 
+              onPeriodChange={handlePeriodChange} 
+              onCustomDateChange={handleCustomDateChange} 
+              defaultValue={period}
+            />
+            <ReportFormatSelector 
+              onExport={handleExport}
+              disabled={isExporting}
+            />
+          </div>
         </div>
         
         <div className="grid gap-6">
@@ -170,11 +199,21 @@ export default function SuperAdminFinancialReport() {
                 <CardDescription>История платежей за выбранный период</CardDescription>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleDownload('excel')}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleExport("excel")}
+                  disabled={isExporting}
+                >
                   <FileText className="h-4 w-4 mr-2" />
                   Excel
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleDownload('csv')}>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleExport("csv")}
+                  disabled={isExporting}
+                >
                   <Save className="h-4 w-4 mr-2" />
                   CSV
                 </Button>
@@ -218,16 +257,11 @@ export default function SuperAdminFinancialReport() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Назад
           </Button>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => handleDownload('excel')}>
-              <Download className="h-4 w-4 mr-2" />
-              Скачать Excel
-            </Button>
-            <Button variant="outline" onClick={() => handleDownload('pdf')}>
-              <Download className="h-4 w-4 mr-2" />
-              Скачать PDF
-            </Button>
-          </div>
+          <ReportFormatSelector 
+            onExport={handleExport}
+            disabled={isExporting}
+            label="Скачать полный отчет"
+          />
         </div>
       </div>
     </SidebarLayout>

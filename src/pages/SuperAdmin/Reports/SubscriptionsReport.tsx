@@ -13,12 +13,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { DateRange } from "@/types/subscription";
 import { toast } from "sonner";
+import { generateAndDownloadReport } from "@/utils/reportGenerator";
+import { ReportFormatSelector } from "@/components/reports/ReportFormatSelector";
 
 export default function SuperAdminSubscriptionsReport() {
   const navigate = useNavigate();
   const [period, setPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   const [customDateRange, setCustomDateRange] = useState<DateRange | null>(null);
   const { analytics, reports } = useReportsData(period);
+  const [isExporting, setIsExporting] = useState(false);
   
   const handlePeriodChange = (value: string) => {
     setPeriod(value as 'week' | 'month' | 'quarter' | 'year');
@@ -27,13 +30,6 @@ export default function SuperAdminSubscriptionsReport() {
   const handleCustomDateChange = (range: DateRange) => {
     setCustomDateRange(range);
     // In a real app, we would fetch data for the custom date range here
-  };
-  
-  const handleDownload = (format: 'excel' | 'csv' | 'pdf') => {
-    toast.info(`Загрузка отчета в формате ${format.toUpperCase()}...`);
-    setTimeout(() => {
-      toast.success(`Отчет успешно скачан в формате ${format.toUpperCase()}`);
-    }, 1000);
   };
   
   const handleExtendSubscription = (clinicName: string) => {
@@ -62,6 +58,33 @@ export default function SuperAdminSubscriptionsReport() {
     expiringCount: subscriptionsReport?.data?.expiringSubscriptions?.length || 2
   };
 
+  // Handle export
+  const handleExport = async (format: "pdf" | "excel" | "csv") => {
+    setIsExporting(true);
+    try {
+      const periodLabel = customDateRange 
+        ? `${new Date(customDateRange.from).toLocaleDateString()} - ${new Date(customDateRange.to).toLocaleDateString()}`
+        : period === 'week' ? 'Неделя' 
+        : period === 'month' ? 'Месяц'
+        : period === 'quarter' ? 'Квартал' : 'Год';
+        
+      await generateAndDownloadReport(
+        "subscriptions",
+        format,
+        {
+          subscriptionData: subscriptionData,
+          stats: stats
+        },
+        periodLabel
+      );
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Ошибка при экспорте отчета");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <SidebarLayout sidebar={<SuperAdminSidebar />}>
       <div className="space-y-6">
@@ -78,11 +101,17 @@ export default function SuperAdminSubscriptionsReport() {
             </Button>
             <h1 className="text-3xl font-bold tracking-tight">Подписки и продления</h1>
           </div>
-          <PeriodFilter 
-            onPeriodChange={handlePeriodChange} 
-            onCustomDateChange={handleCustomDateChange} 
-            defaultValue={period}
-          />
+          <div className="flex items-center gap-2">
+            <PeriodFilter 
+              onPeriodChange={handlePeriodChange} 
+              onCustomDateChange={handleCustomDateChange} 
+              defaultValue={period}
+            />
+            <ReportFormatSelector 
+              onExport={handleExport}
+              disabled={isExporting}
+            />
+          </div>
         </div>
         
         <div className="grid gap-4 md:grid-cols-3">
@@ -163,11 +192,21 @@ export default function SuperAdminSubscriptionsReport() {
               <CardDescription>Статус подписок по клиникам</CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => handleDownload('excel')}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleExport("excel")}
+                disabled={isExporting}
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 Excel
               </Button>
-              <Button variant="outline" size="sm" onClick={() => handleDownload('csv')}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => handleExport("csv")}
+                disabled={isExporting}
+              >
                 <Save className="h-4 w-4 mr-2" />
                 CSV
               </Button>
@@ -223,16 +262,11 @@ export default function SuperAdminSubscriptionsReport() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Назад
           </Button>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => handleDownload('excel')}>
-              <Download className="h-4 w-4 mr-2" />
-              Скачать Excel
-            </Button>
-            <Button variant="outline" onClick={() => handleDownload('pdf')}>
-              <Download className="h-4 w-4 mr-2" />
-              Скачать PDF
-            </Button>
-          </div>
+          <ReportFormatSelector 
+            onExport={handleExport}
+            disabled={isExporting}
+            label="Скачать полный отчет"
+          />
         </div>
       </div>
     </SidebarLayout>

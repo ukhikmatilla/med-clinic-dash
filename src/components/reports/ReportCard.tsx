@@ -6,6 +6,13 @@ import { ReportData } from "@/types/subscription";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { generateAndDownloadReport } from "@/utils/reportGenerator";
 
 interface ReportCardProps {
   report: ReportData;
@@ -15,16 +22,78 @@ interface ReportCardProps {
 
 export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
   const navigate = useNavigate();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadOpen, setDownloadOpen] = useState(false);
   
-  const handleDownload = () => {
-    toast.info("Загрузка отчета...");
-    // In a real app, this would trigger a download
-    setTimeout(() => {
-      toast.success("Отчет успешно загружен");
-    }, 1500);
+  const handleDownloadClick = (format: "pdf" | "excel" | "csv") => {
+    setIsDownloading(true);
+    try {
+      const data = getReportData(report);
+      generateAndDownloadReport(
+        report.type as any,
+        format,
+        data,
+        "Текущий период"
+      ).then(() => {
+        toast.success(`Отчет успешно загружен в формате ${format.toUpperCase()}`);
+        setDownloadOpen(false);
+      }).catch((error) => {
+        console.error("Download error:", error);
+        toast.error("Не удалось загрузить отчет");
+      }).finally(() => {
+        setIsDownloading(false);
+      });
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Не удалось загрузить отчет");
+      setIsDownloading(false);
+    }
   };
 
-  const handleRefresh = async () => {
+  const getReportData = (report: ReportData) => {
+    // Prepare data based on report type
+    switch (report.type) {
+      case "financial":
+        return {
+          revenueData: report.data.revenue || [],
+          paymentData: [
+            { date: '01.04.2025', clinic: 'Najot Shifo', tariff: 'CRM + Telegram', amount: '250,000 сум', status: 'Успешно', method: 'Payme (бот)' },
+            { date: '01.03.2025', clinic: 'Najot Shifo', tariff: 'CRM + Telegram', amount: '250,000 сум', status: 'Успешно', method: 'Payme (бот)' },
+          ]
+        };
+      case "subscriptions":
+        return {
+          subscriptionData: [
+            { clinic: 'Najot Shifo', expiry: '15.05.2025', autoRenewal: true, status: 'Активна', tariff: 'CRM + Telegram' },
+            { clinic: 'Medlife', expiry: '05.05.2025', autoRenewal: false, status: 'Активна', tariff: 'CRM' },
+          ],
+          stats: {
+            activeSubscriptions: report.data.activeSubscriptions || 42,
+            autoRenewal: report.data.autoRenewal || 28,
+            activePercentage: Math.round((report.data.autoRenewal / report.data.activeSubscriptions) * 100) || 66,
+            expiringCount: report.data.expiringSubscriptions?.length || 2
+          }
+        };
+      case "activity":
+        return {
+          clinicActivityData: [
+            { clinic: 'Najot Shifo', doctors: 10, patients: 800, appointments: 156, integrations: ['Google Calendar', 'Telegram'], lastActive: '2025-04-14T10:23:00' },
+            { clinic: 'Medlife', doctors: 8, patients: 650, appointments: 120, integrations: ['Telegram'], lastActive: '2025-04-13T15:45:00' },
+          ],
+          stats: {
+            newClinics: report.data.newClinics || 3,
+            newDoctors: report.data.newDoctors || 12,
+            newPatients: report.data.newPatients || 87,
+            totalAppointments: report.data.totalAppointments || 156
+          }
+        };
+      default:
+        return report.data;
+    }
+  };
+
+  const handleRefresh = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click event
     try {
       await onRefresh(report.id);
       toast.success("Отчет успешно обновлен");
@@ -77,26 +146,70 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent card click event
-              handleRefresh();
-            }}
+            onClick={handleRefresh}
             disabled={isLoading}
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             <span className="sr-only">Обновить отчет</span>
           </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent card click event
-              handleDownload();
-            }}
-          >
-            <Download className="h-4 w-4" />
-            <span className="sr-only">Скачать отчет</span>
-          </Button>
+          <Popover open={downloadOpen} onOpenChange={setDownloadOpen}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card click event
+                }}
+                disabled={isDownloading}
+              >
+                <Download className={`h-4 w-4 ${isDownloading ? 'animate-spin' : ''}`} />
+                <span className="sr-only">Скачать отчет</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48" onClick={(e) => e.stopPropagation()}>
+              <div className="grid gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownloadClick("pdf");
+                  }}
+                  disabled={isDownloading}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  PDF документ
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownloadClick("excel");
+                  }}
+                  disabled={isDownloading}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Excel (.xlsx)
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDownloadClick("csv");
+                  }}
+                  disabled={isDownloading}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  CSV
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
           {hasDetailedView && (
             <Button 
               variant="ghost" 
