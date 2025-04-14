@@ -12,10 +12,16 @@ interface Clinic {
   id: number;
   name: string;
   admin: string;
+  email?: string;
   doctors: number;
   patients: number;
   subscription: string;
+  subscriptionActive: boolean;
   hasGCalendar: boolean;
+  plan?: string;
+  doctorsLimit?: number;
+  telegramBotId?: string;
+  timezone?: string;
 }
 
 interface ClinicsSectionProps {
@@ -57,10 +63,12 @@ export function ClinicsSection({ clinics: initialClinics }: ClinicsSectionProps)
     }
   };
   
-  const handleUpdateClinic = (updatedClinic: Clinic) => {
-    setClinics(clinics.map(clinic => 
-      clinic.id === updatedClinic.id ? updatedClinic : clinic
-    ));
+  const handleUpdateClinic = (updatedClinic: Clinic | Omit<Clinic, "id">) => {
+    if ('id' in updatedClinic) {
+      setClinics(clinics.map(clinic => 
+        clinic.id === updatedClinic.id ? updatedClinic as Clinic : clinic
+      ));
+    }
     setEditingClinic(null);
     
     toast({
