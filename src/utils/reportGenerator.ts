@@ -1,20 +1,14 @@
+
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { ReportData } from "@/types/subscription";
 import { formatDate } from "@/lib/utils";
 
-// Add autoTable to jsPDF instance type
+// Extend jsPDF types to include autoTable method
 declare module "jspdf" {
   interface jsPDF {
     autoTable: (options: any) => jsPDF;
-    internal: {
-      getNumberOfPages: () => number;
-      pageSize: {
-        width: number;
-        height: number;
-      };
-    };
   }
 }
 
@@ -88,14 +82,14 @@ export const generateFinancialReportPDF = (
   });
   
   // Footer with page numbers
-  const pageCount = doc.internal.getNumberOfPages();
+  const pageCount = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(10);
     doc.text(
       `Страница ${i} из ${pageCount}`,
-      doc.internal.pageSize.width / 2,
-      doc.internal.pageSize.height - 10,
+      (doc as any).internal.pageSize.width / 2,
+      (doc as any).internal.pageSize.height - 10,
       { align: "center" }
     );
   }
@@ -154,14 +148,14 @@ export const generateSubscriptionsReportPDF = (
   });
   
   // Footer with page numbers
-  const pageCount = doc.internal.getNumberOfPages();
+  const pageCount = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(10);
     doc.text(
       `Страница ${i} из ${pageCount}`,
-      doc.internal.pageSize.width / 2,
-      doc.internal.pageSize.height - 10,
+      (doc as any).internal.pageSize.width / 2,
+      (doc as any).internal.pageSize.height - 10,
       { align: "center" }
     );
   }
@@ -221,14 +215,14 @@ export const generateActivityReportPDF = (
   });
   
   // Footer with page numbers
-  const pageCount = doc.internal.getNumberOfPages();
+  const pageCount = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(10);
     doc.text(
       `Страница ${i} из ${pageCount}`,
-      doc.internal.pageSize.width / 2,
-      doc.internal.pageSize.height - 10,
+      (doc as any).internal.pageSize.width / 2,
+      (doc as any).internal.pageSize.height - 10,
       { align: "center" }
     );
   }
