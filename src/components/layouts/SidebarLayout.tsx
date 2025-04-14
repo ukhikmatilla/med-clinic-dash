@@ -30,11 +30,11 @@ export function SidebarLayout({ sidebar, children, className }: SidebarLayoutPro
         
         {/* Main content */}
         <SidebarInset className={cn("relative", className)}>
-          <div className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+          <div className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background px-2 sm:gap-4 sm:px-6">
             <SidebarTrigger />
             <div className="flex-1" />
           </div>
-          <div className="p-4 sm:p-6">
+          <div className="overflow-auto p-2 sm:p-6">
             {children}
           </div>
         </SidebarInset>

@@ -28,17 +28,17 @@ export function ClinicAdminDashboard() {
   
   return (
     <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
-      <div className="p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 gap-4">
+      <div className="p-2 sm:p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl font-bold">Najot Shifo</h1>
-            <p className="text-muted-foreground">Центр высококачественной медицины</p>
+            <h1 className="text-xl sm:text-2xl font-bold">Najot Shifo</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">Центр высококачественной медицины</p>
           </div>
           
           <div className="flex gap-2">
-            <Button className="flex items-center">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Добавить приём
+            <Button className="flex items-center text-xs sm:text-sm">
+              <PlusCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="whitespace-nowrap">Добавить приём</span>
             </Button>
             <Button variant="outline" className="relative">
               <Bell className="h-4 w-4" />
@@ -50,14 +50,14 @@ export function ClinicAdminDashboard() {
         </div>
         
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Врачей</CardTitle>
               <UserRound className="h-4 w-4 text-medical-dark" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.doctors}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.doctors}</div>
             </CardContent>
           </Card>
           
@@ -67,7 +67,7 @@ export function ClinicAdminDashboard() {
               <Users className="h-4 w-4 text-medical-dark" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.patients}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.patients}</div>
             </CardContent>
           </Card>
           
@@ -77,7 +77,7 @@ export function ClinicAdminDashboard() {
               <CalendarClock className="h-4 w-4 text-medical-dark" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.appointments}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.appointments}</div>
             </CardContent>
           </Card>
           
@@ -87,14 +87,15 @@ export function ClinicAdminDashboard() {
               <Stethoscope className="h-4 w-4 text-medical-dark" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.services}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.services}</div>
             </CardContent>
           </Card>
         </div>
         
-        {/* Upcoming Appointments */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="bg-white lg:col-span-2">
+        {/* Upcoming Appointments and Subscription */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          {/* Upcoming Appointments - Desktop View */}
+          <Card className="bg-white lg:col-span-2 hidden sm:block">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Ближайшие приёмы</CardTitle>
@@ -135,31 +136,71 @@ export function ClinicAdminDashboard() {
             </CardContent>
           </Card>
           
+          {/* Upcoming Appointments - Mobile View */}
+          <Card className="bg-white lg:col-span-2 sm:hidden">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-base">Ближайшие приёмы</CardTitle>
+                <Button variant="link" size="sm" className="text-primary font-normal text-xs p-0 h-auto">
+                  Смотреть все
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-3">
+              <div className="space-y-3">
+                {upcomingAppointments.map(appointment => (
+                  <Card key={appointment.id} className="p-3 border">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium text-sm">{appointment.time}</span>
+                      <Button variant="link" size="sm" className="h-auto p-0 text-primary text-xs">
+                        Детали
+                      </Button>
+                    </div>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Пациент:</span>
+                        <span>{appointment.patient}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Врач:</span>
+                        <span>{appointment.doctor}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Услуга:</span>
+                        <span>{appointment.service}</span>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
           {/* Subscription Status */}
           <Card className="bg-white">
             <CardHeader>
-              <CardTitle>Статус подписки</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Статус подписки</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-medical-light-blue p-4 rounded-md">
-                <h3 className="font-medium">✅ Активна</h3>
-                <p className="text-sm text-muted-foreground">до 01.06.2025</p>
+              <div className="bg-medical-light-blue p-3 sm:p-4 rounded-md">
+                <h3 className="font-medium text-sm sm:text-base">✅ Активна</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">до 01.06.2025</p>
               </div>
               
               <div>
-                <h3 className="text-sm font-medium mb-1">Тариф</h3>
-                <p>CRM + Telegram (10 врачей)</p>
+                <h3 className="text-xs sm:text-sm font-medium mb-1">Тариф</h3>
+                <p className="text-xs sm:text-sm">CRM + Telegram (10 врачей)</p>
               </div>
               
               <div>
-                <h3 className="text-sm font-medium mb-1">Автопродление</h3>
-                <p className="text-sm text-muted-foreground">Включено</p>
+                <h3 className="text-xs sm:text-sm font-medium mb-1">Автопродление</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">Включено</p>
               </div>
               
               <div className="pt-2 flex flex-col gap-2">
-                <Button>📥 Продлить подписку</Button>
-                <Button variant="outline">🧩 Изменить тариф</Button>
-                <Button variant="outline" className="text-muted-foreground">
+                <Button className="text-xs sm:text-sm">📥 Продлить подписку</Button>
+                <Button variant="outline" className="text-xs sm:text-sm">🧩 Изменить тариф</Button>
+                <Button variant="outline" className="text-muted-foreground text-xs sm:text-sm">
                   🛑 Отключить автопродление
                 </Button>
               </div>

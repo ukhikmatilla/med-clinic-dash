@@ -31,18 +31,18 @@ export function SuperAdminDashboard() {
   
   return (
     <SidebarLayout sidebar={<SuperAdminSidebar />}>
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-6">Дэшборд</h1>
+      <div className="p-2 sm:p-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Дэшборд</h1>
         
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Всего клиник</CardTitle>
               <Building2 className="h-4 w-4 text-medical-dark" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.clinics}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.clinics}</div>
             </CardContent>
           </Card>
           
@@ -52,7 +52,7 @@ export function SuperAdminDashboard() {
               <UserRound className="h-4 w-4 text-medical-dark" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.doctors}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.doctors}</div>
             </CardContent>
           </Card>
           
@@ -62,7 +62,7 @@ export function SuperAdminDashboard() {
               <Users className="h-4 w-4 text-medical-dark" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.patients}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.patients}</div>
             </CardContent>
           </Card>
           
@@ -72,20 +72,20 @@ export function SuperAdminDashboard() {
               <CalendarClock className="h-4 w-4 text-medical-dark" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.appointments}</div>
+              <div className="text-xl sm:text-2xl font-bold">{stats.appointments}</div>
             </CardContent>
           </Card>
         </div>
         
         {/* Recent Clinics */}
-        <h2 className="text-xl font-semibold mb-4">Последние клиники</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Последние клиники</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {recentClinics.map(clinic => (
             <Card key={clinic.id} className="bg-white">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">{clinic.name}</CardTitle>
+                <CardTitle className="text-base sm:text-lg">{clinic.name}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm">
+              <CardContent className="space-y-2 text-xs sm:text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Админ:</span>
                   <span>{clinic.admin}</span>
@@ -124,35 +124,35 @@ export function SuperAdminDashboard() {
         </div>
         
         {/* Integration Errors */}
-        <h2 className="text-xl font-semibold mb-4">Ошибки интеграций</h2>
-        <Card className="bg-white mb-8">
+        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Ошибки интеграций</h2>
+        <Card className="bg-white mb-6 sm:mb-8">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="bg-muted/50">
-                    <th className="text-left py-3 px-4 font-medium text-sm">Клиника</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm">Тип</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm">Ошибка</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm">Дата</th>
-                    <th className="text-right py-3 px-4 font-medium text-sm">Действия</th>
+                    <th className="text-left py-3 px-2 sm:px-4 font-medium text-xs sm:text-sm">Клиника</th>
+                    <th className="text-left py-3 px-2 sm:px-4 font-medium text-xs sm:text-sm">Тип</th>
+                    <th className="text-left py-3 px-2 sm:px-4 font-medium text-xs sm:text-sm">Ошибка</th>
+                    <th className="text-left py-3 px-2 sm:px-4 font-medium text-xs sm:text-sm">Дата</th>
+                    <th className="text-right py-3 px-2 sm:px-4 font-medium text-xs sm:text-sm">Действия</th>
                   </tr>
                 </thead>
                 <tbody>
                   {integrationErrors.map(error => (
                     <tr key={error.id} className="border-t">
-                      <td className="py-3 px-4 text-sm">{error.clinic}</td>
-                      <td className="py-3 px-4 text-sm">{error.type}</td>
-                      <td className="py-3 px-4 text-sm text-red-500">{error.error}</td>
-                      <td className="py-3 px-4 text-sm">{error.date}</td>
-                      <td className="py-3 px-4 text-sm text-right">
-                        <button className="text-primary hover:underline">Исправить</button>
+                      <td className="py-3 px-2 sm:px-4 text-xs sm:text-sm">{error.clinic}</td>
+                      <td className="py-3 px-2 sm:px-4 text-xs sm:text-sm">{error.type}</td>
+                      <td className="py-3 px-2 sm:px-4 text-xs sm:text-sm text-red-500">{error.error}</td>
+                      <td className="py-3 px-2 sm:px-4 text-xs sm:text-sm">{error.date}</td>
+                      <td className="py-3 px-2 sm:px-4 text-xs sm:text-sm text-right">
+                        <button className="text-primary hover:underline text-xs sm:text-sm">Исправить</button>
                       </td>
                     </tr>
                   ))}
                   {integrationErrors.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="py-6 text-center text-muted-foreground">
+                      <td colSpan={5} className="py-6 text-center text-muted-foreground text-xs sm:text-sm">
                         Нет ошибок интеграций
                       </td>
                     </tr>
