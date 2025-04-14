@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 196 83% 49%; /* Medical blue */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -22,7 +22,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 90 74% 94%; /* Soft green */
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -34,21 +34,21 @@
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
+    --sidebar-background: 196 83% 98%;
+    --sidebar-foreground: 196 83% 20%;
+    --sidebar-primary: 196 83% 49%;
     --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 90 74% 94%;
+    --sidebar-accent-foreground: 196 83% 30%;
+    --sidebar-border: 196 83% 90%;
+    --sidebar-ring: 196 83% 70%;
+    
+    /* Custom medical colors */
+    --medical-blue: 196 83% 49%;
+    --medical-light-blue: 212 89% 91%;
+    --medical-green: 90 74% 94%;
+    --medical-purple: 255 100% 94%;
+    --medical-gray: 246 50% 96%;
   }
 
   .dark {
