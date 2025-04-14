@@ -1,4 +1,3 @@
-
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { SuperAdminSidebar } from "@/components/sidebars/SuperAdminSidebar";
 import { 
@@ -10,15 +9,9 @@ import { Check, XCircle, Search, Edit, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export function SuperAdminClinics() {
-  // This would come from your API in a real application
+  // Keep only Najot Shifo in the clinics array
   const clinics = [
     { id: 1, name: "Najot Shifo", admin: "@najot", doctors: 10, patients: 800, subscription: "01.06.2025", hasGCalendar: true },
-    { id: 2, name: "MediPlus", admin: "@mediplus", doctors: 8, patients: 620, subscription: "15.05.2025", hasGCalendar: false },
-    { id: 3, name: "Здоровье+", admin: "@zdorovie", doctors: 12, patients: 950, subscription: "07.03.2025", hasGCalendar: true },
-    { id: 4, name: "Клиника Доктора Иванова", admin: "@ivanov", doctors: 5, patients: 420, subscription: "23.04.2025", hasGCalendar: true },
-    { id: 5, name: "МедЦентр", admin: "@medcenter", doctors: 15, patients: 1200, subscription: "10.06.2025", hasGCalendar: true },
-    { id: 6, name: "Центр Диагностики", admin: "@diagnostika", doctors: 7, patients: 560, subscription: "30.05.2025", hasGCalendar: false },
-    { id: 7, name: "ДокторПлюс", admin: "@doctorplus", doctors: 9, patients: 780, subscription: "12.07.2025", hasGCalendar: true },
   ];
   
   return (

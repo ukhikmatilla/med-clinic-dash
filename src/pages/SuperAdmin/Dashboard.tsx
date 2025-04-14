@@ -1,4 +1,3 @@
-
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { SuperAdminSidebar } from "@/components/sidebars/SuperAdminSidebar";
 import { 
@@ -10,23 +9,22 @@ import {
 import { CalendarClock, Check, Users, Building2, UserRound, XCircle } from "lucide-react";
 
 export function SuperAdminDashboard() {
-  // This would come from your API in a real application
+  // Simplified stats to reflect only Najot Shifo
   const stats = {
-    clinics: 12,
-    doctors: 145,
-    patients: 3628,
-    appointments: 87
+    clinics: 1,
+    doctors: 10,
+    patients: 800,
+    appointments: 27
   };
   
+  // Keep only Najot Shifo
   const recentClinics = [
     { id: 1, name: "Najot Shifo", admin: "@najot", doctors: 10, patients: 800, subscription: "01.06.2025", hasGCalendar: true },
-    { id: 2, name: "MediPlus", admin: "@mediplus", doctors: 8, patients: 620, subscription: "15.05.2025", hasGCalendar: false },
-    { id: 3, name: "Здоровье+", admin: "@zdorovie", doctors: 12, patients: 950, subscription: "07.03.2025", hasGCalendar: true },
   ];
   
+  // Single integration error
   const integrationErrors = [
-    { id: 1, clinic: "Центр Диагностики", type: "Google Calendar", error: "Ошибка авторизации", date: "14.04.2025" },
-    { id: 2, clinic: "MediPlus", type: "Telegram Bot", error: "Бот не отвечает", date: "13.04.2025" },
+    { id: 1, clinic: "Najot Shifo", type: "Google Calendar", error: "Ошибка авторизации", date: "14.04.2025" },
   ];
   
   return (
