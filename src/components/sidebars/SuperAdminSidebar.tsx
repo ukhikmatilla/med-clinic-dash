@@ -18,8 +18,7 @@ import {
   Link2,
   CreditCard,
   LogOut,
-  Stethoscope,
-  AlertCircle
+  Stethoscope
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +28,7 @@ const navItems = [
   { icon: <Link2 className="mr-2 h-4 w-4" />, label: "Интеграции", href: "/super-admin/integrations" },
   { icon: <CreditCard className="mr-2 h-4 w-4" />, label: "Подписки", href: "/super-admin/subscriptions" },
   { icon: <FileText className="mr-2 h-4 w-4" />, label: "Отчёты", href: "/super-admin/reports" },
-  { icon: <AlertCircle className="mr-2 h-4 w-4" />, label: "Логи и ошибки", href: "/super-admin/logs" },
+  { icon: <FileText className="mr-2 h-4 w-4" />, label: "Логи и ошибки", href: "/super-admin/logs" },
   { icon: <Settings className="mr-2 h-4 w-4" />, label: "Настройки", href: "/super-admin/settings" },
 ];
 

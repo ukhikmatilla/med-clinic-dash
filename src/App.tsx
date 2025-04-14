@@ -20,8 +20,6 @@ import SuperAdminReports from "./pages/SuperAdmin/Reports";
 import SuperAdminFinancialReport from "./pages/SuperAdmin/Reports/FinancialReport";
 import SuperAdminSubscriptionsReport from "./pages/SuperAdmin/Reports/SubscriptionsReport";
 import SuperAdminActivityReport from "./pages/SuperAdmin/Reports/ActivityReport";
-import LogsPage from "./pages/SuperAdmin/LogsPage";
-import SettingsPage from "./pages/SuperAdmin/SettingsPage";
 
 // Clinic Admin Pages
 import ClinicAdminDashboard from "./pages/ClinicAdmin/Dashboard";
@@ -53,8 +51,8 @@ const App = () => {
             <Route path="/super-admin/reports-fin" element={<SuperAdminFinancialReport />} />
             <Route path="/super-admin/reports-sub" element={<SuperAdminSubscriptionsReport />} />
             <Route path="/super-admin/reports-active" element={<SuperAdminActivityReport />} />
-            <Route path="/super-admin/logs" element={<LogsPage />} />
-            <Route path="/super-admin/settings" element={<SettingsPage />} />
+            <Route path="/super-admin/settings" element={<NotFound />} />
+            <Route path="/super-admin/logs" element={<NotFound />} />
             
             {/* Clinic Admin Routes */}
             <Route path="/clinic-admin" element={<ClinicAdminDashboard />} />
