@@ -1,9 +1,22 @@
-
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { ReportData } from "@/types/subscription";
 import { formatDate } from "@/lib/utils";
+
+// Add autoTable to jsPDF instance type
+declare module "jspdf" {
+  interface jsPDF {
+    autoTable: (options: any) => jsPDF;
+    internal: {
+      getNumberOfPages: () => number;
+      pageSize: {
+        width: number;
+        height: number;
+      };
+    };
+  }
+}
 
 // Helper function to add company header to PDF
 const addCompanyHeader = (doc: jsPDF, title: string) => {
@@ -63,7 +76,7 @@ export const generateFinancialReportPDF = (
   ];
   
   // Add the table
-  (doc as any).autoTable({
+  doc.autoTable({
     startY: 72,
     head: [columns.map(col => col.header)],
     body: paymentData.map(row => 
@@ -75,7 +88,7 @@ export const generateFinancialReportPDF = (
   });
   
   // Footer with page numbers
-  const pageCount = (doc as any).internal.getNumberOfPages();
+  const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(10);
@@ -125,7 +138,7 @@ export const generateSubscriptionsReportPDF = (
   ];
   
   // Add the table
-  (doc as any).autoTable({
+  doc.autoTable({
     startY: 84,
     head: [columns.map(col => col.header)],
     body: subscriptionData.map(row => [
@@ -141,7 +154,7 @@ export const generateSubscriptionsReportPDF = (
   });
   
   // Footer with page numbers
-  const pageCount = (doc as any).internal.getNumberOfPages();
+  const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(10);
@@ -192,7 +205,7 @@ export const generateActivityReportPDF = (
   ];
   
   // Add the table
-  (doc as any).autoTable({
+  doc.autoTable({
     startY: 90,
     head: [columns.map(col => col.header)],
     body: clinicActivityData.map(row => [
@@ -208,7 +221,7 @@ export const generateActivityReportPDF = (
   });
   
   // Footer with page numbers
-  const pageCount = (doc as any).internal.getNumberOfPages();
+  const pageCount = doc.internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(10);
@@ -292,12 +305,12 @@ export const getReportFileName = (reportType: string, format: string) => {
 };
 
 // Main function to generate and download report
-export const generateAndDownloadReport = (
+export const generateAndDownloadReport = async (
   reportType: "financial" | "subscriptions" | "activity",
   format: "pdf" | "excel" | "csv",
   data: any,
   period: string = "Текущий период"
-) => {
+): Promise<string> => {
   let blob: Blob;
   let fileName: string;
   
@@ -366,6 +379,6 @@ export const generateAndDownloadReport = (
       throw new Error("Unsupported report type");
   }
   
-  downloadBlob(blob, fileName);
+  downloadBlob(blob!, fileName);
   return fileName;
 };
