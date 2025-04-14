@@ -12,13 +12,13 @@ export function useDashboardData() {
     clinics: 1,
     doctors: 10,
     doctorsChange: "+1 за 7 дней",
-    doctorsTrend: "up",
+    doctorsTrend: "up" as const,
     patients: 800,
     patientsChange: "+12 за 7 дней",
-    patientsTrend: "up",
+    patientsTrend: "up" as const,
     appointments: 27,
     appointmentsChange: "-12% от прошлой недели",
-    appointmentsTrend: "down"
+    appointmentsTrend: "down" as const
   };
   
   // Keep only Najot Shifo
