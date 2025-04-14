@@ -1,4 +1,3 @@
-
 import jsPDF from "jspdf";
 // Import the autotable plugin properly
 import { jsPDF as jsPDFType } from "jspdf";
@@ -14,13 +13,19 @@ declare module "jspdf" {
   interface jsPDF {
     autoTable: (options: UserOptions) => jsPDF;
     internal: {
+      // Extend internal with getNumberOfPages method
       getNumberOfPages: () => number;
       pageSize: {
         width: number;
         height: number;
         getWidth: () => number;
         getHeight: () => number;
-      }
+      };
+      // Keep other properties from the original type
+      events?: any;
+      scaleFactor?: number;
+      pages?: number[];
+      getEncryptor?: (objectId: number) => (data: string) => string;
     }
   }
 }
