@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useIntegrationsData } from "@/hooks/useIntegrationsData";
 import { IntegrationCards } from "@/components/integrations/IntegrationCards";
 import { IntegrationsHeader } from "@/components/integrations/IntegrationsHeader";
+import { PaymentProvidersCard } from "@/components/integrations/PaymentProvidersCard";
 import { ErrorsSection } from "@/components/dashboard/ErrorsSection";
 
 export default function SuperAdminIntegrations() {
@@ -27,6 +28,8 @@ export default function SuperAdminIntegrations() {
               />
             </CardContent>
           </Card>
+          
+          <PaymentProvidersCard />
           
           {errors && errors.length > 0 && (
             <ErrorsSection errors={errors} />
