@@ -8,7 +8,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { PaymentHistory } from "@/types/subscription";
-import { CheckCircle, XCircle, Clock } from "lucide-react";
+import { CheckCircle, XCircle, Clock, FileText } from "lucide-react";
 
 interface PaymentsTableProps {
   payments: PaymentHistory[];
@@ -26,7 +26,7 @@ export function PaymentsTable({ payments }: PaymentsTableProps) {
   };
 
   // Рендер статуса платежа с иконкой
-  const renderStatus = (status: string) => {
+  const renderStatus = (status: string, isInvoice: boolean = false) => {
     switch (status) {
       case 'success':
         return (
@@ -40,6 +40,13 @@ export function PaymentsTable({ payments }: PaymentsTableProps) {
           <div className="flex items-center text-amber-500">
             <Clock className="h-4 w-4 mr-1" />
             <span>В обработке</span>
+          </div>
+        );
+      case 'awaiting':
+        return (
+          <div className="flex items-center text-blue-500">
+            <Clock className="h-4 w-4 mr-1" />
+            <span>Ожидает оплаты</span>
           </div>
         );
       case 'failed':
@@ -63,6 +70,7 @@ export function PaymentsTable({ payments }: PaymentsTableProps) {
             <TableHead>Сумма</TableHead>
             <TableHead>Тариф</TableHead>
             <TableHead>Статус</TableHead>
+            <TableHead>Тип</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -71,7 +79,17 @@ export function PaymentsTable({ payments }: PaymentsTableProps) {
               <TableCell>{formatDate(payment.date)}</TableCell>
               <TableCell>{payment.amount}</TableCell>
               <TableCell>{payment.planName}</TableCell>
-              <TableCell>{renderStatus(payment.status)}</TableCell>
+              <TableCell>{renderStatus(payment.status, payment.invoiceGenerated)}</TableCell>
+              <TableCell>
+                {payment.invoiceGenerated ? (
+                  <div className="flex items-center text-gray-600">
+                    <FileText className="h-4 w-4 mr-1" />
+                    <span>Счёт</span>
+                  </div>
+                ) : (
+                  <span>Платёж</span>
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

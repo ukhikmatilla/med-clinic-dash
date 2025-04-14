@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Subscription } from "@/types/subscription";
+import { Subscription, InvoiceFormData } from "@/types/subscription";
 import { 
   Calendar, 
   Clock, 
@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { ExtendSubscriptionModal } from "./ExtendSubscriptionModal";
 import { ChangePlanModal } from "./ChangePlanModal";
+import { GenerateInvoiceModal } from "./GenerateInvoiceModal";
 
 interface SubscriptionCardProps {
   subscription: Subscription;
@@ -26,6 +27,7 @@ interface SubscriptionCardProps {
   onExtend: (months: number) => Promise<void>;
   onChangePlan: (plan: string) => Promise<void>;
   onToggleAutoRenewal: () => Promise<void>;
+  onGenerateInvoice: (data: InvoiceFormData) => Promise<void>;
 }
 
 export function SubscriptionCard({ 
@@ -34,11 +36,13 @@ export function SubscriptionCard({
   isLoading,
   onExtend,
   onChangePlan,
-  onToggleAutoRenewal
+  onToggleAutoRenewal,
+  onGenerateInvoice
 }: SubscriptionCardProps) {
   const { toast } = useToast();
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [isChangePlanModalOpen, setIsChangePlanModalOpen] = useState(false);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   // Форматирование даты в локальный формат
   const formatDate = (dateStr: string): string => {
@@ -167,6 +171,7 @@ export function SubscriptionCard({
             <Button 
               variant="secondary" 
               className="w-full"
+              onClick={() => setIsInvoiceModalOpen(true)}
               disabled={isLoading}
             >
               <FileText className="mr-2 h-4 w-4" />
@@ -187,6 +192,14 @@ export function SubscriptionCard({
         onOpenChange={setIsChangePlanModalOpen}
         currentPlan={subscription.planName}
         onChangePlan={onChangePlan}
+      />
+      
+      <GenerateInvoiceModal
+        open={isInvoiceModalOpen}
+        onOpenChange={setIsInvoiceModalOpen}
+        currentPlan={subscription.planName}
+        clinicId={subscription.clinicId}
+        onGenerateInvoice={onGenerateInvoice}
       />
     </Card>
   );

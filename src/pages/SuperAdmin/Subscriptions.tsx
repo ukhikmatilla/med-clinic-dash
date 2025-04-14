@@ -17,7 +17,8 @@ export default function SuperAdminSubscriptions() {
     isLoading,
     extendSubscription,
     changePlan,
-    toggleAutoRenewal
+    toggleAutoRenewal,
+    generateInvoice
   } = useSubscriptionData();
   const { toast } = useToast();
   
@@ -59,6 +60,19 @@ export default function SuperAdminSubscriptions() {
       });
     }
   };
+  
+  // Обработчик генерации счета
+  const handleGenerateInvoice = async (invoiceData) => {
+    try {
+      await generateInvoice(invoiceData);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось создать счёт",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <SidebarLayout sidebar={<SuperAdminSidebar />}>
@@ -85,14 +99,15 @@ export default function SuperAdminSubscriptions() {
           onExtend={handleExtendSubscription}
           onChangePlan={handleChangePlan}
           onToggleAutoRenewal={handleToggleAutoRenewal}
+          onGenerateInvoice={handleGenerateInvoice}
         />
 
         <div className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>История платежей</CardTitle>
+              <CardTitle>История платежей и счетов</CardTitle>
               <CardDescription>
-                Последние транзакции по подписке клиники {subscription.clinicName}
+                Последние транзакции и выставленные счета для клиники {subscription.clinicName}
               </CardDescription>
             </CardHeader>
             <CardContent>
