@@ -48,3 +48,43 @@ export interface Invoice {
   telegramSent: boolean;
   emailSent?: boolean;
 }
+
+// Report types
+export interface ReportData {
+  id: string;
+  title: string;
+  description: string;
+  generatedAt: string;
+  type: ReportType;
+  data: any;
+}
+
+export type ReportType = 'financial' | 'subscriptions' | 'activity' | 'errors';
+
+export interface SubscriptionTrend {
+  month: string;
+  activeSubscriptions: number;
+  newSubscriptions: number;
+  cancelledSubscriptions: number;
+}
+
+export interface RevenueData {
+  month: string;
+  crmRevenue: number;
+  crmTelegramRevenue: number;
+  total: number;
+}
+
+export interface ClinicActivity {
+  clinicName: string;
+  appointments: number;
+  patients: number;
+  doctors: number;
+  lastActive: string;
+}
+
+export interface IntegrationData {
+  month: string;
+  googleCalendar: number;
+  telegram: number;
+}

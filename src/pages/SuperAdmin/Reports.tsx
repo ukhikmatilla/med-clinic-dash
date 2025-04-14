@@ -3,37 +3,45 @@ import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { SuperAdminSidebar } from "@/components/sidebars/SuperAdminSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Download, BarChart, PieChart, LineChart, Users } from "lucide-react";
+import { FileText, Download, BarChart, PieChart, LineChart, Users, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
+import { useReportsData } from "@/hooks/useReportsData";
+import { ReportCard } from "@/components/reports/ReportCard";
+import { AnalyticsCharts } from "@/components/reports/AnalyticsCharts";
+import { KpiCards } from "@/components/reports/KpiCards";
+import { ExpiringSubscriptionsTable } from "@/components/reports/ExpiringSubscriptionsTable";
+import { toast } from "@/components/ui/sonner";
+import { ErrorsSection } from "@/components/dashboard/ErrorsSection";
+import { useIntegrationsData } from "@/hooks/useIntegrationsData";
 
 export default function SuperAdminReports() {
-  const reportsList = [
-    {
-      name: "Активность клиник",
-      description: "Посещаемость и загруженность за последний месяц",
-      date: "14.04.2025",
-      icon: <BarChart className="h-8 w-8 text-primary" />,
-    },
-    {
-      name: "Финансовый отчёт",
-      description: "Доходы и расходы по всем клиникам",
-      date: "10.04.2025",
-      icon: <LineChart className="h-8 w-8 text-primary" />,
-    },
-    {
-      name: "Статистика врачей",
-      description: "Эффективность и загруженность врачей",
-      date: "05.04.2025",
-      icon: <PieChart className="h-8 w-8 text-primary" />,
-    },
-    {
-      name: "Демографический анализ",
-      description: "Анализ пациентов по возрасту и полу",
-      date: "01.04.2025",
-      icon: <Users className="h-8 w-8 text-primary" />,
-    },
-  ];
+  const [period, setPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const { reports, isLoading, refreshReport, analytics } = useReportsData(period);
+  const { errors } = useIntegrationsData();
+  
+  const handlePeriodChange = (value: string) => {
+    setPeriod(value as 'week' | 'month' | 'quarter' | 'year');
+  };
+  
+  const handleCreateReport = () => {
+    toast.info("Функция создания отчетов в разработке");
+  };
+  
+  // Find the activity report to extract KPI data
+  const activityReport = reports.find(report => report.type === 'activity');
+  const subscriptionsReport = reports.find(report => report.type === 'subscriptions');
+  
+  // Extract KPI data
+  const kpiData = {
+    activeSubscriptions: subscriptionsReport?.data?.activeSubscriptions || 0,
+    autoRenewal: subscriptionsReport?.data?.autoRenewal || 0,
+    newClinics: activityReport?.data?.newClinics || 0,
+    newDoctors: activityReport?.data?.newDoctors || 0,
+    newPatients: activityReport?.data?.newPatients || 0,
+    totalAppointments: activityReport?.data?.totalAppointments || 0,
+  };
 
   return (
     <SidebarLayout sidebar={<SuperAdminSidebar />}>
@@ -46,7 +54,7 @@ export default function SuperAdminReports() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Select defaultValue="month">
+            <Select defaultValue={period} onValueChange={handlePeriodChange}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Период" />
               </SelectTrigger>
@@ -57,7 +65,7 @@ export default function SuperAdminReports() {
                 <SelectItem value="year">За год</SelectItem>
               </SelectContent>
             </Select>
-            <Button>
+            <Button onClick={handleCreateReport}>
               <FileText className="mr-2 h-4 w-4" />
               Создать отчёт
             </Button>
@@ -70,45 +78,50 @@ export default function SuperAdminReports() {
             <TabsTrigger value="analytics">Аналитика</TabsTrigger>
             <TabsTrigger value="custom">Настраиваемые отчёты</TabsTrigger>
           </TabsList>
-          <TabsContent value="recent" className="mt-4">
+          
+          {/* Recent Reports Tab */}
+          <TabsContent value="recent" className="mt-4 space-y-6">
+            <KpiCards data={kpiData} />
+            
             <div className="grid gap-4 md:grid-cols-2">
-              {reportsList.map((report) => (
-                <Card key={report.name}>
-                  <CardHeader className="flex flex-row items-start justify-between space-y-0">
-                    {report.icon}
-                    <Button variant="ghost" size="icon">
-                      <Download className="h-4 w-4" />
-                      <span className="sr-only">Скачать отчёт</span>
-                    </Button>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-1">
-                      <CardTitle>{report.name}</CardTitle>
-                      <CardDescription>{report.description}</CardDescription>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Создан: {report.date}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {reports
+                .filter(report => report.type !== "errors") // We'll display errors separately
+                .map((report) => (
+                  <ReportCard 
+                    key={report.id} 
+                    report={report} 
+                    onRefresh={refreshReport}
+                    isLoading={isLoading} 
+                  />
+                ))
+              }
+            </div>
+            
+            {/* Display the expiring subscriptions from the report */}
+            {subscriptionsReport && (
+              <ExpiringSubscriptionsTable 
+                subscriptions={subscriptionsReport.data.expiringSubscriptions || []} 
+              />
+            )}
+            
+            {/* Integration Errors Section */}
+            <div className="mt-6">
+              <ErrorsSection errors={errors} />
             </div>
           </TabsContent>
-          <TabsContent value="analytics" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Аналитика по всей системе</CardTitle>
-                <CardDescription>
-                  Сводная статистика и ключевые показатели
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-center text-muted-foreground py-12">
-                  Графики аналитики будут отображены здесь
-                </p>
-              </CardContent>
-            </Card>
+          
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="mt-4 space-y-6">
+            <KpiCards data={kpiData} />
+            
+            <AnalyticsCharts 
+              subscriptionTrends={analytics.subscriptionTrends}
+              revenueData={analytics.revenueData}
+              integrationData={analytics.integrationData}
+            />
           </TabsContent>
+          
+          {/* Custom Reports Tab */}
           <TabsContent value="custom" className="mt-4">
             <Card>
               <CardHeader>
@@ -118,9 +131,17 @@ export default function SuperAdminReports() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-center text-muted-foreground py-12">
-                  Мастер создания отчётов будет здесь
-                </p>
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Создайте свой отчёт</h3>
+                  <p className="text-muted-foreground max-w-md mb-6">
+                    Выберите параметры, метрики и фильтры для создания персонализированного отчёта
+                  </p>
+                  <Button onClick={handleCreateReport}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Создать отчёт
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
