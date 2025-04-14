@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, RefreshCw, FileText, BarChart, Users, AlertTriangle, ExternalLink } from "lucide-react";
@@ -13,6 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { generateAndDownloadReport } from "@/utils/reportGenerator";
+import { ReportFormatSelector } from "./ReportFormatSelector";
 
 interface ReportCardProps {
   report: ReportData;
@@ -25,27 +25,22 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadOpen, setDownloadOpen] = useState(false);
   
-  const handleDownloadClick = (format: "pdf" | "excel" | "csv") => {
+  const handleExport = async (format: "pdf" | "excel" | "csv") => {
     setIsDownloading(true);
     try {
       const data = getReportData(report);
-      generateAndDownloadReport(
+      await generateAndDownloadReport(
         report.type as any,
         format,
         data,
         "Текущий период"
-      ).then(() => {
-        toast.success(`Отчет успешно загружен в формате ${format.toUpperCase()}`);
-        setDownloadOpen(false);
-      }).catch((error) => {
-        console.error("Download error:", error);
-        toast.error("Не удалось загрузить отчет");
-      }).finally(() => {
-        setIsDownloading(false);
-      });
+      );
+      toast.success(`Отчет успешно загружен в формате ${format.toUpperCase()}`);
+      setDownloadOpen(false);
     } catch (error) {
       console.error("Download error:", error);
       toast.error("Не удалось загрузить отчет");
+    } finally {
       setIsDownloading(false);
     }
   };
@@ -152,6 +147,7 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             <span className="sr-only">Обновить отчет</span>
           </Button>
+          
           <Popover open={downloadOpen} onOpenChange={setDownloadOpen}>
             <PopoverTrigger asChild>
               <Button 
@@ -174,7 +170,7 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
                   className="justify-start"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDownloadClick("pdf");
+                    handleExport("pdf");
                   }}
                   disabled={isDownloading}
                 >
@@ -187,7 +183,7 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
                   className="justify-start"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDownloadClick("excel");
+                    handleExport("excel");
                   }}
                   disabled={isDownloading}
                 >
@@ -200,7 +196,7 @@ export function ReportCard({ report, onRefresh, isLoading }: ReportCardProps) {
                   className="justify-start"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDownloadClick("csv");
+                    handleExport("csv");
                   }}
                   disabled={isDownloading}
                 >
