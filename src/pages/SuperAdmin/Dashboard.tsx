@@ -1,3 +1,4 @@
+
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { SuperAdminSidebar } from "@/components/sidebars/SuperAdminSidebar";
 import { 
@@ -40,7 +41,6 @@ import { SubscriptionAlert } from "@/components/dashboard/SubscriptionAlert";
 import { ClinicsSection } from "@/components/dashboard/ClinicsSection";
 import { IntegrationErrorsTable } from "@/components/dashboard/IntegrationErrorsTable";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { Building2, UserRound, Users, CalendarClock } from "lucide-react";
 
 export function SuperAdminDashboard() {
   const { toast } = useToast();
