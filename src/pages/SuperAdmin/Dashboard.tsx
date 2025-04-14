@@ -7,7 +7,7 @@ import { LicenseAndActivitySection } from "@/components/dashboard/LicenseAndActi
 import { SubscriptionAlert } from "@/components/dashboard/SubscriptionAlert";
 import { ClinicsSection } from "@/components/dashboard/ClinicsSection";
 import { ErrorsSection } from "@/components/dashboard/ErrorsSection";
-import { useDashboardData } from "@/components/dashboard/DashboardData";
+import { useDashboardData } from "@/hooks/dashboard/useDashboardData";
 
 export function SuperAdminDashboard() {
   const {
