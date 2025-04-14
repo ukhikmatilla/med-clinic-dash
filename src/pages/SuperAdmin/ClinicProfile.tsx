@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
@@ -211,6 +210,19 @@ const fetchServices = async (clinicId: string) => {
   ];
 };
 
+// New mock function for toggling auto-renewal
+const toggleAutoRenewal = async (clinicId: string, value: boolean): Promise<boolean> => {
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // Simulating a 90% success rate
+  if (Math.random() > 0.1) {
+    return value;
+  } else {
+    throw new Error("Failed to update auto-renewal status");
+  }
+};
+
 export function SuperAdminClinicProfile() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
@@ -292,6 +304,34 @@ export function SuperAdminClinicProfile() {
     });
   };
   
+  const handleToggleAutoRenewal = async (value: boolean) => {
+    try {
+      const result = await toggleAutoRenewal(id || "", value);
+      
+      setClinic({
+        ...clinic,
+        subscription: {
+          ...clinic.subscription,
+          autoRenewal: result
+        }
+      });
+      
+      toast({
+        title: "Автопродление обновлено",
+        description: `Автопродление ${result ? "включено" : "отключено"}`
+      });
+      
+      return result;
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить статус автопродления",
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+  
   // Handle back button click
   const handleBack = () => {
     window.history.back();
@@ -363,10 +403,12 @@ export function SuperAdminClinicProfile() {
             plan={clinic.subscription.plan}
             autoRenewal={clinic.subscription.autoRenewal}
             clinicName={clinic.name}
+            clinicId={id}
             isSuperAdmin={true}
             onExtend={handleExtendSubscription}
             onChangePlan={handleChangePlan}
             onDisable={handleDisableSubscription}
+            onToggleAutoRenewal={handleToggleAutoRenewal}
           />
         </div>
         

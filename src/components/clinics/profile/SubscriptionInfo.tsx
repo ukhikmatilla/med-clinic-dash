@@ -7,8 +7,10 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, ToggleLeft, ToggleRight } from "lucide-react";
+import { Check, ToggleLeft, ToggleRight, Loader2 } from "lucide-react";
 import { ManageSubscriptionDialog } from "./ManageSubscriptionDialog";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
 
 interface SubscriptionInfoProps {
   status: string;
@@ -16,10 +18,12 @@ interface SubscriptionInfoProps {
   plan: string;
   autoRenewal: boolean;
   clinicName: string;
+  clinicId?: string;
   isSuperAdmin?: boolean;
   onExtend?: (data: { duration: number }) => void;
   onChangePlan?: (data: { plan: string }) => void;
   onDisable?: (data: { active: boolean }) => void;
+  onToggleAutoRenewal?: (value: boolean) => void;
 }
 
 export function SubscriptionInfo({ 
@@ -28,12 +32,16 @@ export function SubscriptionInfo({
   plan, 
   autoRenewal,
   clinicName,
+  clinicId,
   isSuperAdmin = false,
   onExtend,
   onChangePlan,
-  onDisable
+  onDisable,
+  onToggleAutoRenewal
 }: SubscriptionInfoProps) {
   const [dialogMode, setDialogMode] = useState<"extend" | "change" | "disable" | null>(null);
+  const [isToggling, setIsToggling] = useState(false);
+  const { toast } = useToast();
   
   const handleExtend = () => {
     setDialogMode("extend");
@@ -58,6 +66,23 @@ export function SubscriptionInfo({
       case "disable":
         onDisable && onDisable(data);
         break;
+    }
+  };
+  
+  const handleToggleAutoRenewal = async (checked: boolean) => {
+    if (!isSuperAdmin || !onToggleAutoRenewal) return;
+    
+    setIsToggling(true);
+    try {
+      await onToggleAutoRenewal(checked);
+    } catch (error) {
+      toast({
+        title: "Ошибка при обновлении",
+        description: "Не удалось обновить статус автопродления",
+        variant: "destructive"
+      });
+    } finally {
+      setIsToggling(false);
     }
   };
   
@@ -90,19 +115,36 @@ export function SubscriptionInfo({
           
           <div>
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Автопродление</h3>
-            <div className="flex items-center">
-              {autoRenewal ? (
-                <>
-                  <ToggleRight className="mr-2 h-5 w-5 text-primary" />
-                  <span>ВКЛ</span>
-                </>
-              ) : (
-                <>
-                  <ToggleLeft className="mr-2 h-5 w-5 text-muted-foreground" />
-                  <span>ВЫКЛ</span>
-                </>
-              )}
-            </div>
+            {isSuperAdmin ? (
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-sm">{autoRenewal ? "ВКЛ" : "ВЫКЛ"}</span>
+                <div className="flex items-center relative">
+                  {isToggling && (
+                    <Loader2 className="absolute right-10 w-4 h-4 animate-spin text-primary" />
+                  )}
+                  <Switch
+                    checked={autoRenewal}
+                    onCheckedChange={handleToggleAutoRenewal}
+                    disabled={isToggling}
+                    className="data-[state=checked]:bg-primary"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center">
+                {autoRenewal ? (
+                  <>
+                    <ToggleRight className="mr-2 h-5 w-5 text-primary" />
+                    <span>ВКЛ</span>
+                  </>
+                ) : (
+                  <>
+                    <ToggleLeft className="mr-2 h-5 w-5 text-muted-foreground" />
+                    <span>ВЫКЛ</span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
           
           {isSuperAdmin && (
