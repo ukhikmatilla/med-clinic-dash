@@ -158,7 +158,7 @@ export function ClinicAdminDoctors() {
           open={viewDialogOpen}
           onOpenChange={setViewDialogOpen}
           doctor={selectedDoctor}
-          services={mockServices}
+          services={mockServices as any}
         />
         
         {/* Delete Confirmation Dialog */}
