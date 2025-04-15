@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,14 +55,14 @@ export function EditServiceDialog({
   });
   
   // Reset form when dialog opens/closes or service changes
-  useState(() => {
+  useEffect(() => {
     if (open) {
       form.reset({
         name: service?.name || "",
         price: service?.price ? service.price.toString() : ""
       });
     }
-  });
+  }, [open, service, form]);
   
   const handleSubmit = async (values: ServiceFormValues) => {
     setLoading(true);
