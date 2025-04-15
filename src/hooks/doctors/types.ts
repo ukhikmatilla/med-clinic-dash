@@ -1,4 +1,3 @@
-import { DoctorFormValues } from "@/components/clinics/doctors/DoctorForm";
 
 export interface Doctor {
   id: string;
@@ -19,6 +18,7 @@ export interface Service {
   id: string;
   name: string;
   category: string;
+  category_id?: string; 
   price: number;
   durationMin: number;
   doctors?: string[]; // Array of doctor IDs

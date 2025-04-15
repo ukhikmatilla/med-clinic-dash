@@ -1,16 +1,15 @@
-
 import { Doctor, Service } from "@/hooks/doctors/types";
 
 // Mock services data
 export const mockServices: Service[] = [
-  { id: "service1", name: "Консультация", price: 50000, durationMin: 15 },
-  { id: "service2", name: "УЗИ щитовидной железы", price: 90000, durationMin: 30 },
-  { id: "service3", name: "Анализ крови", price: 50000, durationMin: 10 },
-  { id: "service4", name: "ЭКГ", price: 168000, durationMin: 20 },
-  { id: "service5", name: "Вакцинация", price: 120000, durationMin: 15 },
-  { id: "service6", name: "Физиотерапия", price: 85000, durationMin: 40 },
-  { id: "service7", name: "Массаж", price: 100000, durationMin: 60 },
-  { id: "service8", name: "Кардиограмма", price: 200000, durationMin: 30 },
+  { id: "service1", name: "Консультация", price: 50000, durationMin: 15, category: "Консультации" },
+  { id: "service2", name: "УЗИ щитовидной железы", price: 90000, durationMin: 30, category: "УЗИ" },
+  { id: "service3", name: "Анализ крови", price: 50000, durationMin: 10, category: "Анализы" },
+  { id: "service4", name: "ЭКГ", price: 168000, durationMin: 20, category: "Консультации" },
+  { id: "service5", name: "Вакцинация", price: 120000, durationMin: 15, category: "Консультации" },
+  { id: "service6", name: "Физиотерапия", price: 85000, durationMin: 40, category: "Физиотерапия" },
+  { id: "service7", name: "Массаж", price: 100000, durationMin: 60, category: "Массаж" },
+  { id: "service8", name: "Кардиограмма", price: 200000, durationMin: 30, category: "Консультации" },
 ];
 
 // Mock doctors data
