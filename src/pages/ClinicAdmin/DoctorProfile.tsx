@@ -14,16 +14,7 @@ import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog"
 import { useDoctorProfileData } from "@/hooks/useDoctorProfileData";
 import { mockServices } from "@/data/doctors/mockData";
 import { Loader2 } from "lucide-react";
-import { Service as DoctorService } from "@/hooks/doctors/types";
-
-// Define a mapper function to convert DoctorService to the expected Service format
-const mapServiceToExpectedFormat = (service: DoctorService) => {
-  return {
-    ...service,
-    // Convert number price to string format for compatibility with existing components
-    price: service.price.toString()
-  };
-};
+import { Service } from "@/hooks/doctors/types";
 
 export function DoctorProfile() {
   const { id } = useParams<{ id: string }>();
@@ -53,8 +44,11 @@ export function DoctorProfile() {
     );
   }
   
-  // Map services to the expected format
-  const formattedServices = services.map(mapServiceToExpectedFormat);
+  // Convert mockServices for compatibility with doctor form dialog
+  const formattedMockServices = mockServices.map(service => ({
+    ...service,
+    price: service.price.toString() // Convert to string for form display
+  }));
   
   return (
     <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
@@ -104,7 +98,7 @@ export function DoctorProfile() {
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
           doctor={doctor}
-          services={mockServices}
+          services={formattedMockServices}
           onSave={async (values, isEditing) => {
             // In a real app, this would update the doctor data
             console.log("Updating doctor:", values);

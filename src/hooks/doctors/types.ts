@@ -21,7 +21,7 @@ export interface Service {
   name: string;
   category: string;
   category_id?: string; 
-  price: number;
+  price: number;  // Ensuring this is consistently a number
   durationMin: number;
   doctors?: string[]; // Array of doctor IDs
 }
