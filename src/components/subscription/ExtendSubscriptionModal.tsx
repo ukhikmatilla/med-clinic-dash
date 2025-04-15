@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useToast } from "@/hooks/use-toast";
+import { formatExtensionRequestMessage, sendTelegramNotification } from "@/utils/notificationUtils";
 
 interface ExtendSubscriptionModalProps {
   open: boolean;
@@ -31,6 +32,17 @@ export function ExtendSubscriptionModal({
     setIsSubmitting(true);
     try {
       const months = parseInt(selectedMonths);
+      
+      // Send notification to Super Admin via Telegram
+      // This is just for demonstration - in a real app, this would be handled server-side
+      try {
+        // This would be handled server-side in a real application
+        // We're showing it here for demonstration purposes
+        console.log("Sending notification to Super Admin");
+      } catch (error) {
+        console.error("Error sending notification:", error);
+      }
+      
       const success = await onExtend(months);
       
       // Only close the modal if success is explicitly false

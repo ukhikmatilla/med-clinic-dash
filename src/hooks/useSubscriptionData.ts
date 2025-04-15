@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Subscription, PaymentHistory, InvoiceFormData, SubscriptionExtensionRequest } from '@/types/subscription';
 import { useToast } from '@/hooks/use-toast';
+import { formatExtensionRequestMessage, sendTelegramNotification } from '@/utils/notificationUtils';
 
 // Мок-данные для подписки Najot Shifo
 const mockSubscription: Subscription = {
@@ -125,6 +126,15 @@ export function useSubscriptionData() {
     };
     
     setExtensionRequests([newRequest, ...extensionRequests]);
+    
+    // Отправляем уведомление в Telegram суперадмину
+    try {
+      const message = formatExtensionRequestMessage(subscription.clinicName, months);
+      await sendTelegramNotification(message);
+    } catch (error) {
+      console.error("Error sending Telegram notification:", error);
+    }
+    
     setIsLoading(false);
     
     return true;
@@ -190,7 +200,7 @@ export function useSubscriptionData() {
       if (req.id === requestId) {
         return {
           ...req,
-          status: approve ? 'approved' : 'rejected',
+          status: approve ? 'approved' as const : 'rejected' as const,
           adminComment: comment
         };
       }
