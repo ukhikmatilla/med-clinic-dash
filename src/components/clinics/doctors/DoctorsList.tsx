@@ -1,216 +1,124 @@
 
-import { useState } from "react";
+import { Link } from "react-router-dom";
 import { 
-  Card, 
-  CardContent
-} from "@/components/ui/card";
-import { Eye, Pencil, Trash2, Clock, Award } from "lucide-react";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-interface Doctor {
-  id: string;
-  fullName: string;
-  specialties: string[];
-  status: "active" | "inactive";
-  schedule: Record<string, string>;
-  experience?: string;
-  category?: string;
-}
+import { Doctor } from "@/hooks/useDoctorsData";
+import { MoreHorizontal, Eye, Edit, Trash2, Check, X } from "lucide-react";
 
 interface DoctorsListProps {
   doctors: Doctor[];
-  onViewDoctor: (doctor: Doctor) => void;
-  onEditDoctor: (doctor: Doctor) => void;
-  onDeleteDoctor: (doctor: Doctor) => void;
+  onViewDoctor: (doctorId: string) => void;
+  onEditDoctor: (doctorId: string) => void;
+  onDeleteDoctor: (doctorId: string) => void;
 }
 
 export function DoctorsList({ 
-  doctors, 
-  onViewDoctor, 
-  onEditDoctor, 
-  onDeleteDoctor 
+  doctors,
+  onViewDoctor,
+  onEditDoctor,
+  onDeleteDoctor
 }: DoctorsListProps) {
+  if (doctors.length === 0) {
+    return (
+      <div className="text-center p-8 text-muted-foreground border rounded-md">
+        Нет добавленных врачей
+      </div>
+    );
+  }
+  
   return (
-    <>
-      {/* Desktop table view */}
-      <div className="hidden md:block">
-        <Card className="bg-white">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-muted/50">
-                    <th className="text-left py-3 px-4 font-medium text-sm">ФИО</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm">Специальность(и)</th>
-                    <th className="text-left py-3 px-4 font-medium text-sm whitespace-nowrap">
-                      <Clock className="h-3.5 w-3.5 inline mr-1" /> Стаж
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-sm whitespace-nowrap">
-                      <Award className="h-3.5 w-3.5 inline mr-1" /> Категория
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-sm">Расписание</th>
-                    <th className="text-center py-3 px-4 font-medium text-sm">Статус</th>
-                    <th className="text-right py-3 px-4 font-medium text-sm">Действия</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {doctors.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="text-center py-6 text-muted-foreground">
-                        Врачи не найдены
-                      </td>
-                    </tr>
-                  ) : (
-                    doctors.map((doctor) => {
-                      const scheduleString = Object.keys(doctor.schedule).length > 0
-                        ? `${Object.keys(doctor.schedule)[0]}-${Object.keys(doctor.schedule)[Object.keys(doctor.schedule).length - 1]} ${Object.values(doctor.schedule)[0]}`
-                        : "Не указано";
-                        
-                      return (
-                        <tr key={doctor.id} className="border-t hover:bg-muted/20">
-                          <td className="py-3 px-4">{doctor.fullName}</td>
-                          <td className="py-3 px-4 text-sm">{doctor.specialties.join(", ")}</td>
-                          <td className="py-3 px-4 text-sm">{doctor.experience || "—"}</td>
-                          <td className="py-3 px-4 text-sm">{doctor.category || "—"}</td>
-                          <td className="py-3 px-4 text-sm">{scheduleString}</td>
-                          <td className="py-3 px-4 text-sm text-center">
-                            {doctor.status === "active" ? (
-                              <Badge variant="success">
-                                Активен
-                              </Badge>
-                            ) : (
-                              <Badge variant="destructive">
-                                Неактивен
-                              </Badge>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 text-sm text-right space-x-1">
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              onClick={() => onViewDoctor(doctor)}
-                              title="Просмотр"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              onClick={() => onEditDoctor(doctor)}
-                              title="Редактировать"
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              onClick={() => onDeleteDoctor(doctor)}
-                              title="Удалить"
-                              className="text-destructive hover:text-destructive/80"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Mobile card view */}
-      <div className="md:hidden space-y-3">
-        {doctors.length === 0 ? (
-          <Card className="bg-white">
-            <CardContent className="p-4 text-center text-muted-foreground">
-              Врачи не найдены
-            </CardContent>
-          </Card>
-        ) : (
-          doctors.map((doctor) => {
-            const scheduleString = Object.keys(doctor.schedule).length > 0
-              ? `${Object.keys(doctor.schedule)[0]}-${Object.keys(doctor.schedule)[Object.keys(doctor.schedule).length - 1]} ${Object.values(doctor.schedule)[0]}`
-              : "Не указано";
-              
-            return (
-              <Card key={doctor.id} className="bg-white">
-                <CardContent className="p-3">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="font-medium text-sm">{doctor.fullName}</h3>
-                      <p className="text-xs text-muted-foreground">{doctor.specialties.join(", ")}</p>
-                    </div>
-                    <div className="flex space-x-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 px-2"
-                        onClick={() => onViewDoctor(doctor)}
-                      >
-                        <Eye className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 px-2"
-                        onClick={() => onEditDoctor(doctor)}
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 px-2 text-destructive hover:text-destructive/80"
-                        onClick={() => onDeleteDoctor(doctor)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
+    <div className="border rounded-md">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[300px]">ФИО</TableHead>
+            <TableHead>Специальности</TableHead>
+            <TableHead>Telegram ID</TableHead>
+            <TableHead>Статус</TableHead>
+            <TableHead className="text-right"></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {doctors.map((doctor) => (
+            <TableRow key={doctor.id}>
+              <TableCell className="font-medium">
+                <Link to={`/clinic-admin/doctor/${doctor.id}`} className="hover:underline">
+                  {doctor.fullName}
+                </Link>
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-wrap gap-1">
+                  {doctor.specialties.map((specialty, index) => (
+                    <Badge key={index} variant="outline" className="mr-1">
+                      {specialty}
+                    </Badge>
+                  ))}
+                </div>
+              </TableCell>
+              <TableCell>{doctor.telegramId || "—"}</TableCell>
+              <TableCell>
+                {doctor.status === "active" ? (
+                  <div className="flex items-center">
+                    <Check className="h-4 w-4 text-green-500 mr-1" />
+                    <span>Активен</span>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="text-muted-foreground">
-                        <Clock className="h-3 w-3 inline mr-0.5" /> Стаж:
-                      </span>
-                      <div>{doctor.experience || "—"}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">
-                        <Award className="h-3 w-3 inline mr-0.5" /> Категория:
-                      </span>
-                      <div>{doctor.category || "—"}</div>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Статус:</span>
-                      <div className="flex items-center mt-0.5">
-                        {doctor.status === "active" ? (
-                          <Badge variant="success" className="text-[10px] px-1">
-                            Активен
-                          </Badge>
-                        ) : (
-                          <Badge variant="destructive" className="text-[10px] px-1">
-                            Неактивен
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-span-2">
-                      <span className="text-muted-foreground">Расписание:</span>
-                      <div>{scheduleString}</div>
-                    </div>
+                ) : (
+                  <div className="flex items-center">
+                    <X className="h-4 w-4 text-red-500 mr-1" />
+                    <span>Неактивен</span>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })
-        )}
-      </div>
-    </>
+                )}
+              </TableCell>
+              <TableCell className="text-right">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <span className="sr-only">Открыть меню</span>
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Действия</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => onViewDoctor(doctor.id)}>
+                      <Eye className="h-4 w-4 mr-2" />
+                      Просмотр
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onEditDoctor(doctor.id)}>
+                      <Edit className="h-4 w-4 mr-2" />
+                      Редактировать
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => onDeleteDoctor(doctor.id)}
+                      className="text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Удалить
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

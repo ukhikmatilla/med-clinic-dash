@@ -25,6 +25,7 @@ import SuperAdminActivityReport from "./pages/SuperAdmin/Reports/ActivityReport"
 import ClinicAdminDashboard from "./pages/ClinicAdmin/Dashboard";
 import ClinicAdminDoctors from "./pages/ClinicAdmin/Doctors";
 import ClinicAdminServices from "./pages/ClinicAdmin/Services";
+import DoctorProfile from "./pages/ClinicAdmin/DoctorProfile";
 
 const App = () => {
   // Create a new QueryClient instance inside the component
@@ -55,6 +56,7 @@ const App = () => {
             {/* Clinic Admin Routes */}
             <Route path="/clinic-admin" element={<ClinicAdminDashboard />} />
             <Route path="/clinic-admin/doctors" element={<ClinicAdminDoctors />} />
+            <Route path="/clinic-admin/doctor/:id" element={<DoctorProfile />} />
             <Route path="/clinic-admin/services" element={<ClinicAdminServices />} />
             <Route path="/clinic-admin/schedule" element={<NotFound />} />
             <Route path="/clinic-admin/schedule/:id" element={<NotFound />} />
