@@ -1,5 +1,5 @@
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { 
   SidebarMenu,
   SidebarMenuItem,
@@ -12,11 +12,8 @@ import {
 import { 
   LayoutDashboard,
   ClipboardList, 
-  FileSpreadsheet, 
-  Calendar, 
-  Settings, 
-  Link2,
-  CreditCard
+  FileSpreadsheet,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,10 +21,6 @@ const navItems = [
   { icon: <LayoutDashboard className="mr-2 h-4 w-4" />, label: "Дашборд", href: "/clinic-admin" },
   { icon: <ClipboardList className="mr-2 h-4 w-4" />, label: "Врачи", href: "/clinic-admin/doctors" },
   { icon: <FileSpreadsheet className="mr-2 h-4 w-4" />, label: "Услуги", href: "/clinic-admin/services" },
-  { icon: <Calendar className="mr-2 h-4 w-4" />, label: "Расписание", href: "/clinic-admin/schedule" },
-  { icon: <Settings className="mr-2 h-4 w-4" />, label: "Настройки клиники", href: "/clinic-admin/settings" },
-  { icon: <Link2 className="mr-2 h-4 w-4" />, label: "Интеграции", href: "/clinic-admin/integrations" },
-  { icon: <CreditCard className="mr-2 h-4 w-4" />, label: "Подписка", href: "/clinic-admin/subscription" },
 ];
 
 type ClinicAdminSidebarProps = {
@@ -36,6 +29,13 @@ type ClinicAdminSidebarProps = {
 
 export function ClinicAdminSidebar({ clinicName }: ClinicAdminSidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    // In a real app, you would call your authentication logout function here
+    // For now, we'll just redirect to the login page
+    navigate("/login");
+  };
   
   return (
     <div className="flex flex-col h-full">
@@ -70,7 +70,22 @@ export function ClinicAdminSidebar({ clinicName }: ClinicAdminSidebarProps) {
         </SidebarGroupContent>
       </SidebarGroup>
       
+      <div className="flex-1"></div>
+      
       <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              onClick={handleLogout}
+              tooltip="Выйти"
+              className="text-muted-foreground hover:text-sidebar-foreground w-full justify-start"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Выйти</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+        
         <div className="p-2">
           <div className="rounded-md bg-medical-light-blue p-3">
             <p className="text-xs font-medium text-sidebar-foreground">Подписка: Активна</p>
