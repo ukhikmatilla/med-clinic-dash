@@ -20,6 +20,8 @@ interface DoctorProfileHeaderProps {
 }
 
 export function DoctorProfileHeader({ doctor, onEditClick }: DoctorProfileHeaderProps) {
+  const specialties = doctor.specialties || [];
+  
   return (
     <Card>
       <CardContent className="p-6">
@@ -38,7 +40,7 @@ export function DoctorProfileHeader({ doctor, onEditClick }: DoctorProfileHeader
             </div>
             
             <div className="flex flex-wrap gap-2 mt-2">
-              {doctor.specialties && doctor.specialties.map((specialty, index) => (
+              {specialties && specialties.length > 0 && specialties.map((specialty, index) => (
                 <Badge key={index} variant="outline">
                   {specialty}
                 </Badge>

@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Service } from "@/hooks/useDoctorsData";
+import { mockDoctors, mockServices } from "@/data/doctors/mockData";
 
 // Define doctor interface
 export interface DoctorProfile {
@@ -31,52 +32,71 @@ export function useDoctorProfileData(doctorId?: string) {
 
     setLoading(true);
 
-    // In a real application, this would make API calls
-    // For now, we'll use mock data
+    // Find the doctor from mockDoctors based on doctorId
     setTimeout(() => {
-      // Mock doctor data
-      const mockDoctor: DoctorProfile = {
-        id: doctorId,
-        fullName: "Иванов Иван Петрович",
-        specialties: ["Терапевт", "Кардиолог"],
-        telegramId: "@doctor_ivanov",
-        telegramBot: "@najot_doctor_bot",
-        schedule: {
-          "Понедельник": "09:00 - 17:00",
-          "Вторник": "09:00 - 17:00",
-          "Среда": "09:00 - 17:00",
-          "Четверг": "09:00 - 17:00",
-          "Пятница": "09:00 - 15:00"
-        },
-        services: ["service1", "service2", "service3"],
-        status: "active",
-        experience: "15 лет",
-        category: "Высшая",
-        initialConsultation: "150 000 сум",
-        followupConsultation: "100 000 сум"
-      };
+      // Find the doctor in our mockData
+      const foundDoctor = mockDoctors.find(doc => doc.id === doctorId);
+      
+      if (foundDoctor) {
+        // Use the found doctor data
+        const doctorData: DoctorProfile = {
+          ...foundDoctor,
+          telegramBot: "@najot_doctor_bot"
+        };
+        
+        // Get services for this doctor
+        const doctorServices = mockServices.filter(service => 
+          foundDoctor.services.includes(service.id)
+        );
 
-      // Mock services data
-      const mockServices: Service[] = [
-        {
-          id: "service1",
-          name: "Первичная консультация",
-          price: "150 000 сум"
-        },
-        {
-          id: "service2",
-          name: "Повторная консультация",
-          price: "100 000 сум"
-        },
-        {
-          id: "service3",
-          name: "ЭКГ с расшифровкой",
-          price: "80 000 сум"
-        }
-      ];
+        setDoctor(doctorData);
+        setServices(doctorServices);
+      } else {
+        // Fallback to mock data if doctor not found
+        const mockDoctor: DoctorProfile = {
+          id: doctorId,
+          fullName: "Иванов Иван Петрович",
+          specialties: ["Терапевт", "Кардиолог"],
+          telegramId: "@doctor_ivanov",
+          telegramBot: "@najot_doctor_bot",
+          schedule: {
+            "Понедельник": "09:00 - 17:00",
+            "Вторник": "09:00 - 17:00",
+            "Среда": "09:00 - 17:00",
+            "Четверг": "09:00 - 17:00",
+            "Пятница": "09:00 - 15:00"
+          },
+          services: ["service1", "service2", "service3"],
+          status: "active",
+          experience: "15 лет",
+          category: "Высшая",
+          initialConsultation: "150 000 сум",
+          followupConsultation: "100 000 сум"
+        };
 
-      setDoctor(mockDoctor);
-      setServices(mockServices);
+        // Mock services data
+        const mockServicesList: Service[] = [
+          {
+            id: "service1",
+            name: "Первичная консультация",
+            price: "150 000 сум"
+          },
+          {
+            id: "service2",
+            name: "Повторная консультация",
+            price: "100 000 сум"
+          },
+          {
+            id: "service3",
+            name: "ЭКГ с расшифровкой",
+            price: "80 000 сум"
+          }
+        ];
+
+        setDoctor(mockDoctor);
+        setServices(mockServicesList);
+      }
+      
       setLoading(false);
     }, 1000);
   }, [doctorId]);
