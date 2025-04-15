@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,13 +32,13 @@ export function DoctorAppointmentsTab({ doctor }: DoctorAppointmentsTabProps) {
   const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
   const [patientDetailsOpen, setPatientDetailsOpen] = useState(false);
   
-  // Mocked appointments data
+  // Updated appointments data with Uzbek names
   const appointments: Appointment[] = [
     {
       id: "appt1",
       date: "15.04.2025",
-      time: "10:00",
-      patientName: "Иванов Иван",
+      time: "14:30",
+      patientName: "Azimov Bobur",
       patientId: "patient1",
       service: "Первичная консультация",
       paymentStatus: "paid",
@@ -48,8 +47,8 @@ export function DoctorAppointmentsTab({ doctor }: DoctorAppointmentsTabProps) {
     {
       id: "appt2",
       date: "15.04.2025",
-      time: "11:30",
-      patientName: "Петров Петр",
+      time: "15:45",
+      patientName: "Karimova Dilnoza",
       patientId: "patient2",
       service: "УЗИ щитовидной железы",
       paymentStatus: "unpaid",
@@ -58,8 +57,8 @@ export function DoctorAppointmentsTab({ doctor }: DoctorAppointmentsTabProps) {
     {
       id: "appt3",
       date: "16.04.2025",
-      time: "09:00",
-      patientName: "Сидорова Мария",
+      time: "14:15",
+      patientName: "Rahimov Jahongir",
       patientId: "patient3",
       service: "Повторная консультация",
       paymentStatus: "partial",
@@ -68,8 +67,8 @@ export function DoctorAppointmentsTab({ doctor }: DoctorAppointmentsTabProps) {
     {
       id: "appt4",
       date: "14.04.2025",
-      time: "15:30",
-      patientName: "Николаев Николай",
+      time: "16:30",
+      patientName: "Nuriddinova Madina",
       patientId: "patient4",
       service: "ЭКГ",
       paymentStatus: "paid",
@@ -78,8 +77,8 @@ export function DoctorAppointmentsTab({ doctor }: DoctorAppointmentsTabProps) {
     {
       id: "appt5",
       date: "13.04.2025",
-      time: "14:00",
-      patientName: "Алексеева Алиса",
+      time: "15:00",
+      patientName: "Yusupov Alisher",
       patientId: "patient5",
       service: "Консультация",
       paymentStatus: "refunded",
