@@ -1,107 +1,20 @@
 
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Doctor, Service, Bot, UseDoctorsDataOptions, DoctorsDataActions } from "@/hooks/doctors/types";
 import { DoctorFormValues } from "@/components/clinics/doctors/DoctorForm";
+import { formValuesToDoctorData } from "@/hooks/doctors/utils";
 
-// Type definitions
-export interface Doctor {
-  id: string;
-  fullName: string;
-  specialties: string[];
-  telegramId: string | null;
-  telegramBot?: string;
-  schedule: Record<string, string>;
-  services: string[];
-  status: "active" | "inactive";
-  experience?: string;
-  category?: string;
-  initialConsultation?: string;
-  followupConsultation?: string;
-}
+// Re-export types for backward compatibility
+export type { Doctor, Service, Bot, UseDoctorsDataOptions };
 
-export interface Service {
-  id: string;
-  name: string;
-  price: string;
-}
-
-export interface Bot {
-  id: string;
-  name: string;
-}
-
-export interface UseDoctorsDataOptions {
-  maxDoctors?: number;
-}
-
-export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctorsDataOptions = {}) {
+export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctorsDataOptions = {}): DoctorsDataActions {
   const [doctors, setDoctors] = useState<Doctor[]>(initialDoctors);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const { maxDoctors } = options;
   const hasReachedLimit = maxDoctors ? doctors.length >= maxDoctors : false;
-
-  // Parse schedule string to Record format
-  const parseSchedule = (scheduleStr: string): Record<string, string> => {
-    const schedule: Record<string, string> = {};
-    if (!scheduleStr) return schedule;
-
-    const parts = scheduleStr.split(", ");
-    parts.forEach(part => {
-      const match = part.match(/([А-Яа-я]+)[-–]?([А-Яа-я]+)?\s+(.+)/);
-      if (match) {
-        const [_, startDay, endDay, time] = match;
-        
-        if (startDay && endDay) {
-          // Convert days range to individual days
-          const daysMap: Record<string, string> = {
-            'Пн': 'Понедельник',
-            'Вт': 'Вторник',
-            'Ср': 'Среда',
-            'Чт': 'Четверг',
-            'Пт': 'Пятница',
-            'Сб': 'Суббота',
-            'Вс': 'Воскресенье'
-          };
-          
-          const fullDays = Object.keys(daysMap);
-          const startIdx = fullDays.indexOf(startDay);
-          const endIdx = fullDays.indexOf(endDay);
-          
-          if (startIdx !== -1 && endIdx !== -1) {
-            for (let i = startIdx; i <= endIdx; i++) {
-              schedule[fullDays[i]] = time;
-            }
-          } else {
-            // If we can't parse the range, just add the original days
-            schedule[startDay] = time;
-            if (endDay) schedule[endDay] = time;
-          }
-        } else {
-          schedule[startDay] = time;
-        }
-      }
-    });
-    
-    return schedule;
-  };
-
-  // Convert form values to Doctor format
-  const formValuesToDoctorData = (values: DoctorFormValues, doctorId?: string): Doctor => {
-    return {
-      id: doctorId || `doctor_${Date.now()}`,
-      fullName: values.fullName,
-      specialties: values.specialties.split(',').map(s => s.trim()),
-      telegramId: values.telegramId || null,
-      telegramBot: values.telegramBot,
-      schedule: parseSchedule(values.schedule || ""),
-      services: values.services || [],
-      status: values.isActive ? "active" : "inactive",
-      experience: values.experience,
-      category: values.category
-    };
-  };
 
   // Get available bots
   const getAvailableBots = async (): Promise<Bot[]> => {
