@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Service } from "@/hooks/doctors/types";
 
 // Form schema
 const serviceFormSchema = z.object({
@@ -73,7 +74,7 @@ export function EditServiceDialog({
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
         name: values.name,
-        price: Number(values.price)
+        price: Number(values.price) // Ensure price is converted to a number
       });
     } finally {
       setLoading(false);
@@ -112,7 +113,12 @@ export function EditServiceDialog({
                 <FormItem>
                   <FormLabel>Цена</FormLabel>
                   <FormControl>
-                    <Input placeholder="Например: 150000" {...field} />
+                    <Input 
+                      placeholder="Например: 150000" 
+                      {...field} 
+                      type="number" 
+                      onChange={(e) => field.onChange(e.target.value)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
