@@ -34,7 +34,15 @@ export function EditServiceDialog({
   if (!service) return null;
 
   const handleSubmit = (formData: Omit<Service, 'id'>) => {
-    onSubmit(service.id, formData);
+    // Ensure price is a number
+    const updatedFormData = {
+      ...formData,
+      price: typeof formData.price === 'string' 
+        ? parseInt(formData.price.replace(/[^\d]/g, ''), 10) 
+        : formData.price
+    };
+    
+    onSubmit(service.id, updatedFormData);
     onOpenChange(false);
   };
 

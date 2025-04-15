@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { ClinicAdminSidebar } from "@/components/sidebars/ClinicAdminSidebar";
@@ -37,11 +36,11 @@ export function ClinicAdminDoctors() {
     hasReachedLimit
   } = useDoctorsData(mockDoctors, { maxDoctors });
 
-  // Convert mockServices for compatibility with doctor form dialog
+  // Convert mockServices for compatibility with doctor form dialog ensuring number price
   const formattedMockServices: Service[] = mockServices.map(service => ({
     id: service.id,
     name: service.name,
-    price: service.price,
+    price: typeof service.price === 'string' ? parseInt(service.price) : service.price,
     durationMin: service.durationMin,
     category: service.category
   }));

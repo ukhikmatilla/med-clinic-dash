@@ -77,10 +77,8 @@ export function EditServiceDialog({
   const handleSubmit = async (values: ServiceFormValues) => {
     setLoading(true);
     try {
-      // Ensure price is a number
-      const price = typeof values.price === 'string' 
-        ? parseInt(values.price.replace(/[^\d]/g, ''), 10) 
-        : values.price;
+      // Ensure price is a number after transformation
+      const price = typeof values.price === 'number' ? values.price : 0;
       
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
