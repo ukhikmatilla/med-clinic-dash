@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Service } from "@/hooks/doctors/types";
+import { Service } from "@/hooks/useDoctorsData";
 import { mockDoctors, mockServices } from "@/data/doctors/mockData";
 
 // Define doctor interface
@@ -74,28 +74,22 @@ export function useDoctorProfileData(doctorId?: string) {
           followupConsultation: "100 000 сум"
         };
 
-        // Mock services data with number prices
+        // Mock services data
         const mockServicesList: Service[] = [
           {
             id: "service1",
             name: "Первичная консультация",
-            price: 150000,
-            durationMin: 30,
-            category: "Консультации"
+            price: "150 000 сум"
           },
           {
             id: "service2",
             name: "Повторная консультация",
-            price: 100000,
-            durationMin: 30,
-            category: "Консультации"
+            price: "100 000 сум"
           },
           {
             id: "service3",
             name: "ЭКГ с расшифровкой",
-            price: 80000,
-            durationMin: 45,
-            category: "Кардиология"
+            price: "80 000 сум"
           }
         ];
 

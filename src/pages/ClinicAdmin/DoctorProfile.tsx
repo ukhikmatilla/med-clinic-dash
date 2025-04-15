@@ -14,7 +14,6 @@ import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog"
 import { useDoctorProfileData } from "@/hooks/useDoctorProfileData";
 import { mockServices } from "@/data/doctors/mockData";
 import { Loader2 } from "lucide-react";
-import { Service } from "@/hooks/doctors/types";
 
 export function DoctorProfile() {
   const { id } = useParams<{ id: string }>();
@@ -75,10 +74,7 @@ export function DoctorProfile() {
           </TabsContent>
           
           <TabsContent value="services" className="mt-6">
-            <DoctorServicesTab 
-              doctor={doctor} 
-              services={services as Service[]} 
-            />
+            <DoctorServicesTab doctor={doctor} services={services} />
           </TabsContent>
           
           <TabsContent value="schedule" className="mt-6">

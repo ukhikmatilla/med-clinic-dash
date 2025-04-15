@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,7 +20,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Service } from "@/hooks/doctors/types";
 
 // Form schema
 const serviceFormSchema = z.object({
@@ -33,8 +32,8 @@ type ServiceFormValues = z.infer<typeof serviceFormSchema>;
 interface EditServiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  service: { id: string; name: string; price: number } | null;
-  onSave: (data: { id: string; name: string; price: number }) => void;
+  service: { id: string; name: string; price: string } | null;
+  onSave: (data: { id: string; name: string; price: string }) => void;
 }
 
 export function EditServiceDialog({ 
@@ -51,19 +50,19 @@ export function EditServiceDialog({
     resolver: zodResolver(serviceFormSchema),
     defaultValues: {
       name: service?.name || "",
-      price: service?.price ? service.price.toString() : ""
+      price: service?.price || ""
     }
   });
   
   // Reset form when dialog opens/closes or service changes
-  useEffect(() => {
+  useState(() => {
     if (open) {
       form.reset({
         name: service?.name || "",
-        price: service?.price ? service.price.toString() : ""
+        price: service?.price || ""
       });
     }
-  }, [open, service, form]);
+  });
   
   const handleSubmit = async (values: ServiceFormValues) => {
     setLoading(true);
@@ -74,7 +73,7 @@ export function EditServiceDialog({
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
         name: values.name,
-        price: Number(values.price) // Ensure price is converted to a number
+        price: values.price
       });
     } finally {
       setLoading(false);
@@ -113,12 +112,7 @@ export function EditServiceDialog({
                 <FormItem>
                   <FormLabel>Цена</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Например: 150000" 
-                      {...field} 
-                      type="number" 
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
+                    <Input placeholder="Например: 150 000 сум" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

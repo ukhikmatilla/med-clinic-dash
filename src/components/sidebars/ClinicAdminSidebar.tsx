@@ -1,3 +1,4 @@
+
 import { useLocation } from "react-router-dom";
 import { 
   SidebarMenu,
@@ -6,22 +7,27 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
-  SidebarFooter,
-  SidebarSeparator
+  SidebarFooter
 } from "@/components/ui/sidebar";
 import { 
   LayoutDashboard,
   ClipboardList, 
-  FileSpreadsheet,
-  LogOut
+  FileSpreadsheet, 
+  Calendar, 
+  Settings, 
+  Link2,
+  CreditCard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Simplified navigation items - keeping only Dashboard, Doctors and Services
 const navItems = [
   { icon: <LayoutDashboard className="mr-2 h-4 w-4" />, label: "Дашборд", href: "/clinic-admin" },
   { icon: <ClipboardList className="mr-2 h-4 w-4" />, label: "Врачи", href: "/clinic-admin/doctors" },
   { icon: <FileSpreadsheet className="mr-2 h-4 w-4" />, label: "Услуги", href: "/clinic-admin/services" },
+  { icon: <Calendar className="mr-2 h-4 w-4" />, label: "Расписание", href: "/clinic-admin/schedule" },
+  { icon: <Settings className="mr-2 h-4 w-4" />, label: "Настройки клиники", href: "/clinic-admin/settings" },
+  { icon: <Link2 className="mr-2 h-4 w-4" />, label: "Интеграции", href: "/clinic-admin/integrations" },
+  { icon: <CreditCard className="mr-2 h-4 w-4" />, label: "Подписка", href: "/clinic-admin/subscription" },
 ];
 
 type ClinicAdminSidebarProps = {
@@ -30,13 +36,6 @@ type ClinicAdminSidebarProps = {
 
 export function ClinicAdminSidebar({ clinicName }: ClinicAdminSidebarProps) {
   const location = useLocation();
-  
-  const handleLogout = () => {
-    // In a real app, this would call authentication service logout
-    console.log("Logging out...");
-    // Redirect to login page
-    window.location.href = "/login";
-  };
   
   return (
     <div className="flex flex-col h-full">
@@ -70,23 +69,6 @@ export function ClinicAdminSidebar({ clinicName }: ClinicAdminSidebarProps) {
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
-      
-      <div className="mt-auto">
-        <SidebarSeparator className="my-2" />
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton 
-              tooltip="Выйти" 
-              onClick={handleLogout}
-            >
-              <div className="flex items-center text-red-500">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Выйти</span>
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </div>
       
       <SidebarFooter>
         <div className="p-2">

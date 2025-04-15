@@ -5,11 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Edit, Plus } from "lucide-react";
 import { EditServiceDialog } from "@/components/clinics/doctor-profile/EditServiceDialog";
+import { Service } from "@/hooks/useDoctorsData";
 import { useToast } from "@/hooks/use-toast";
-import { Service } from "@/hooks/doctors/types";
 
 interface Doctor {
   id: string;
+}
+
+interface DoctorServiceItem {
+  id: string;
+  name: string;
+  price: string;
 }
 
 interface DoctorServicesTabProps {
@@ -20,14 +26,10 @@ interface DoctorServicesTabProps {
 export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) {
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<{ id: string; name: string; price: number } | null>(null);
+  const [selectedService, setSelectedService] = useState<DoctorServiceItem | null>(null);
   
-  const handleEditService = (service: Service) => {
-    setSelectedService({
-      id: service.id,
-      name: service.name,
-      price: service.price,
-    });
+  const handleEditService = (service: DoctorServiceItem) => {
+    setSelectedService(service);
     setIsEditDialogOpen(true);
   };
   
@@ -36,18 +38,13 @@ export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) 
     setIsEditDialogOpen(true);
   };
   
-  const handleSaveService = (serviceData: { id: string; name: string; price: number }) => {
+  const handleSaveService = (serviceData: DoctorServiceItem) => {
     // In a real application, this would make an API call
     toast({
       title: "Услуга сохранена",
       description: `Услуга "${serviceData.name}" была успешно ${selectedService ? 'обновлена' : 'добавлена'}.`
     });
     setIsEditDialogOpen(false);
-  };
-
-  // Helper function to format price
-  const formatPrice = (price: number): string => {
-    return `${price.toLocaleString()} сум`;
   };
   
   return (
@@ -74,12 +71,16 @@ export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) 
                 {services.map((service) => (
                   <TableRow key={service.id}>
                     <TableCell>{service.name}</TableCell>
-                    <TableCell className="text-right">{formatPrice(service.price)}</TableCell>
+                    <TableCell className="text-right">{service.price}</TableCell>
                     <TableCell>
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        onClick={() => handleEditService(service)}
+                        onClick={() => handleEditService({
+                          id: service.id,
+                          name: service.name,
+                          price: service.price
+                        })}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>

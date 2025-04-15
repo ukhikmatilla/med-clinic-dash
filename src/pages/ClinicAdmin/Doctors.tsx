@@ -4,7 +4,7 @@ import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { ClinicAdminSidebar } from "@/components/sidebars/ClinicAdminSidebar";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog";
-import { ViewDoctorDialog } from "@/components/clinics/doctors/ViewDoctorDialog";
+import { ViewDoctorDialog } from "@/components/clinics/profile/ViewDoctorDialog";
 import { DoctorFormValues } from "@/components/clinics/doctors/DoctorForm";
 import { useDoctorsData } from "@/hooks/useDoctorsData";
 import { mockDoctors, mockServices } from "@/data/doctors/mockData";
@@ -13,7 +13,6 @@ import { DoctorsHeader } from "@/components/clinics/doctors/DoctorsHeader";
 import { DoctorsToolbar } from "@/components/clinics/doctors/DoctorsToolbar";
 import { DoctorsList } from "@/components/clinics/doctors/DoctorsList";
 import { DeleteDoctorDialog } from "@/components/clinics/doctors/DeleteDoctorDialog";
-import { Service } from "@/hooks/doctors/types";
 
 export function ClinicAdminDoctors() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -147,7 +146,7 @@ export function ClinicAdminDoctors() {
           open={formDialogOpen}
           onOpenChange={setFormDialogOpen}
           doctor={selectedDoctor}
-          services={mockServices as Service[]}
+          services={mockServices}
           subscriptionHasDoctorLimit={subscriptionHasDoctorLimit}
           currentDoctorCount={doctors.length}
           maxDoctorsAllowed={maxDoctors}
@@ -159,7 +158,7 @@ export function ClinicAdminDoctors() {
           open={viewDialogOpen}
           onOpenChange={setViewDialogOpen}
           doctor={selectedDoctor}
-          services={mockServices as Service[]}
+          services={mockServices}
         />
         
         {/* Delete Confirmation Dialog */}

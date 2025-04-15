@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Clock, Tag, Users } from "lucide-react";
-import { Service } from "@/hooks/doctors/types";
 
 interface ServiceDetails {
   id: string;
