@@ -87,6 +87,7 @@ export function EditServiceDialog({
       });
     } finally {
       setLoading(false);
+      onOpenChange(false);
     }
   };
   

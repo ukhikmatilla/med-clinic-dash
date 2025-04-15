@@ -56,9 +56,11 @@ export function useDoctorProfileData(doctorId?: string) {
             specialties: doctorData.specialties || [],
             telegramId: doctorData.telegram_id,
             telegramBot: doctorData.telegram_bot || "@najot_doctor_bot",
-            schedule: doctorData.schedule || {},
+            schedule: typeof doctorData.schedule === 'object' ? doctorData.schedule as Record<string, string> : {},
             services: [], // Will be filled later
-            status: doctorData.status || "active",
+            status: (doctorData.status === 'active' || doctorData.status === 'inactive') 
+              ? doctorData.status as "active" | "inactive" 
+              : "active",
             experience: doctorData.experience || "",
             category: doctorData.category || "",
             initialConsultation: doctorData.initial_consultation || "",

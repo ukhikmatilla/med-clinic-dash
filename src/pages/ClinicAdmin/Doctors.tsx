@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { ClinicAdminSidebar } from "@/components/sidebars/ClinicAdminSidebar";
@@ -12,7 +13,16 @@ import { DoctorsHeader } from "@/components/clinics/doctors/DoctorsHeader";
 import { DoctorsToolbar } from "@/components/clinics/doctors/DoctorsToolbar";
 import { DoctorsList } from "@/components/clinics/doctors/DoctorsList";
 import { DeleteDoctorDialog } from "@/components/clinics/doctors/DeleteDoctorDialog";
-import { Service } from "@/hooks/doctors/types";
+import { Service as DoctorService } from "@/hooks/doctors/types";
+
+// Helper function to convert DoctorService to expected Service format
+const mapServiceToExpectedFormat = (service: DoctorService) => {
+  return {
+    ...service,
+    // Convert number price to string format for compatibility with existing components
+    price: service.price.toString()
+  };
+};
 
 export function ClinicAdminDoctors() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,6 +45,9 @@ export function ClinicAdminDoctors() {
     deleteDoctor,
     hasReachedLimit
   } = useDoctorsData(mockDoctors, { maxDoctors });
+
+  // Format mockServices for compatibility
+  const formattedMockServices = mockServices.map(mapServiceToExpectedFormat);
   
   // Filter doctors based on search query and active tab
   const filteredDoctors = doctors.filter(doctor => {
@@ -146,7 +159,7 @@ export function ClinicAdminDoctors() {
           open={formDialogOpen}
           onOpenChange={setFormDialogOpen}
           doctor={selectedDoctor}
-          services={mockServices}
+          services={formattedMockServices}
           subscriptionHasDoctorLimit={subscriptionHasDoctorLimit}
           currentDoctorCount={doctors.length}
           maxDoctorsAllowed={maxDoctors}
@@ -158,7 +171,7 @@ export function ClinicAdminDoctors() {
           open={viewDialogOpen}
           onOpenChange={setViewDialogOpen}
           doctor={selectedDoctor}
-          services={mockServices}
+          services={formattedMockServices}
         />
         
         {/* Delete Confirmation Dialog */}

@@ -14,7 +14,16 @@ import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog"
 import { useDoctorProfileData } from "@/hooks/useDoctorProfileData";
 import { mockServices } from "@/data/doctors/mockData";
 import { Loader2 } from "lucide-react";
-import { Service } from "@/hooks/doctors/types";
+import { Service as DoctorService } from "@/hooks/doctors/types";
+
+// Define a mapper function to convert DoctorService to the expected Service format
+const mapServiceToExpectedFormat = (service: DoctorService) => {
+  return {
+    ...service,
+    // Convert number price to string format for compatibility with existing components
+    price: service.price.toString()
+  };
+};
 
 export function DoctorProfile() {
   const { id } = useParams<{ id: string }>();
@@ -43,6 +52,9 @@ export function DoctorProfile() {
       </SidebarLayout>
     );
   }
+  
+  // Map services to the expected format
+  const formattedServices = services.map(mapServiceToExpectedFormat);
   
   return (
     <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>

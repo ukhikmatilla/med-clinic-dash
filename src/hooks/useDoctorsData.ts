@@ -43,9 +43,11 @@ export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctor
           specialties: doctor.specialties || [],
           telegramId: doctor.telegram_id,
           telegramBot: doctor.telegram_bot,
-          schedule: doctor.schedule || {},
+          schedule: typeof doctor.schedule === 'object' ? doctor.schedule as Record<string, string> : {},
           services: doctor.doctor_services ? doctor.doctor_services.map((ds: any) => ds.service_id) : [],
-          status: doctor.status || "active",
+          status: (doctor.status === 'active' || doctor.status === 'inactive') 
+            ? doctor.status as "active" | "inactive" 
+            : "active",
           experience: doctor.experience || "",
           category: doctor.category || "",
           initialConsultation: doctor.initial_consultation || "",
@@ -137,9 +139,11 @@ export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctor
         specialties: data.specialties || [],
         telegramId: data.telegram_id,
         telegramBot: data.telegram_bot,
-        schedule: data.schedule || {},
+        schedule: typeof data.schedule === 'object' ? data.schedule as Record<string, string> : {},
         services: values.services || [],
-        status: data.status || "active",
+        status: (data.status === 'active' || data.status === 'inactive') 
+          ? data.status as "active" | "inactive" 
+          : "active",
         experience: data.experience || "",
         category: data.category || "",
         initialConsultation: data.initial_consultation || "",

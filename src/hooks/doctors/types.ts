@@ -1,4 +1,6 @@
 
+import { DoctorFormValues } from "@/components/clinics/doctors/DoctorForm";
+
 export interface Doctor {
   id: string;
   fullName: string;
