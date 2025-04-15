@@ -93,6 +93,27 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          clinic_name: string | null
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          clinic_name?: string | null
+          created_at?: string
+          id: string
+          role: string
+        }
+        Update: {
+          clinic_name?: string | null
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: []
+      }
       service_categories: {
         Row: {
           created_at: string

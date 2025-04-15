@@ -14,7 +14,6 @@ import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog"
 import { useDoctorProfileData } from "@/hooks/useDoctorProfileData";
 import { mockServices } from "@/data/doctors/mockData";
 import { Loader2 } from "lucide-react";
-import { Service } from "@/hooks/doctors/types";
 
 export function DoctorProfile() {
   const { id } = useParams<{ id: string }>();
@@ -24,7 +23,7 @@ export function DoctorProfile() {
   
   if (isLoading) {
     return (
-      <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
+      <SidebarLayout sidebar={<ClinicAdminSidebar />}>
         <div className="p-6 flex justify-center items-center min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -34,7 +33,7 @@ export function DoctorProfile() {
   
   if (!doctor) {
     return (
-      <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
+      <SidebarLayout sidebar={<ClinicAdminSidebar />}>
         <div className="p-6">
           <div className="text-center py-8 text-muted-foreground">
             Врач не найден
@@ -47,11 +46,11 @@ export function DoctorProfile() {
   // Convert mockServices for compatibility with doctor form dialog
   const formattedMockServices = mockServices.map(service => ({
     ...service,
-    price: service.price.toString() // Convert to string for form display
+    price: service.price // Keep as number
   }));
   
   return (
-    <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
+    <SidebarLayout sidebar={<ClinicAdminSidebar />}>
       <div className="p-2 sm:p-6 space-y-6">
         <DoctorProfileHeader 
           doctor={doctor}

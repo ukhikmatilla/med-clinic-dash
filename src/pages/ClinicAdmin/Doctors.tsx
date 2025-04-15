@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { ClinicAdminSidebar } from "@/components/sidebars/ClinicAdminSidebar";
@@ -98,7 +99,7 @@ export function ClinicAdminDoctors() {
   };
   
   return (
-    <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
+    <SidebarLayout sidebar={<ClinicAdminSidebar />}>
       <div className="p-2 sm:p-6">
         <DoctorsHeader 
           totalDoctors={doctors.length}

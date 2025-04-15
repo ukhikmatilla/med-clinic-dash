@@ -27,7 +27,7 @@ export function useUserProfile() {
       try {
         setLoading(true);
         
-        // Use custom SQL query to check if profile exists
+        // Use type-safe query to check if profile exists
         const { data, error: queryError } = await supabase
           .from('profiles')
           .select('*')
@@ -44,7 +44,7 @@ export function useUserProfile() {
               .from('profiles')
               .insert({
                 id: user.id,
-                role,
+                role: role as 'super-admin' | 'clinic-admin',
                 clinic_name
               })
               .select()

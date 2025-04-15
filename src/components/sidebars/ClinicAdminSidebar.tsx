@@ -13,13 +13,11 @@ import {
   Plug
 } from "lucide-react";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
-interface ClinicAdminSidebarProps {
-  clinicName: string;
-}
-
-export function ClinicAdminSidebar({ clinicName }: ClinicAdminSidebarProps) {
+export function ClinicAdminSidebar() {
   const location = useLocation();
+  const { profile } = useUserProfile();
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
@@ -35,7 +33,7 @@ export function ClinicAdminSidebar({ clinicName }: ClinicAdminSidebarProps) {
             </div>
             <div className="flex-1 overflow-hidden">
               <h3 className="text-lg font-semibold text-foreground truncate">
-                {clinicName || "Медицинская CRM"}
+                {profile?.clinic_name || "Медицинская CRM"}
               </h3>
               <p className="text-xs text-muted-foreground">
                 Панель администратора

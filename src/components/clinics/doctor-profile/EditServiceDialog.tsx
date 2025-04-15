@@ -83,7 +83,7 @@ export function EditServiceDialog({
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
         name: values.name,
-        price: values.price // This is now a number thanks to our transform
+        price: values.price // This is already a number thanks to our transform
       });
     } finally {
       setLoading(false);
