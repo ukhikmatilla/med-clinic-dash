@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { SubscriptionCard } from "@/components/subscription/SubscriptionCard";
 import { PaymentsTable } from "@/components/subscription/PaymentsTable";
 import { SubscriptionAlert } from "@/components/subscription/SubscriptionAlert";
+import { PendingExtensionRequests } from "@/components/subscription/PendingExtensionRequests";
 import { useSubscriptionData } from "@/hooks/useSubscriptionData";
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,12 +14,14 @@ export default function SuperAdminSubscriptions() {
   const { 
     subscription, 
     payments, 
+    extensionRequests,
     daysRemaining, 
     isLoading,
     extendSubscription,
     changePlan,
     toggleAutoRenewal,
-    generateInvoice
+    generateInvoice,
+    handleExtensionRequest
   } = useSubscriptionData();
   const { toast } = useToast();
   
@@ -74,15 +77,49 @@ export default function SuperAdminSubscriptions() {
     }
   };
 
+  // Обработчик подтверждения запроса на продление
+  const handleApproveRequest = async (requestId: string) => {
+    try {
+      await handleExtensionRequest(requestId, true);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось подтвердить запрос",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Обработчик отклонения запроса на продление
+  const handleRejectRequest = async (requestId: string, comment?: string) => {
+    try {
+      await handleExtensionRequest(requestId, false, comment);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отклонить запрос",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <SidebarLayout sidebar={<SuperAdminSidebar />}>
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Управление подписками</h1>
           <p className="text-muted-foreground">
             Управление подпиской клиники {subscription.clinicName}
           </p>
         </div>
+
+        {/* Запросы на продление подписки */}
+        <PendingExtensionRequests 
+          requests={extensionRequests}
+          onApprove={handleApproveRequest}
+          onReject={handleRejectRequest}
+          isLoading={isLoading}
+        />
 
         {/* Уведомление о скором окончании подписки */}
         <SubscriptionAlert 

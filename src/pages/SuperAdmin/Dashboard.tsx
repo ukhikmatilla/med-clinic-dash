@@ -5,9 +5,11 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { StatsSection } from "@/components/dashboard/StatsSection";
 import { LicenseAndActivitySection } from "@/components/dashboard/LicenseAndActivitySection";
 import { SubscriptionAlert } from "@/components/dashboard/SubscriptionAlert";
+import { SubscriptionRequestsAlert } from "@/components/dashboard/SubscriptionRequestsAlert";
 import { ClinicsSection } from "@/components/dashboard/ClinicsSection";
 import { ErrorsSection } from "@/components/dashboard/ErrorsSection";
 import { useDashboardData } from "@/hooks/dashboard/useDashboardData";
+import { useSubscriptionData } from "@/hooks/useSubscriptionData";
 
 export function SuperAdminDashboard() {
   const {
@@ -21,6 +23,8 @@ export function SuperAdminDashboard() {
     expiringSubscriptions,
     licenseInfo
   } = useDashboardData();
+  
+  const { extensionRequests } = useSubscriptionData();
   
   return (
     <SidebarLayout sidebar={<SuperAdminSidebar />}>
@@ -41,6 +45,9 @@ export function SuperAdminDashboard() {
           licenseInfo={licenseInfo} 
           activities={activityFeed} 
         />
+        
+        {/* Pending Subscription Requests Alert */}
+        <SubscriptionRequestsAlert requests={extensionRequests} />
         
         {/* Expiring Subscriptions Alert */}
         <SubscriptionAlert subscriptions={expiringSubscriptions} />

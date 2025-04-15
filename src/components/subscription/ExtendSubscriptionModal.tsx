@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Dialog, 
@@ -9,11 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useToast } from "@/hooks/use-toast";
 
 interface ExtendSubscriptionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onExtend: (months: number) => Promise<boolean | void>; // Updated type to handle void return
+  onExtend: (months: number) => Promise<boolean | void>; 
 }
 
 export function ExtendSubscriptionModal({ 
@@ -23,6 +25,7 @@ export function ExtendSubscriptionModal({
 }: ExtendSubscriptionModalProps) {
   const [selectedMonths, setSelectedMonths] = useState("1");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -33,9 +36,18 @@ export function ExtendSubscriptionModal({
       // Only close the modal if success is explicitly false
       if (success !== false) {
         onOpenChange(false);
+        toast({
+          title: "Запрос отправлен",
+          description: "Запрос на продление подписки отправлен администратору"
+        });
       }
     } catch (error) {
       console.error("Error in subscription extension:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отправить запрос на продление подписки",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -101,7 +113,7 @@ export function ExtendSubscriptionModal({
             disabled={isSubmitting}
           >
             <Calendar className="mr-2 h-4 w-4" />
-            {isSubmitting ? "Продление..." : "Продлить подписку"}
+            {isSubmitting ? "Отправка запроса..." : "Отправить запрос"}
           </Button>
         </DialogFooter>
       </DialogContent>

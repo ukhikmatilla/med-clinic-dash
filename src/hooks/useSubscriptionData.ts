@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
-import { Subscription, PaymentHistory, InvoiceFormData } from '@/types/subscription';
+import { Subscription, PaymentHistory, InvoiceFormData, SubscriptionExtensionRequest } from '@/types/subscription';
+import { useToast } from '@/hooks/use-toast';
 
 // Мок-данные для подписки Najot Shifo
 const mockSubscription: Subscription = {
@@ -50,9 +51,31 @@ const mockPayments: PaymentHistory[] = [
   }
 ];
 
+// Мок-данные для запросов на продление подписки
+const mockExtensionRequests: SubscriptionExtensionRequest[] = [
+  {
+    id: "req_1",
+    clinicId: "clinic_najot",
+    clinicName: "Najot Shifo",
+    requestedMonths: 3,
+    requestedAt: "2025-04-15T10:30:00Z",
+    status: 'pending'
+  },
+  {
+    id: "req_2",
+    clinicId: "clinic_medlife",
+    clinicName: "Medlife",
+    requestedMonths: 6,
+    requestedAt: "2025-04-14T14:22:00Z",
+    status: 'pending'
+  }
+];
+
 export function useSubscriptionData() {
+  const { toast } = useToast();
   const [subscription, setSubscription] = useState<Subscription>(mockSubscription);
   const [payments, setPayments] = useState<PaymentHistory[]>(mockPayments);
+  const [extensionRequests, setExtensionRequests] = useState<SubscriptionExtensionRequest[]>(mockExtensionRequests);
   const [isLoading, setIsLoading] = useState(false);
 
   // Функция для расчета оставшихся дней
@@ -84,7 +107,30 @@ export function useSubscriptionData() {
     return updatedSubscription;
   };
 
-  // Функция для продления подписки
+  // Функция для создания запроса на продление подписки
+  const requestExtendSubscription = async (months: number): Promise<boolean> => {
+    setIsLoading(true);
+    
+    // Имитация API запроса
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Создаем новый запрос на продление
+    const newRequest: SubscriptionExtensionRequest = {
+      id: `req_${extensionRequests.length + 1}`,
+      clinicId: subscription.clinicId,
+      clinicName: subscription.clinicName,
+      requestedMonths: months,
+      requestedAt: new Date().toISOString(),
+      status: 'pending'
+    };
+    
+    setExtensionRequests([newRequest, ...extensionRequests]);
+    setIsLoading(false);
+    
+    return true;
+  };
+
+  // Функция для продления подписки админом
   const extendSubscription = async (months: number): Promise<Subscription> => {
     setIsLoading(true);
     
@@ -105,7 +151,7 @@ export function useSubscriptionData() {
     const newPayment: PaymentHistory = {
       id: `pay_${payments.length + 1}`,
       date: new Date().toISOString().split('T')[0],
-      amount: "250,000 сум",
+      amount: `${250000 * months} сум`,
       planName: subscription.planName,
       status: "success",
       clinicId: subscription.clinicId,
@@ -116,7 +162,56 @@ export function useSubscriptionData() {
     setPayments([newPayment, ...payments]);
     setIsLoading(false);
     
+    toast({
+      title: "Подписка продлена",
+      description: `Подписка для ${subscription.clinicName} продлена на ${months} месяцев`
+    });
+    
     return updatedSubscription;
+  };
+
+  // Функция для обработки запроса на продление (подтверждение/отклонение)
+  const handleExtensionRequest = async (requestId: string, approve: boolean, comment?: string): Promise<void> => {
+    setIsLoading(true);
+    
+    // Имитация API запроса
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Находим запрос по ID
+    const request = extensionRequests.find(req => req.id === requestId);
+    
+    if (!request) {
+      setIsLoading(false);
+      throw new Error("Запрос не найден");
+    }
+    
+    // Обновляем статус запроса
+    const updatedRequests = extensionRequests.map(req => {
+      if (req.id === requestId) {
+        return {
+          ...req,
+          status: approve ? 'approved' : 'rejected',
+          adminComment: comment
+        };
+      }
+      return req;
+    });
+    
+    setExtensionRequests(updatedRequests);
+    
+    // Если запрос одобрен, продлеваем подписку
+    if (approve) {
+      await extendSubscription(request.requestedMonths);
+    }
+    
+    toast({
+      title: approve ? "Запрос одобрен" : "Запрос отклонен",
+      description: approve 
+        ? `Подписка для ${request.clinicName} продлена на ${request.requestedMonths} месяцев`
+        : `Запрос на продление от клиники ${request.clinicName} отклонен`
+    });
+    
+    setIsLoading(false);
   };
 
   // Функция для изменения тарифного плана
@@ -196,12 +291,15 @@ export function useSubscriptionData() {
   return {
     subscription,
     payments,
+    extensionRequests,
     isLoading,
     daysRemaining,
     updateSubscription,
     extendSubscription,
+    requestExtendSubscription,
     changePlan,
     toggleAutoRenewal,
-    generateInvoice
+    generateInvoice,
+    handleExtensionRequest
   };
 }
