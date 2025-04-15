@@ -31,6 +31,8 @@ interface Doctor {
   schedule: Record<string, string>;
   services: string[];
   status: "active" | "inactive";
+  experience?: string;
+  category?: string;
 }
 
 interface DoctorFormDialogProps {
