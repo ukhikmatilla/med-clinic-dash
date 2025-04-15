@@ -6,15 +6,7 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-
-// Updated Service interface to match the one in hooks/doctors/types.ts
-interface Service {
-  id: string;
-  name: string;
-  price: number;
-  durationMin: number;
-  category: string;
-}
+import { Service } from "@/hooks/doctors/types";
 
 interface DoctorServicesCardProps {
   services: Service[];

@@ -75,7 +75,7 @@ export function DoctorProfile() {
           </TabsContent>
           
           <TabsContent value="services" className="mt-6">
-            <DoctorServicesTab doctor={doctor} services={services as any} />
+            <DoctorServicesTab doctor={doctor} services={services} />
           </TabsContent>
           
           <TabsContent value="schedule" className="mt-6">

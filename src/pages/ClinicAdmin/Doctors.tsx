@@ -13,6 +13,7 @@ import { DoctorsHeader } from "@/components/clinics/doctors/DoctorsHeader";
 import { DoctorsToolbar } from "@/components/clinics/doctors/DoctorsToolbar";
 import { DoctorsList } from "@/components/clinics/doctors/DoctorsList";
 import { DeleteDoctorDialog } from "@/components/clinics/doctors/DeleteDoctorDialog";
+import { Service } from "@/hooks/doctors/types";
 
 export function ClinicAdminDoctors() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -158,7 +159,7 @@ export function ClinicAdminDoctors() {
           open={viewDialogOpen}
           onOpenChange={setViewDialogOpen}
           doctor={selectedDoctor}
-          services={mockServices as any}
+          services={mockServices}
         />
         
         {/* Delete Confirmation Dialog */}

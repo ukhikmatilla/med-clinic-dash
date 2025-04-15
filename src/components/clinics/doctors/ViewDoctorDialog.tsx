@@ -16,7 +16,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Doctor } from "@/hooks/useDoctorsData";
-import { Service } from "@/hooks/useDoctorsData";
+import { Service } from "@/hooks/doctors/types";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -66,6 +66,11 @@ export function ViewDoctorDialog({
         });
       }
     }, 1500);
+  };
+  
+  // Format price helper function
+  const formatPrice = (price: number): string => {
+    return `${price.toLocaleString()} сум`;
   };
   
   return (
@@ -172,7 +177,7 @@ export function ViewDoctorDialog({
                     {doctorServices.map((service) => (
                       <div key={service.id} className="flex justify-between">
                         <span>{service.name}</span>
-                        <span className="text-muted-foreground">{service.price}</span>
+                        <span className="text-muted-foreground">{formatPrice(service.price)}</span>
                       </div>
                     ))}
                   </div>

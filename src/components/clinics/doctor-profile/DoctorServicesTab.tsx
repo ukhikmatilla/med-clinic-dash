@@ -6,6 +6,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Edit, Plus } from "lucide-react";
 import { EditServiceDialog } from "@/components/clinics/doctor-profile/EditServiceDialog";
 import { useToast } from "@/hooks/use-toast";
+import { Service } from "@/hooks/doctors/types";
 
 interface Doctor {
   id: string;
@@ -15,15 +16,6 @@ interface DoctorServiceItem {
   id: string;
   name: string;
   price: string;
-}
-
-// Updated the Service interface to match the one in hooks/doctors/types.ts
-interface Service {
-  id: string;
-  name: string;
-  price: number;
-  durationMin: number;
-  category: string;
 }
 
 interface DoctorServicesTabProps {

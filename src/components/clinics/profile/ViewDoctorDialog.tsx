@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Service } from "@/hooks/useDoctorsData";
+import { Service } from "@/hooks/doctors/types";
 import { DoctorBasicInfo } from "./doctor-details/DoctorBasicInfo";
 import { DoctorScheduleCard } from "./doctor-details/DoctorScheduleCard";
 import { DoctorServicesCard } from "./doctor-details/DoctorServicesCard";
@@ -36,7 +36,7 @@ interface ViewDoctorDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   doctor: DoctorDetails | null;
-  services?: Service[];
+  services: Service[];
 }
 
 export function ViewDoctorDialog({ 
