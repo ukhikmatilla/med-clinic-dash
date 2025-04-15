@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Edit, Plus } from "lucide-react";
 import { EditServiceDialog } from "@/components/clinics/doctor-profile/EditServiceDialog";
-import { Service } from "@/hooks/useDoctorsData";
 import { useToast } from "@/hooks/use-toast";
 
 interface Doctor {
@@ -18,6 +17,15 @@ interface DoctorServiceItem {
   price: string;
 }
 
+// Updated the Service interface to match the one in hooks/doctors/types.ts
+interface Service {
+  id: string;
+  name: string;
+  price: number;
+  durationMin: number;
+  category: string;
+}
+
 interface DoctorServicesTabProps {
   doctor: Doctor;
   services: Service[];
@@ -28,8 +36,12 @@ export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<DoctorServiceItem | null>(null);
   
-  const handleEditService = (service: DoctorServiceItem) => {
-    setSelectedService(service);
+  const handleEditService = (service: Service) => {
+    setSelectedService({
+      id: service.id,
+      name: service.name,
+      price: formatPrice(service.price),
+    });
     setIsEditDialogOpen(true);
   };
   
@@ -45,6 +57,11 @@ export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) 
       description: `Услуга "${serviceData.name}" была успешно ${selectedService ? 'обновлена' : 'добавлена'}.`
     });
     setIsEditDialogOpen(false);
+  };
+
+  // Helper function to format price
+  const formatPrice = (price: number): string => {
+    return `${price.toLocaleString()} сум`;
   };
   
   return (
@@ -71,16 +88,12 @@ export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) 
                 {services.map((service) => (
                   <TableRow key={service.id}>
                     <TableCell>{service.name}</TableCell>
-                    <TableCell className="text-right">{service.price}</TableCell>
+                    <TableCell className="text-right">{formatPrice(service.price)}</TableCell>
                     <TableCell>
                       <Button 
                         variant="ghost" 
                         size="icon"
-                        onClick={() => handleEditService({
-                          id: service.id,
-                          name: service.name,
-                          price: service.price
-                        })}
+                        onClick={() => handleEditService(service)}
                       >
                         <Edit className="h-4 w-4" />
                       </Button>

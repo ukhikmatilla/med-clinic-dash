@@ -6,13 +6,26 @@ import {
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
-import { Service } from "@/hooks/useDoctorsData";
+
+// Updated Service interface to match the one in hooks/doctors/types.ts
+interface Service {
+  id: string;
+  name: string;
+  price: number;
+  durationMin: number;
+  category: string;
+}
 
 interface DoctorServicesCardProps {
   services: Service[];
 }
 
 export function DoctorServicesCard({ services }: DoctorServicesCardProps) {
+  // Format price helper function
+  const formatPrice = (price: number): string => {
+    return `${price.toLocaleString()} сум`;
+  };
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -27,7 +40,7 @@ export function DoctorServicesCard({ services }: DoctorServicesCardProps) {
             {services.map((service) => (
               <div key={service.id} className="flex justify-between">
                 <span>{service.name}</span>
-                <span className="text-muted-foreground">{service.price}</span>
+                <span className="text-muted-foreground">{formatPrice(service.price)}</span>
               </div>
             ))}
           </div>
