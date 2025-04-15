@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-// Updated form schema
+// Updated form schema with proper price transformation
 const serviceFormSchema = z.object({
   name: z.string().min(2, "Название услуги должно содержать не менее 2 символов"),
   price: z.string().min(1, "Укажите цену услуги")

@@ -41,7 +41,7 @@ export function Doctors() {
   const formattedMockServices: Service[] = mockServices.map(service => ({
     id: service.id,
     name: service.name,
-    price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price,
+    price: typeof service.price === 'string' ? parseInt(String(service.price), 10) : service.price,
     durationMin: service.durationMin,
     category: service.category
   }));
