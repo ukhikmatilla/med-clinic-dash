@@ -1,16 +1,16 @@
 
-import { Doctor, Service } from "@/hooks/useDoctorsData";
+import { Doctor, Service } from "@/hooks/doctors/types";
 
 // Mock services data
 export const mockServices: Service[] = [
-  { id: "service1", name: "Консультация", price: "50 000 сум" },
-  { id: "service2", name: "УЗИ щитовидной железы", price: "90 000 сум" },
-  { id: "service3", name: "Анализ крови", price: "50 000 сум" },
-  { id: "service4", name: "ЭКГ", price: "168 000 сум" },
-  { id: "service5", name: "Вакцинация", price: "120 000 сум" },
-  { id: "service6", name: "Физиотерапия", price: "85 000 сум" },
-  { id: "service7", name: "Массаж", price: "100 000 сум" },
-  { id: "service8", name: "Кардиограмма", price: "200 000 сум" },
+  { id: "service1", name: "Консультация", price: 50000, durationMin: 15 },
+  { id: "service2", name: "УЗИ щитовидной железы", price: 90000, durationMin: 30 },
+  { id: "service3", name: "Анализ крови", price: 50000, durationMin: 10 },
+  { id: "service4", name: "ЭКГ", price: 168000, durationMin: 20 },
+  { id: "service5", name: "Вакцинация", price: 120000, durationMin: 15 },
+  { id: "service6", name: "Физиотерапия", price: 85000, durationMin: 40 },
+  { id: "service7", name: "Массаж", price: 100000, durationMin: 60 },
+  { id: "service8", name: "Кардиограмма", price: 200000, durationMin: 30 },
 ];
 
 // Mock doctors data

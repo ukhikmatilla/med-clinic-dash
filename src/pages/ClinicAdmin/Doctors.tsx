@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { ClinicAdminSidebar } from "@/components/sidebars/ClinicAdminSidebar";
@@ -147,7 +146,7 @@ export function ClinicAdminDoctors() {
           open={formDialogOpen}
           onOpenChange={setFormDialogOpen}
           doctor={selectedDoctor}
-          services={mockServices as Service[]}
+          services={mockServices}
           subscriptionHasDoctorLimit={subscriptionHasDoctorLimit}
           currentDoctorCount={doctors.length}
           maxDoctorsAllowed={maxDoctors}
@@ -159,7 +158,7 @@ export function ClinicAdminDoctors() {
           open={viewDialogOpen}
           onOpenChange={setViewDialogOpen}
           doctor={selectedDoctor}
-          services={mockServices as Service[]}
+          services={mockServices}
         />
         
         {/* Delete Confirmation Dialog */}

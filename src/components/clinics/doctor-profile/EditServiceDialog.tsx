@@ -25,6 +25,11 @@ import { Input } from "@/components/ui/input";
 const serviceFormSchema = z.object({
   name: z.string().min(2, "Название услуги должно содержать не менее 2 символов"),
   price: z.string().min(1, "Укажите цену услуги")
+    .transform((val) => {
+      // Convert string price to number by removing non-numeric characters
+      const numericValue = val.replace(/[^\d]/g, '');
+      return numericValue ? parseInt(numericValue, 10) : 0;
+    })
 });
 
 type ServiceFormValues = z.infer<typeof serviceFormSchema>;
@@ -32,8 +37,8 @@ type ServiceFormValues = z.infer<typeof serviceFormSchema>;
 interface EditServiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  service: { id: string; name: string; price: string } | null;
-  onSave: (data: { id: string; name: string; price: string }) => void;
+  service: { id: string; name: string; price: number } | null;
+  onSave: (data: { id: string; name: string; price: number }) => void;
 }
 
 export function EditServiceDialog({ 
@@ -45,12 +50,17 @@ export function EditServiceDialog({
   const isEditing = !!service;
   const [loading, setLoading] = useState(false);
   
+  // Format price for display in the form
+  const formatPriceForDisplay = (price: number): string => {
+    return price ? new Intl.NumberFormat('ru-RU').format(price) + ' сум' : '';
+  };
+  
   // Set up form
   const form = useForm<ServiceFormValues>({
     resolver: zodResolver(serviceFormSchema),
     defaultValues: {
       name: service?.name || "",
-      price: service?.price || ""
+      price: service?.price ? formatPriceForDisplay(service.price) : ""
     }
   });
   
@@ -59,7 +69,7 @@ export function EditServiceDialog({
     if (open) {
       form.reset({
         name: service?.name || "",
-        price: service?.price || ""
+        price: service?.price ? formatPriceForDisplay(service.price) : ""
       });
     }
   });
@@ -73,7 +83,7 @@ export function EditServiceDialog({
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
         name: values.name,
-        price: values.price
+        price: values.price // This is now a number thanks to our transform
       });
     } finally {
       setLoading(false);
