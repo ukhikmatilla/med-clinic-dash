@@ -7,7 +7,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Eye } from "lucide-react";
+import { Check, Eye, UserPlus } from "lucide-react";
 import { 
   Table,
   TableHeader,
@@ -17,6 +17,8 @@ import {
   TableCell
 } from "@/components/ui/table";
 import { ViewDoctorDialog } from "./ViewDoctorDialog";
+import { useToast } from "@/hooks/use-toast";
+import { getDoctorsLimitByPlan } from "@/utils/subscriptionUtils";
 
 interface Doctor {
   id: string;
@@ -31,11 +33,19 @@ interface Doctor {
 interface DoctorsTabProps {
   doctors?: Doctor[];
   isSuperAdmin?: boolean;
+  clinicPlan?: string;
+  onAddDoctor?: () => void;
 }
 
-export function DoctorsTab({ doctors = [], isSuperAdmin = false }: DoctorsTabProps) {
+export function DoctorsTab({ 
+  doctors = [], 
+  isSuperAdmin = false, 
+  clinicPlan = "", 
+  onAddDoctor 
+}: DoctorsTabProps) {
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [viewDoctorOpen, setViewDoctorOpen] = useState(false);
+  const { toast } = useToast();
   
   const formatSpecialties = (specialties: string[]) => {
     return specialties.join(", ");
@@ -56,6 +66,24 @@ export function DoctorsTab({ doctors = [], isSuperAdmin = false }: DoctorsTabPro
     setViewDoctorOpen(true);
   };
   
+  const handleAddDoctor = () => {
+    // Check doctor limit based on subscription plan
+    const doctorsLimit = getDoctorsLimitByPlan(clinicPlan);
+    
+    if (doctors.length >= doctorsLimit) {
+      toast({
+        title: "Лимит врачей достигнут",
+        description: `Ваш текущий тариф позволяет добавить максимум ${doctorsLimit} врачей. Обновите тариф для увеличения лимита.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (onAddDoctor) {
+      onAddDoctor();
+    }
+  };
+  
   return (
     <>
       <Card className="bg-white">
@@ -63,7 +91,10 @@ export function DoctorsTab({ doctors = [], isSuperAdmin = false }: DoctorsTabPro
           <div className="flex justify-between items-center">
             <CardTitle>Врачи</CardTitle>
             {!isSuperAdmin && (
-              <Button size="sm">Добавить врача</Button>
+              <Button size="sm" onClick={handleAddDoctor}>
+                <UserPlus className="mr-2 h-4 w-4" />
+                Добавить врача
+              </Button>
             )}
           </div>
         </CardHeader>
