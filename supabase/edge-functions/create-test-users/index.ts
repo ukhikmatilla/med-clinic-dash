@@ -51,23 +51,6 @@ serve(async (req) => {
 
     console.log('Created super admin user:', superAdmin.user.id)
 
-    // Create second Super Admin user for ukhikmatilla@gmail.com
-    const { data: userSuperAdmin, error: userSuperAdminError } = await supabase.auth.admin.createUser({
-      email: 'ukhikmatilla@gmail.com',
-      password: 'password123',
-      email_confirm: true,
-      user_metadata: {
-        role: 'super-admin'
-      }
-    })
-
-    if (userSuperAdminError) {
-      console.error('Error creating user super admin:', userSuperAdminError)
-      throw userSuperAdminError
-    }
-
-    console.log('Created user super admin:', userSuperAdmin.user.id)
-
     // Create Clinic Admin user
     const { data: clinicAdmin, error: clinicAdminError } = await supabase.auth.admin.createUser({
       email: 'clinicadmin@test.com',
@@ -90,15 +73,10 @@ serve(async (req) => {
       JSON.stringify({ 
         message: 'Test users created successfully', 
         superAdmin: superAdmin.user.id,
-        userSuperAdmin: userSuperAdmin.user.id,
         clinicAdmin: clinicAdmin.user.id,
         loginCredentials: {
           superAdmin: {
             email: 'superadmin@test.com',
-            password: 'password123'
-          },
-          userSuperAdmin: {
-            email: 'ukhikmatilla@gmail.com',
             password: 'password123'
           },
           clinicAdmin: {

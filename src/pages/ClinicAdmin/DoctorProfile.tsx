@@ -44,17 +44,11 @@ export function DoctorProfile() {
     );
   }
   
-  // Convert services to ensure prices are numbers
-  const formattedServices: Service[] = services.map(service => ({
-    ...service,
-    price: typeof service.price === 'string' ? parseInt(String(service.price), 10) : service.price
-  }));
-  
   // Convert mockServices for compatibility with doctor form dialog
-  const formattedMockServices = mockServices.map(service => ({
+  const formattedMockServices: Service[] = mockServices.map(service => ({
     id: service.id,
     name: service.name,
-    price: typeof service.price === 'string' ? parseInt(String(service.price), 10) : service.price,
+    price: service.price,
     durationMin: service.durationMin,
     category: service.category
   }));
@@ -90,7 +84,7 @@ export function DoctorProfile() {
           </TabsContent>
           
           <TabsContent value="services" className="mt-6">
-            <DoctorServicesTab doctor={doctor} services={formattedServices} />
+            <DoctorServicesTab doctor={doctor} services={services} />
           </TabsContent>
           
           <TabsContent value="schedule" className="mt-6">

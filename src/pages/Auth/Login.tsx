@@ -25,19 +25,19 @@ export function Login() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, user, userRole, loading: authLoading } = useAuth();
+  const { signIn, user, loading: authLoading } = useAuth();
+
+  // Get redirect path from location state or default to dashboard
+  const from = (location.state as any)?.from?.pathname || 
+    (role === "super-admin" ? "/super-admin" : "/clinic-admin");
 
   // Redirect if already authenticated
   useEffect(() => {
     if (user && !authLoading) {
-      // Redirect based on user's actual role from metadata
-      if (userRole === 'super-admin') {
-        navigate('/super-admin', { replace: true });
-      } else {
-        navigate('/clinic-admin', { replace: true });
-      }
+      const redirectPath = role === "super-admin" ? "/super-admin" : "/clinic-admin";
+      navigate(redirectPath, { replace: true });
     }
-  }, [user, authLoading, navigate, userRole]);
+  }, [user, authLoading, navigate, role]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

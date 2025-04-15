@@ -26,19 +26,15 @@ export function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { signUp, user, userRole, loading: authLoading } = useAuth();
+  const { signUp, user, loading: authLoading } = useAuth();
 
   // Redirect if already authenticated
   useEffect(() => {
     if (user && !authLoading) {
-      // Redirect based on user's actual role
-      if (userRole === 'super-admin') {
-        navigate('/super-admin', { replace: true });
-      } else {
-        navigate('/clinic-admin', { replace: true });
-      }
+      const redirectPath = role === "super-admin" ? "/super-admin" : "/clinic-admin";
+      navigate(redirectPath, { replace: true });
     }
-  }, [user, authLoading, navigate, userRole]);
+  }, [user, authLoading, navigate, role]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -10,7 +10,7 @@ interface DoctorsHeaderProps {
 }
 
 export function DoctorsHeader({ 
-  totalDoctors = 0, 
+  totalDoctors, 
   maxDoctors, 
   onAddDoctor,
   hasReachedLimit

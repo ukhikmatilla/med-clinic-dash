@@ -18,12 +18,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Doctor } from "@/hooks/doctors/types";
+import { Doctor } from "@/hooks/useDoctorsData";
 import { MoreHorizontal, Eye, Edit, Trash2, Check, X, Clock, Award } from "lucide-react";
 
 interface DoctorsListProps {
   doctors: Doctor[];
-  isLoading?: boolean;
   onViewDoctor: (doctorId: string) => void;
   onEditDoctor: (doctorId: string) => void;
   onDeleteDoctor: (doctorId: string) => void;
@@ -31,19 +30,10 @@ interface DoctorsListProps {
 
 export function DoctorsList({ 
   doctors,
-  isLoading = false,
   onViewDoctor,
   onEditDoctor,
   onDeleteDoctor
 }: DoctorsListProps) {
-  if (isLoading) {
-    return (
-      <div className="text-center p-8 text-muted-foreground border rounded-md">
-        Загрузка данных...
-      </div>
-    );
-  }
-
   if (doctors.length === 0) {
     return (
       <div className="text-center p-8 text-muted-foreground border rounded-md">

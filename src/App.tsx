@@ -51,7 +51,7 @@ const App = () => {
               <Route 
                 path="/super-admin" 
                 element={
-                  <ProtectedRoute requiredRole="super-admin">
+                  <ProtectedRoute>
                     <SuperAdminDashboard />
                   </ProtectedRoute>
                 } 
@@ -59,7 +59,7 @@ const App = () => {
               <Route 
                 path="/super-admin/clinics" 
                 element={
-                  <ProtectedRoute requiredRole="super-admin">
+                  <ProtectedRoute>
                     <SuperAdminClinics />
                   </ProtectedRoute>
                 } 
@@ -67,7 +67,7 @@ const App = () => {
               <Route 
                 path="/super-admin/clinic/:id" 
                 element={
-                  <ProtectedRoute requiredRole="super-admin">
+                  <ProtectedRoute>
                     <SuperAdminClinicProfile />
                   </ProtectedRoute>
                 } 
@@ -75,7 +75,7 @@ const App = () => {
               <Route 
                 path="/super-admin/integrations" 
                 element={
-                  <ProtectedRoute requiredRole="super-admin">
+                  <ProtectedRoute>
                     <SuperAdminIntegrations />
                   </ProtectedRoute>
                 } 
@@ -83,7 +83,7 @@ const App = () => {
               <Route 
                 path="/super-admin/subscriptions" 
                 element={
-                  <ProtectedRoute requiredRole="super-admin">
+                  <ProtectedRoute>
                     <SuperAdminSubscriptions />
                   </ProtectedRoute>
                 } 
@@ -91,7 +91,7 @@ const App = () => {
               <Route 
                 path="/super-admin/reports" 
                 element={
-                  <ProtectedRoute requiredRole="super-admin">
+                  <ProtectedRoute>
                     <SuperAdminReports />
                   </ProtectedRoute>
                 } 
@@ -99,7 +99,7 @@ const App = () => {
               <Route 
                 path="/super-admin/reports-fin" 
                 element={
-                  <ProtectedRoute requiredRole="super-admin">
+                  <ProtectedRoute>
                     <SuperAdminFinancialReport />
                   </ProtectedRoute>
                 } 
@@ -107,7 +107,7 @@ const App = () => {
               <Route 
                 path="/super-admin/reports-sub" 
                 element={
-                  <ProtectedRoute requiredRole="super-admin">
+                  <ProtectedRoute>
                     <SuperAdminSubscriptionsReport />
                   </ProtectedRoute>
                 } 
@@ -115,7 +115,7 @@ const App = () => {
               <Route 
                 path="/super-admin/reports-active" 
                 element={
-                  <ProtectedRoute requiredRole="super-admin">
+                  <ProtectedRoute>
                     <SuperAdminActivityReport />
                   </ProtectedRoute>
                 } 
@@ -125,7 +125,7 @@ const App = () => {
               <Route 
                 path="/clinic-admin" 
                 element={
-                  <ProtectedRoute requiredRole="clinic-admin">
+                  <ProtectedRoute>
                     <ClinicAdminDashboard />
                   </ProtectedRoute>
                 } 
@@ -133,7 +133,7 @@ const App = () => {
               <Route 
                 path="/clinic-admin/doctors" 
                 element={
-                  <ProtectedRoute requiredRole="clinic-admin">
+                  <ProtectedRoute>
                     <ClinicAdminDoctors />
                   </ProtectedRoute>
                 } 
@@ -141,7 +141,7 @@ const App = () => {
               <Route 
                 path="/clinic-admin/doctor/:id" 
                 element={
-                  <ProtectedRoute requiredRole="clinic-admin">
+                  <ProtectedRoute>
                     <DoctorProfile />
                   </ProtectedRoute>
                 } 
@@ -149,7 +149,7 @@ const App = () => {
               <Route 
                 path="/clinic-admin/services" 
                 element={
-                  <ProtectedRoute requiredRole="clinic-admin">
+                  <ProtectedRoute>
                     <ClinicAdminServices />
                   </ProtectedRoute>
                 } 
@@ -157,7 +157,7 @@ const App = () => {
               <Route 
                 path="/clinic-admin/schedule" 
                 element={
-                  <ProtectedRoute requiredRole="clinic-admin">
+                  <ProtectedRoute>
                     <NotFound />
                   </ProtectedRoute>
                 } 
@@ -165,7 +165,7 @@ const App = () => {
               <Route 
                 path="/clinic-admin/schedule/:id" 
                 element={
-                  <ProtectedRoute requiredRole="clinic-admin">
+                  <ProtectedRoute>
                     <NotFound />
                   </ProtectedRoute>
                 } 
@@ -173,7 +173,7 @@ const App = () => {
               <Route 
                 path="/clinic-admin/settings" 
                 element={
-                  <ProtectedRoute requiredRole="clinic-admin">
+                  <ProtectedRoute>
                     <NotFound />
                   </ProtectedRoute>
                 } 
@@ -181,7 +181,7 @@ const App = () => {
               <Route 
                 path="/clinic-admin/integrations" 
                 element={
-                  <ProtectedRoute requiredRole="clinic-admin">
+                  <ProtectedRoute>
                     <NotFound />
                   </ProtectedRoute>
                 } 
@@ -189,7 +189,7 @@ const App = () => {
               <Route 
                 path="/clinic-admin/subscription" 
                 element={
-                  <ProtectedRoute requiredRole="clinic-admin">
+                  <ProtectedRoute>
                     <NotFound />
                   </ProtectedRoute>
                 } 

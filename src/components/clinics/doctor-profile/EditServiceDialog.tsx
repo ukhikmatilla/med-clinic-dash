@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-// Updated form schema with proper price transformation
+// Updated form schema
 const serviceFormSchema = z.object({
   name: z.string().min(2, "Название услуги должно содержать не менее 2 символов"),
   price: z.string().min(1, "Укажите цену услуги")
@@ -77,11 +77,15 @@ export function EditServiceDialog({
   const handleSubmit = async (values: ServiceFormValues) => {
     setLoading(true);
     try {
-      // Here values.price is now a number thanks to the zod transformation
+      // Ensure price is a number
+      const price = typeof values.price === 'string' 
+        ? parseInt(values.price.replace(/[^\d]/g, ''), 10) 
+        : values.price;
+      
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
         name: values.name,
-        price: values.price  // This is now guaranteed to be a number
+        price: price  // This is now guaranteed to be a number
       });
     } finally {
       setLoading(false);
