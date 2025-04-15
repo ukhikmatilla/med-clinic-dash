@@ -15,7 +15,7 @@ interface Doctor {
 interface DoctorServiceItem {
   id: string;
   name: string;
-  price: string;
+  price: number;
 }
 
 interface DoctorServicesTabProps {
@@ -32,7 +32,7 @@ export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) 
     setSelectedService({
       id: service.id,
       name: service.name,
-      price: formatPrice(service.price),
+      price: service.price,
     });
     setIsEditDialogOpen(true);
   };

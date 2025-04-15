@@ -32,8 +32,8 @@ type ServiceFormValues = z.infer<typeof serviceFormSchema>;
 interface EditServiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  service: { id: string; name: string; price: string } | null;
-  onSave: (data: { id: string; name: string; price: string }) => void;
+  service: { id: string; name: string; price: number } | null;
+  onSave: (data: { id: string; name: string; price: number }) => void;
 }
 
 export function EditServiceDialog({ 
@@ -50,7 +50,7 @@ export function EditServiceDialog({
     resolver: zodResolver(serviceFormSchema),
     defaultValues: {
       name: service?.name || "",
-      price: service?.price || ""
+      price: service?.price ? service.price.toString() : ""
     }
   });
   
@@ -59,7 +59,7 @@ export function EditServiceDialog({
     if (open) {
       form.reset({
         name: service?.name || "",
-        price: service?.price || ""
+        price: service?.price ? service.price.toString() : ""
       });
     }
   });
@@ -73,7 +73,7 @@ export function EditServiceDialog({
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
         name: values.name,
-        price: values.price
+        price: Number(values.price)
       });
     } finally {
       setLoading(false);
@@ -112,7 +112,7 @@ export function EditServiceDialog({
                 <FormItem>
                   <FormLabel>Цена</FormLabel>
                   <FormControl>
-                    <Input placeholder="Например: 150 000 сум" {...field} />
+                    <Input placeholder="Например: 150000" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
