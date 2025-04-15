@@ -12,12 +12,6 @@ interface Doctor {
   id: string;
 }
 
-interface DoctorServiceItem {
-  id: string;
-  name: string;
-  price: number;
-}
-
 interface DoctorServicesTabProps {
   doctor: Doctor;
   services: Service[];
@@ -26,7 +20,7 @@ interface DoctorServicesTabProps {
 export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) {
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<DoctorServiceItem | null>(null);
+  const [selectedService, setSelectedService] = useState<{ id: string; name: string; price: number } | null>(null);
   
   const handleEditService = (service: Service) => {
     setSelectedService({
@@ -42,7 +36,7 @@ export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) 
     setIsEditDialogOpen(true);
   };
   
-  const handleSaveService = (serviceData: DoctorServiceItem) => {
+  const handleSaveService = (serviceData: { id: string; name: string; price: number }) => {
     // In a real application, this would make an API call
     toast({
       title: "Услуга сохранена",
