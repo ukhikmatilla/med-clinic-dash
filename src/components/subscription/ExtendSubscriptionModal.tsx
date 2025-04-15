@@ -9,13 +9,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface ExtendSubscriptionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onExtend: (months: number) => Promise<void>;
+  onExtend: (months: number) => Promise<boolean>;
 }
 
 export function ExtendSubscriptionModal({ 
@@ -23,7 +22,6 @@ export function ExtendSubscriptionModal({
   onOpenChange, 
   onExtend 
 }: ExtendSubscriptionModalProps) {
-  const { toast } = useToast();
   const [selectedMonths, setSelectedMonths] = useState("1");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,20 +29,13 @@ export function ExtendSubscriptionModal({
     setIsSubmitting(true);
     try {
       const months = parseInt(selectedMonths);
-      await onExtend(months);
+      const success = await onExtend(months);
       
-      toast({
-        title: "Подписка продлена",
-        description: `Подписка успешно продлена на ${months} ${getMonthWord(months)}`
-      });
-      
-      onOpenChange(false);
+      if (success) {
+        onOpenChange(false);
+      }
     } catch (error) {
-      toast({
-        title: "Ошибка",
-        description: "Не удалось продлить подписку",
-        variant: "destructive"
-      });
+      console.error("Error in subscription extension:", error);
     } finally {
       setIsSubmitting(false);
     }

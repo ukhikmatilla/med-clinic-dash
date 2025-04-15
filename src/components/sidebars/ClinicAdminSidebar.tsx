@@ -10,6 +10,7 @@ import {
   SidebarFooter
 } from "@/components/ui/sidebar";
 import { 
+  LayoutDashboard,
   ClipboardList, 
   FileSpreadsheet, 
   Calendar, 
@@ -20,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const navItems = [
+  { icon: <LayoutDashboard className="mr-2 h-4 w-4" />, label: "Дашборд", href: "/clinic-admin" },
   { icon: <ClipboardList className="mr-2 h-4 w-4" />, label: "Врачи", href: "/clinic-admin/doctors" },
   { icon: <FileSpreadsheet className="mr-2 h-4 w-4" />, label: "Услуги", href: "/clinic-admin/services" },
   { icon: <Calendar className="mr-2 h-4 w-4" />, label: "Расписание", href: "/clinic-admin/schedule" },

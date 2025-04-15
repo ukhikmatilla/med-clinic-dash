@@ -8,76 +8,90 @@ import {
   DialogFooter 
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { CheckCircle } from "lucide-react";
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardFooter, 
+  CardTitle, 
+  CardDescription 
+} from "@/components/ui/card";
+import { Check, CreditCard } from "lucide-react";
 
 interface ChangePlanModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentPlan: string;
-  onChangePlan: (plan: string) => Promise<void>;
+  onChangePlan: (planName: string) => Promise<boolean>;
 }
 
 export function ChangePlanModal({ 
   open, 
-  onOpenChange, 
+  onOpenChange,
   currentPlan,
   onChangePlan
 }: ChangePlanModalProps) {
-  const { toast } = useToast();
-  const [selectedPlan, setSelectedPlan] = useState(currentPlan);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  
   const plans = [
     {
-      id: "CRM",
-      name: "CRM",
-      description: "Базовая функциональность CRM системы",
-      price: "150,000 сум / месяц",
+      id: "basic",
+      name: "Базовый",
+      description: "CRM + Telegram (5 врачей)",
+      price: "150,000",
       features: [
-        "Управление пациентами",
-        "Расписание врачей",
-        "Отчеты и статистика",
-        "До 10 врачей"
+        "До 5 врачей",
+        "Базовая CRM",
+        "Telegram бот",
+        "Базовая отчетность"
       ]
     },
     {
-      id: "CRM + Telegram",
-      name: "CRM + Telegram",
-      description: "Расширенная CRM + Telegram бот для клиентов",
-      price: "250,000 сум / месяц",
+      id: "standard",
+      name: "Стандарт",
+      description: "CRM + Telegram (10 врачей)",
+      price: "250,000",
       features: [
-        "Все функции базового тарифа",
-        "Интеграция с Telegram",
-        "Онлайн-запись через бота",
-        "Уведомления пациентам",
-        "До 20 врачей"
+        "До 10 врачей",
+        "Расширенная CRM",
+        "Telegram бот",
+        "Расширенная отчетность",
+        "Интеграция с Google Calendar"
+      ]
+    },
+    {
+      id: "premium",
+      name: "Премиум",
+      description: "CRM + Telegram (без ограничений)",
+      price: "400,000",
+      features: [
+        "Неограниченное число врачей",
+        "Полная CRM",
+        "Telegram бот",
+        "Полная отчетность",
+        "Интеграция с Google Calendar",
+        "API для интеграций",
+        "Приоритетная поддержка"
       ]
     }
   ];
-
+  
   const handleSubmit = async () => {
-    if (selectedPlan === currentPlan) {
-      onOpenChange(false);
-      return;
-    }
+    if (!selectedPlan) return;
+    
+    const planToChange = plans.find(p => p.id === selectedPlan);
+    if (!planToChange) return;
     
     setIsSubmitting(true);
     try {
-      await onChangePlan(selectedPlan);
+      const success = await onChangePlan(planToChange.description);
       
-      toast({
-        title: "Тариф изменен",
-        description: `Тариф успешно изменен на "${selectedPlan}"`
-      });
-      
-      onOpenChange(false);
+      if (success) {
+        onOpenChange(false);
+      }
     } catch (error) {
-      toast({
-        title: "Ошибка",
-        description: "Не удалось изменить тариф",
-        variant: "destructive"
-      });
+      console.error("Error changing plan:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -85,50 +99,49 @@ export function ChangePlanModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Изменение тарифного плана</DialogTitle>
+          <DialogTitle>Изменить тариф</DialogTitle>
         </DialogHeader>
         
         <div className="py-4 space-y-4">
-          <p className="text-sm text-muted-foreground mb-2">
-            Выберите новый тарифный план:
+          <p className="text-sm text-muted-foreground">
+            Текущий тариф: <span className="font-medium">{currentPlan}</span>
           </p>
           
-          <div className="space-y-4">
-            {plans.map((plan) => (
-              <div 
-                key={plan.id}
-                className={`
-                  p-4 rounded-lg border-2 cursor-pointer
-                  ${selectedPlan === plan.id 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-gray-200 hover:border-gray-300'
-                  }
-                `}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {plans.map(plan => (
+              <Card 
+                key={plan.id} 
+                className={`cursor-pointer transition-all ${selectedPlan === plan.id ? 'border-primary ring-2 ring-primary' : ''}`}
                 onClick={() => setSelectedPlan(plan.id)}
               >
-                <div className="flex justify-between">
-                  <div>
-                    <h3 className="font-medium">{plan.name}</h3>
-                    <p className="text-sm text-muted-foreground">{plan.description}</p>
-                  </div>
-                  {selectedPlan === plan.id && (
-                    <CheckCircle className="h-5 w-5 text-primary" />
-                  )}
-                </div>
-                
-                <p className="text-sm font-medium mt-2">{plan.price}</p>
-                
-                <ul className="mt-2 space-y-1">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="text-sm flex items-center">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary mr-2" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                <CardHeader className="pb-2">
+                  <CardTitle>{plan.name}</CardTitle>
+                  <CardDescription>{plan.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-2">
+                  <p className="text-2xl font-bold mb-2">{plan.price} <span className="text-sm font-normal">сум/мес</span></p>
+                  <ul className="space-y-1">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="text-sm flex">
+                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    variant={selectedPlan === plan.id ? "default" : "outline"} 
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setSelectedPlan(plan.id)}
+                  >
+                    {selectedPlan === plan.id ? "Выбрано" : "Выбрать"}
+                  </Button>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         </div>
@@ -138,11 +151,11 @@ export function ChangePlanModal({
             Отмена
           </Button>
           <Button 
-            type="button" 
             onClick={handleSubmit} 
-            disabled={isSubmitting || selectedPlan === currentPlan}
+            disabled={!selectedPlan || isSubmitting}
           >
-            {isSubmitting ? "Обновление..." : "Изменить тариф"}
+            <CreditCard className="mr-2 h-4 w-4" />
+            {isSubmitting ? "Изменение..." : "Изменить тариф"}
           </Button>
         </DialogFooter>
       </DialogContent>

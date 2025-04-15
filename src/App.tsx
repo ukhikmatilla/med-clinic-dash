@@ -57,6 +57,7 @@ const App = () => {
             <Route path="/clinic-admin/doctors" element={<ClinicAdminDoctors />} />
             <Route path="/clinic-admin/services" element={<ClinicAdminServices />} />
             <Route path="/clinic-admin/schedule" element={<NotFound />} />
+            <Route path="/clinic-admin/schedule/:id" element={<NotFound />} />
             <Route path="/clinic-admin/settings" element={<NotFound />} />
             <Route path="/clinic-admin/integrations" element={<NotFound />} />
             <Route path="/clinic-admin/subscription" element={<NotFound />} />
