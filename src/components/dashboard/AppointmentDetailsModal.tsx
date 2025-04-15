@@ -21,6 +21,10 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { SendSmsModal } from "./SendSmsModal";
+import { PaymentModal } from "./PaymentModal";
+import { useToast } from "@/hooks/use-toast";
 
 interface AppointmentDetailsModalProps {
   open: boolean;
@@ -33,6 +37,10 @@ export function AppointmentDetailsModal({
   onOpenChange,
   appointmentId
 }: AppointmentDetailsModalProps) {
+  const { toast } = useToast();
+  const [isSmsModalOpen, setIsSmsModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  
   if (!appointmentId) return null;
   
   // In a real app, fetch appointment details based on appointmentId
@@ -88,134 +96,178 @@ export function AppointmentDetailsModal({
         return null;
     }
   };
+  
+  const handleCallPatient = () => {
+    // Check if we're on mobile
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // Open phone dialer with the patient's phone number
+      window.location.href = `tel:${appointmentDetails.patient.phone.replace(/\s+/g, '')}`;
+    } else {
+      // On desktop, show a toast notification
+      toast({
+        title: "Функция звонка",
+        description: "Звонок доступен только на мобильных устройствах",
+      });
+    }
+  };
+  
+  const handleSendSms = () => {
+    setIsSmsModalOpen(true);
+  };
+  
+  const handlePayment = () => {
+    setIsPaymentModalOpen(true);
+  };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex justify-between items-center">
-            <span>Информация о приёме #{appointmentId}</span>
-            {getStatusBadge()}
-          </DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-6">
-          {/* Date and Time */}
-          <div className="flex items-start space-x-6">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-muted-foreground">Дата:</span>
-                <span className="ml-2 font-medium">{appointmentDetails.date}</span>
-              </div>
-              <div className="mt-1 flex items-center text-sm">
-                <Clock className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-muted-foreground">Время:</span>
-                <span className="ml-2 font-medium">{appointmentDetails.time} ({appointmentDetails.duration})</span>
-              </div>
-              <div className="mt-1 flex items-center text-sm">
-                <MapPin className="h-4 w-4 text-muted-foreground mr-2" />
-                <span className="text-muted-foreground">Место:</span>
-                <span className="ml-2 font-medium">{appointmentDetails.location}</span>
-              </div>
-            </div>
-            <div className="flex-shrink-0">
-              <div className="rounded-md bg-blue-50 p-3 text-center">
-                <p className="text-xs font-medium text-blue-700">{appointmentDetails.service.price}</p>
-                <p className="text-xs text-blue-500">Стоимость приёма</p>
-              </div>
-            </div>
-          </div>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex justify-between items-center">
+              <span>Информация о приёме #{appointmentId}</span>
+              {getStatusBadge()}
+            </DialogTitle>
+          </DialogHeader>
           
-          <Separator />
-          
-          {/* Patient Info */}
-          <div>
-            <h3 className="text-sm font-medium flex items-center">
-              <User className="h-4 w-4 mr-2" />
-              Информация о пациенте
-            </h3>
-            <div className="mt-2 space-y-1 text-sm">
-              <div className="flex">
-                <span className="w-1/3 text-muted-foreground">ФИО:</span>
-                <span className="w-2/3 font-medium">{appointmentDetails.patient.name}</span>
+          <div className="space-y-6">
+            {/* Date and Time */}
+            <div className="flex items-start space-x-6">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center text-sm">
+                  <Calendar className="h-4 w-4 text-muted-foreground mr-2" />
+                  <span className="text-muted-foreground">Дата:</span>
+                  <span className="ml-2 font-medium">{appointmentDetails.date}</span>
+                </div>
+                <div className="mt-1 flex items-center text-sm">
+                  <Clock className="h-4 w-4 text-muted-foreground mr-2" />
+                  <span className="text-muted-foreground">Время:</span>
+                  <span className="ml-2 font-medium">{appointmentDetails.time} ({appointmentDetails.duration})</span>
+                </div>
+                <div className="mt-1 flex items-center text-sm">
+                  <MapPin className="h-4 w-4 text-muted-foreground mr-2" />
+                  <span className="text-muted-foreground">Место:</span>
+                  <span className="ml-2 font-medium">{appointmentDetails.location}</span>
+                </div>
               </div>
-              <div className="flex">
-                <span className="w-1/3 text-muted-foreground">Телефон:</span>
-                <span className="w-2/3">{appointmentDetails.patient.phone}</span>
-              </div>
-              <div className="flex">
-                <span className="w-1/3 text-muted-foreground">Email:</span>
-                <span className="w-2/3">{appointmentDetails.patient.email}</span>
-              </div>
-              <div className="flex">
-                <span className="w-1/3 text-muted-foreground">Мед. карта:</span>
-                <span className="w-2/3">{appointmentDetails.patient.medicalCardNumber}</span>
-              </div>
-            </div>
-          </div>
-          
-          <Separator />
-          
-          {/* Doctor and Service */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h3 className="text-sm font-medium flex items-center">
-                <UserRound className="h-4 w-4 mr-2" />
-                Врач
-              </h3>
-              <div className="mt-1 text-sm">
-                <div>{appointmentDetails.doctor.name}</div>
-                <div className="text-muted-foreground">{appointmentDetails.doctor.specialty}</div>
+              <div className="flex-shrink-0">
+                <div className="rounded-md bg-blue-50 p-3 text-center">
+                  <p className="text-xs font-medium text-blue-700">{appointmentDetails.service.price}</p>
+                  <p className="text-xs text-blue-500">Стоимость приёма</p>
+                </div>
               </div>
             </div>
             
+            <Separator />
+            
+            {/* Patient Info */}
             <div>
               <h3 className="text-sm font-medium flex items-center">
-                <FileText className="h-4 w-4 mr-2" />
-                Услуга
+                <User className="h-4 w-4 mr-2" />
+                Информация о пациенте
               </h3>
-              <div className="mt-1 text-sm">
-                <div>{appointmentDetails.service.name}</div>
-                <div className="text-muted-foreground">{appointmentDetails.service.price}</div>
+              <div className="mt-2 space-y-1 text-sm">
+                <div className="flex">
+                  <span className="w-1/3 text-muted-foreground">ФИО:</span>
+                  <span className="w-2/3 font-medium">{appointmentDetails.patient.name}</span>
+                </div>
+                <div className="flex">
+                  <span className="w-1/3 text-muted-foreground">Телефон:</span>
+                  <span className="w-2/3">{appointmentDetails.patient.phone}</span>
+                </div>
+                <div className="flex">
+                  <span className="w-1/3 text-muted-foreground">Email:</span>
+                  <span className="w-2/3">{appointmentDetails.patient.email}</span>
+                </div>
+                <div className="flex">
+                  <span className="w-1/3 text-muted-foreground">Мед. карта:</span>
+                  <span className="w-2/3">{appointmentDetails.patient.medicalCardNumber}</span>
+                </div>
               </div>
             </div>
+            
+            <Separator />
+            
+            {/* Doctor and Service */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-sm font-medium flex items-center">
+                  <UserRound className="h-4 w-4 mr-2" />
+                  Врач
+                </h3>
+                <div className="mt-1 text-sm">
+                  <div>{appointmentDetails.doctor.name}</div>
+                  <div className="text-muted-foreground">{appointmentDetails.doctor.specialty}</div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-medium flex items-center">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Услуга
+                </h3>
+                <div className="mt-1 text-sm">
+                  <div>{appointmentDetails.service.name}</div>
+                  <div className="text-muted-foreground">{appointmentDetails.service.price}</div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Comment */}
+            {appointmentDetails.comment && (
+              <>
+                <Separator />
+                <div>
+                  <h3 className="text-sm font-medium">Комментарий</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {appointmentDetails.comment}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
           
-          {/* Comment */}
-          {appointmentDetails.comment && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="text-sm font-medium">Комментарий</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {appointmentDetails.comment}
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-        
-        <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Phone className="h-3.5 w-3.5 mr-1" />
-              Позвонить
-            </Button>
-            <Button variant="outline" size="sm">
-              <Mail className="h-3.5 w-3.5 mr-1" />
-              Отправить SMS
-            </Button>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="secondary" size="sm">
-              <CreditCard className="h-3.5 w-3.5 mr-1" />
-              Оплата
-            </Button>
-            <Button size="sm">Закрыть</Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter className="flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0 mt-4">
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+              <Button variant="outline" size="sm" onClick={handleCallPatient}>
+                <Phone className="h-3.5 w-3.5 mr-1" />
+                Позвонить
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleSendSms}>
+                <Mail className="h-3.5 w-3.5 mr-1" />
+                Отправить SMS
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+              <Button variant="secondary" size="sm" onClick={handlePayment}>
+                <CreditCard className="h-3.5 w-3.5 mr-1" />
+                Оплата
+              </Button>
+              <Button size="sm" onClick={() => onOpenChange(false)}>Закрыть</Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* SMS Modal */}
+      <SendSmsModal 
+        open={isSmsModalOpen}
+        onOpenChange={setIsSmsModalOpen}
+        patientPhone={appointmentDetails.patient.phone}
+        patientName={appointmentDetails.patient.name}
+      />
+      
+      {/* Payment Modal */}
+      <PaymentModal
+        open={isPaymentModalOpen}
+        onOpenChange={setIsPaymentModalOpen}
+        appointmentId={appointmentId}
+        patientName={appointmentDetails.patient.name}
+        serviceName={appointmentDetails.service.name}
+        servicePrice={appointmentDetails.service.price}
+      />
+    </>
   );
 }
