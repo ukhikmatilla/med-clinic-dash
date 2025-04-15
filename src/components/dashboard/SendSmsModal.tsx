@@ -50,8 +50,8 @@ export function SendSmsModal({
     setIsSending(true);
     
     try {
-      // In a real app, this would call an API to send the SMS through Telegram bot
-      // For now, we'll just simulate the API call
+      // In a real app, this would call an Edge Function to send the message
+      // through the Telegram bot API to the patient's Telegram
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
