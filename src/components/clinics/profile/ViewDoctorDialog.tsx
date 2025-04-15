@@ -7,7 +7,7 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Check, Calendar, Tag } from "lucide-react";
+import { Check, Calendar, Tag, Award, Clock } from "lucide-react";
 import { 
   Card, 
   CardContent, 
@@ -23,6 +23,10 @@ interface DoctorDetails {
   schedule: Record<string, string>;
   services: string[];
   status: "active" | "inactive";
+  experience?: string;
+  category?: string;
+  initialConsultation?: string;
+  followupConsultation?: string;
 }
 
 interface ViewDoctorDialogProps {
@@ -68,6 +72,30 @@ export function ViewDoctorDialog({
                   </span>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                <Clock className="h-4 w-4 inline mr-1" /> Стаж
+              </h3>
+              <p>{doctor.experience || "—"}</p>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                <Award className="h-4 w-4 inline mr-1" /> Категория
+              </h3>
+              <p>{doctor.category || "—"}</p>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Первичная консультация</h3>
+              <p>{doctor.initialConsultation || "—"}</p>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-1">Повторная консультация</h3>
+              <p>{doctor.followupConsultation || "—"}</p>
             </div>
           </div>
           

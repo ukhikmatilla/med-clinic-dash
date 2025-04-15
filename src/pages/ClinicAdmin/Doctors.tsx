@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { ClinicAdminSidebar } from "@/components/sidebars/ClinicAdminSidebar";
@@ -9,7 +8,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Search, UserPlus, Trash2, Eye, Pencil } from "lucide-react";
+import { Search, UserPlus, Trash2, Eye, Pencil, Award, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog";
@@ -164,7 +163,12 @@ export function ClinicAdminDoctors() {
                         <tr className="bg-muted/50">
                           <th className="text-left py-3 px-4 font-medium text-sm">ФИО</th>
                           <th className="text-left py-3 px-4 font-medium text-sm">Специальность(и)</th>
-                          <th className="text-left py-3 px-4 font-medium text-sm">Telegram ID</th>
+                          <th className="text-left py-3 px-4 font-medium text-sm whitespace-nowrap">
+                            <Clock className="h-3.5 w-3.5 inline mr-1" /> Стаж
+                          </th>
+                          <th className="text-left py-3 px-4 font-medium text-sm whitespace-nowrap">
+                            <Award className="h-3.5 w-3.5 inline mr-1" /> Категория
+                          </th>
                           <th className="text-left py-3 px-4 font-medium text-sm">Расписание</th>
                           <th className="text-center py-3 px-4 font-medium text-sm">Статус</th>
                           <th className="text-right py-3 px-4 font-medium text-sm">Действия</th>
@@ -173,7 +177,7 @@ export function ClinicAdminDoctors() {
                       <tbody>
                         {filteredDoctors.length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="text-center py-6 text-muted-foreground">
+                            <td colSpan={7} className="text-center py-6 text-muted-foreground">
                               {searchQuery ? "Нет врачей, соответствующих поиску" : "Врачи не найдены"}
                             </td>
                           </tr>
@@ -182,26 +186,13 @@ export function ClinicAdminDoctors() {
                             const scheduleString = Object.keys(doctor.schedule).length > 0
                               ? `${Object.keys(doctor.schedule)[0]}-${Object.keys(doctor.schedule)[Object.keys(doctor.schedule).length - 1]} ${Object.values(doctor.schedule)[0]}`
                               : "Не указано";
-                            
-                            const telegramConnected = doctor.telegramId?.startsWith('@doctor');
                               
                             return (
                               <tr key={doctor.id} className="border-t hover:bg-muted/20">
                                 <td className="py-3 px-4">{doctor.fullName}</td>
                                 <td className="py-3 px-4 text-sm">{doctor.specialties.join(", ")}</td>
-                                <td className="py-3 px-4 text-sm">
-                                  <div className="flex items-center">
-                                    {doctor.telegramId || "—"}
-                                    {doctor.telegramId && (
-                                      <Badge 
-                                        className="ml-2" 
-                                        variant={telegramConnected ? "success" : "destructive"}
-                                      >
-                                        {telegramConnected ? "✓" : "✗"}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </td>
+                                <td className="py-3 px-4 text-sm">{doctor.experience || "—"}</td>
+                                <td className="py-3 px-4 text-sm">{doctor.category || "—"}</td>
                                 <td className="py-3 px-4 text-sm">{scheduleString}</td>
                                 <td className="py-3 px-4 text-sm text-center">
                                   {doctor.status === "active" ? (
@@ -266,8 +257,6 @@ export function ClinicAdminDoctors() {
                     ? `${Object.keys(doctor.schedule)[0]}-${Object.keys(doctor.schedule)[Object.keys(doctor.schedule).length - 1]} ${Object.values(doctor.schedule)[0]}`
                     : "Не указано";
                     
-                  const telegramConnected = doctor.telegramId?.startsWith('@doctor');
-                    
                   return (
                     <Card key={doctor.id} className="bg-white">
                       <CardContent className="p-3">
@@ -306,18 +295,16 @@ export function ClinicAdminDoctors() {
                         
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div>
-                            <span className="text-muted-foreground">Telegram ID:</span>
-                            <div className="flex items-center">
-                              {doctor.telegramId || "—"}
-                              {doctor.telegramId && (
-                                <Badge 
-                                  className="ml-1 text-[10px] px-1" 
-                                  variant={telegramConnected ? "success" : "destructive"}
-                                >
-                                  {telegramConnected ? "✓" : "✗"}
-                                </Badge>
-                              )}
-                            </div>
+                            <span className="text-muted-foreground">
+                              <Clock className="h-3 w-3 inline mr-0.5" /> Стаж:
+                            </span>
+                            <div>{doctor.experience || "—"}</div>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">
+                              <Award className="h-3 w-3 inline mr-0.5" /> Категория:
+                            </span>
+                            <div>{doctor.category || "—"}</div>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Статус:</span>

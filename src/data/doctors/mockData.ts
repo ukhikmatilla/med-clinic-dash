@@ -29,7 +29,11 @@ export const mockDoctors: Doctor[] = [
       "Суббота": "14:00–17:00"
     },
     services: ["service1", "service6"],
-    status: "active"
+    status: "active",
+    experience: "23 г.",
+    category: "Третья категория",
+    initialConsultation: "По запросу",
+    followupConsultation: "По запросу"
   },
   {
     id: "doc2",
@@ -45,7 +49,11 @@ export const mockDoctors: Doctor[] = [
       "Суббота": "09:30–16:00"
     },
     services: ["service1", "service2"],
-    status: "active"
+    status: "active",
+    experience: "25 л.",
+    category: "Высшая категория",
+    initialConsultation: "35 000 сум",
+    followupConsultation: "По запросу"
   },
   {
     id: "doc3",
@@ -60,7 +68,11 @@ export const mockDoctors: Doctor[] = [
       "Пятница": "09:00–14:00"
     },
     services: ["service1", "service3"],
-    status: "active"
+    status: "active",
+    experience: "37 л.",
+    category: "Высшая категория",
+    initialConsultation: "По запросу",
+    followupConsultation: "По запросу"
   },
   {
     id: "doc4",
@@ -69,7 +81,11 @@ export const mockDoctors: Doctor[] = [
     telegramId: null,
     schedule: {},
     services: ["service1", "service4", "service8"],
-    status: "active"
+    status: "active",
+    experience: "13 л.",
+    category: "—",
+    initialConsultation: "По запросу",
+    followupConsultation: "По запросу"
   },
   {
     id: "doc5",
@@ -78,7 +94,11 @@ export const mockDoctors: Doctor[] = [
     telegramId: null,
     schedule: {},
     services: ["service1", "service2"],
-    status: "active"
+    status: "active",
+    experience: "34 г.",
+    category: "—",
+    initialConsultation: "По запросу",
+    followupConsultation: "По запросу"
   },
   {
     id: "doc6",
@@ -94,7 +114,11 @@ export const mockDoctors: Doctor[] = [
       "Суббота": "09:00–14:00"
     },
     services: ["service1", "service4", "service8"],
-    status: "active"
+    status: "active",
+    experience: "40 л.",
+    category: "Высшая категория",
+    initialConsultation: "По запросу",
+    followupConsultation: "По запросу"
   },
   {
     id: "doc7",
@@ -109,7 +133,11 @@ export const mockDoctors: Doctor[] = [
       "Пятница": "09:00–15:00"
     },
     services: ["service1", "service3"],
-    status: "active"
+    status: "active",
+    experience: "—",
+    category: "—",
+    initialConsultation: "По запросу",
+    followupConsultation: "По запросу"
   },
   {
     id: "doc8",
@@ -125,7 +153,11 @@ export const mockDoctors: Doctor[] = [
       "Суббота": "09:00–15:00"
     },
     services: ["service1"],
-    status: "active"
+    status: "active",
+    experience: "8 л.",
+    category: "Вторая категория",
+    initialConsultation: "По запросу",
+    followupConsultation: "По запросу"
   },
   {
     id: "doc9",
@@ -134,6 +166,10 @@ export const mockDoctors: Doctor[] = [
     telegramId: null,
     schedule: {},
     services: ["service7"],
-    status: "active"
+    status: "active",
+    experience: "9 л.",
+    category: "Вторая категория",
+    initialConsultation: "По запросу",
+    followupConsultation: "По запросу"
   }
 ];
