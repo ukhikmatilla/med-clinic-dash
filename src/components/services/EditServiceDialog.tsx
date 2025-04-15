@@ -38,7 +38,7 @@ export function EditServiceDialog({
     const updatedFormData = {
       ...formData,
       price: typeof formData.price === 'string' 
-        ? parseInt(formData.price.toString().replace(/[^\d]/g, ''), 10) 
+        ? parseInt(String(formData.price).replace(/[^\d]/g, ''), 10) 
         : formData.price
     };
     

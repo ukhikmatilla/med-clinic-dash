@@ -12,6 +12,7 @@ import { useDoctorsData } from "@/hooks/useDoctorsData";
 import { mockDoctors, mockServices } from "@/data/doctors/mockData";
 import { Doctor, Service } from "@/hooks/doctors/types";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs } from "@/components/ui/tabs";
 
 // Maximum number of doctors allowed in the demo for clinic admin
 const maxDoctors = 10;
@@ -44,6 +45,13 @@ export function Doctors() {
     durationMin: service.durationMin,
     category: service.category
   })) as Service[];
+
+  // Calculate doctor counts for different statuses
+  const doctorsCount = {
+    all: doctors.length,
+    active: doctors.filter(d => d.status === "active").length,
+    inactive: doctors.filter(d => d.status === "inactive").length
+  };
   
   // Filter doctors based on search term and active/inactive status
   const filteredDoctors = doctors
@@ -138,23 +146,32 @@ export function Doctors() {
   return (
     <SidebarLayout sidebar={<ClinicAdminSidebar />}>
       <div className="p-6 space-y-6">
-        <DoctorsHeader onAddDoctor={handleAddDoctor} hasReachedLimit={hasReachedLimit} />
-        
-        <DoctorsToolbar 
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          doctors={doctors}
+        <DoctorsHeader 
+          onAddDoctor={handleAddDoctor} 
+          hasReachedLimit={hasReachedLimit}
+          totalDoctors={doctors.length}
+          maxDoctors={maxDoctors}
         />
         
-        <DoctorsList 
-          doctors={filteredDoctors}
-          isLoading={doctorsLoading}
-          onEdit={handleEditDoctor}
-          onView={handleViewDoctor}
-          onDelete={handleDeleteDoctor}
-        />
+        <Tabs defaultValue="all" value={activeFilter} onValueChange={setActiveFilter}>
+          <DoctorsToolbar 
+            activeTab={activeFilter}
+            setActiveTab={setActiveFilter}
+            searchQuery={searchTerm}
+            setSearchQuery={setSearchTerm}
+            doctorsCount={doctorsCount}
+            onAddDoctor={handleAddDoctor}
+            hasReachedLimit={hasReachedLimit}
+          />
+          
+          <DoctorsList 
+            doctors={filteredDoctors}
+            isLoading={doctorsLoading}
+            onViewDoctor={(id) => handleViewDoctor(doctors.find(d => d.id === id)!)}
+            onEditDoctor={(id) => handleEditDoctor(doctors.find(d => d.id === id)!)}
+            onDeleteDoctor={(id) => handleDeleteDoctor(doctors.find(d => d.id === id)!)}
+          />
+        </Tabs>
         
         {/* Add/Edit Doctor Dialog */}
         <DoctorFormDialog
@@ -172,6 +189,7 @@ export function Doctors() {
             open={isViewOpen}
             onOpenChange={setIsViewOpen}
             doctor={selectedDoctor}
+            services={formattedMockServices}
           />
         )}
         
