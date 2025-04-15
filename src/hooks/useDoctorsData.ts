@@ -97,7 +97,9 @@ export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctor
       telegramBot: values.telegramBot,
       schedule: parseSchedule(values.schedule || ""),
       services: values.services || [],
-      status: values.isActive ? "active" : "inactive"
+      status: values.isActive ? "active" : "inactive",
+      experience: values.experience,
+      category: values.category
     };
   };
 

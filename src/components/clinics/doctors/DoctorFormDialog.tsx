@@ -68,6 +68,8 @@ export function DoctorFormDialog({
     telegramId: doctor.telegramId || "",
     telegramBot: doctor.telegramBot || availableBots[0]?.id || "",
     specialties: doctor.specialties.join(", "),
+    experience: doctor.experience || "",
+    category: doctor.category || "",
     schedule: Object.entries(doctor.schedule)
       .map(([day, time]) => `${day} ${time}`)
       .join(", "),

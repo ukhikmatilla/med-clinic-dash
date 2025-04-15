@@ -37,6 +37,8 @@ const doctorFormSchema = z.object({
   specialties: z.string().min(2, {
     message: "Укажите минимум одну специальность",
   }),
+  experience: z.string().optional(),
+  category: z.string().optional(),
   schedule: z.string().optional(),
   isActive: z.boolean().default(true),
   services: z.array(z.string()).optional(),
@@ -85,6 +87,8 @@ export function DoctorForm({
       telegramId: initialData?.telegramId || "",
       telegramBot: initialData?.telegramBot || (availableBots.length > 0 ? availableBots[0].id : ""),
       specialties: initialData?.specialties || "",
+      experience: initialData?.experience || "",
+      category: initialData?.category || "",
       schedule: initialData?.schedule || "",
       isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
       services: initialData?.services || [],
@@ -210,9 +214,37 @@ export function DoctorForm({
             name="specialties"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Специальность</FormLabel>
+                <FormLabel>Специальность(и)</FormLabel>
                 <FormControl>
                   <Input placeholder="Например: Кардиолог, Терапевт" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="experience"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Стаж</FormLabel>
+                <FormControl>
+                  <Input placeholder="Например: 15 лет" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Категория</FormLabel>
+                <FormControl>
+                  <Input placeholder="Например: Высшая" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
