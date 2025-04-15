@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { ClinicAdminSidebar } from "@/components/sidebars/ClinicAdminSidebar";
@@ -39,7 +38,7 @@ export function ClinicAdminDoctors() {
   // Convert mockServices for compatibility with doctor form dialog
   const formattedMockServices = mockServices.map(service => ({
     ...service,
-    price: service.price.toString() // Convert to string for form display
+    price: service.price // Keep as number
   }));
   
   // Filter doctors based on search query and active tab

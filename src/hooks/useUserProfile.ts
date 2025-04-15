@@ -27,16 +27,16 @@ export function useUserProfile() {
       try {
         setLoading(true);
         
-        // First check if the user profile exists
-        const { data, error } = await supabase
+        // Use custom SQL query to check if profile exists
+        const { data, error: queryError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
 
-        if (error) {
+        if (queryError) {
           // If no profile exists, create one based on user metadata
-          if (error.code === 'PGRST116') {
+          if (queryError.code === 'PGRST116') {
             const role = user.user_metadata.role || 'clinic-admin';
             const clinic_name = user.user_metadata.clinic_name;
             
@@ -51,12 +51,12 @@ export function useUserProfile() {
               .single();
             
             if (insertError) throw insertError;
-            setProfile(newProfile);
+            setProfile(newProfile as UserProfile);
           } else {
-            throw error;
+            throw queryError;
           }
         } else {
-          setProfile(data);
+          setProfile(data as UserProfile);
         }
       } catch (err) {
         console.error('Error fetching user profile:', err);
@@ -81,7 +81,7 @@ export function useUserProfile() {
         .single();
 
       if (error) throw error;
-      setProfile(data);
+      setProfile(data as UserProfile);
       return { success: true, error: null };
     } catch (err) {
       console.error('Error updating profile:', err);

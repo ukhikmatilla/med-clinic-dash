@@ -11,9 +11,11 @@ import {
   ChevronLeft
 } from "lucide-react";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 export function SuperAdminSidebar() {
   const location = useLocation();
+  const { profile } = useUserProfile();
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);

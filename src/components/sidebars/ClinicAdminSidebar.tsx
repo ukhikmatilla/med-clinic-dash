@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
   UserRound, 
-  MedicalCross, 
+  Stethoscope, 
   CalendarDays, 
   Settings, 
   ChevronLeft,
@@ -74,7 +74,7 @@ export function ClinicAdminSidebar({ clinicName }: ClinicAdminSidebarProps) {
             asChild
           >
             <Link to="/clinic-admin/services">
-              <MedicalCross className="h-4 w-4 mr-2" />
+              <Stethoscope className="h-4 w-4 mr-2" />
               Услуги
             </Link>
           </Button>
