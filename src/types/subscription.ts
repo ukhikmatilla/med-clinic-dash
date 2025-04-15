@@ -1,4 +1,5 @@
 
+
 export interface Subscription {
   id: string;
   clinicId: string;
@@ -42,6 +43,7 @@ export interface InvoiceFormData {
     to: Date;
   };
   sendToTelegram: boolean;
+  expiryDate?: Date;
 }
 
 export interface DateRange {

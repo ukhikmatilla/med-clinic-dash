@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { SuperAdminSidebar } from "@/components/sidebars/SuperAdminSidebar";
@@ -250,8 +249,8 @@ export default function SuperAdminFinancialReport() {
                       </TableCell>
                       <TableCell>
                         {payment.source === 'payme' ? 'Payme' : 
-                         payment.source === 'click' ? 'Click' : 
-                         payment.source === 'bot' ? 'Payme (бот)' : 'Вручную'}
+                         payment.source === 'bot' ? 'Payme (бот)' : 
+                         payment.source === 'manual' ? 'Вручную' : 'Другой способ'}
                       </TableCell>
                     </TableRow>
                   ))}

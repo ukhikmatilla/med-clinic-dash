@@ -50,7 +50,7 @@ export function GenerateInvoiceModal({
   const [fromDate, setFromDate] = useState<Date>(today);
   const [toDate, setToDate] = useState<Date>(nextMonth);
   const [price, setPrice] = useState(250000);
-  const [tariff, setTariff] = useState<SubscriptionPlan>(currentPlan as SubscriptionPlan);
+  const [tariffName, setTariffName] = useState<string>(currentPlan);
   const [sendToTelegram, setSendToTelegram] = useState(true);
 
   const handleSubmit = async () => {
@@ -61,9 +61,8 @@ export function GenerateInvoiceModal({
           from: fromDate,
           to: toDate
         },
-        tariff: tariff,
+        tariff: tariffName,
         price: price,
-        expiryDate: toDate,
         sendToTelegram: sendToTelegram
       };
       
@@ -155,8 +154,8 @@ export function GenerateInvoiceModal({
             <Label htmlFor="tariff">Тариф</Label>
             <Input 
               id="tariff" 
-              value={tariff} 
-              disabled 
+              value={tariffName} 
+              onChange={(e) => setTariffName(e.target.value)}
               className="bg-gray-100"
             />
           </div>
