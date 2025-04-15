@@ -10,6 +10,10 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 
+// Auth Provider
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+
 // Super Admin Pages
 import SuperAdminDashboard from "./pages/SuperAdmin/Dashboard";
 import SuperAdminClinics from "./pages/SuperAdmin/Clinics";
@@ -36,37 +40,165 @@ const App = () => {
       <TooltipProvider>
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            
-            {/* Super Admin Routes */}
-            <Route path="/super-admin" element={<SuperAdminDashboard />} />
-            <Route path="/super-admin/clinics" element={<SuperAdminClinics />} />
-            <Route path="/super-admin/clinic/:id" element={<SuperAdminClinicProfile />} />
-            <Route path="/super-admin/integrations" element={<SuperAdminIntegrations />} />
-            <Route path="/super-admin/subscriptions" element={<SuperAdminSubscriptions />} />
-            <Route path="/super-admin/reports" element={<SuperAdminReports />} />
-            <Route path="/super-admin/reports-fin" element={<SuperAdminFinancialReport />} />
-            <Route path="/super-admin/reports-sub" element={<SuperAdminSubscriptionsReport />} />
-            <Route path="/super-admin/reports-active" element={<SuperAdminActivityReport />} />
-            
-            {/* Clinic Admin Routes */}
-            <Route path="/clinic-admin" element={<ClinicAdminDashboard />} />
-            <Route path="/clinic-admin/doctors" element={<ClinicAdminDoctors />} />
-            <Route path="/clinic-admin/doctor/:id" element={<DoctorProfile />} />
-            <Route path="/clinic-admin/services" element={<ClinicAdminServices />} />
-            <Route path="/clinic-admin/schedule" element={<NotFound />} />
-            <Route path="/clinic-admin/schedule/:id" element={<NotFound />} />
-            <Route path="/clinic-admin/settings" element={<NotFound />} />
-            <Route path="/clinic-admin/integrations" element={<NotFound />} />
-            <Route path="/clinic-admin/subscription" element={<NotFound />} />
-            
-            {/* Catch All Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              
+              {/* Super Admin Routes */}
+              <Route 
+                path="/super-admin" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/super-admin/clinics" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminClinics />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/super-admin/clinic/:id" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminClinicProfile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/super-admin/integrations" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminIntegrations />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/super-admin/subscriptions" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminSubscriptions />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/super-admin/reports" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminReports />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/super-admin/reports-fin" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminFinancialReport />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/super-admin/reports-sub" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminSubscriptionsReport />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/super-admin/reports-active" 
+                element={
+                  <ProtectedRoute>
+                    <SuperAdminActivityReport />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Clinic Admin Routes */}
+              <Route 
+                path="/clinic-admin" 
+                element={
+                  <ProtectedRoute>
+                    <ClinicAdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/clinic-admin/doctors" 
+                element={
+                  <ProtectedRoute>
+                    <ClinicAdminDoctors />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/clinic-admin/doctor/:id" 
+                element={
+                  <ProtectedRoute>
+                    <DoctorProfile />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/clinic-admin/services" 
+                element={
+                  <ProtectedRoute>
+                    <ClinicAdminServices />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/clinic-admin/schedule" 
+                element={
+                  <ProtectedRoute>
+                    <NotFound />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/clinic-admin/schedule/:id" 
+                element={
+                  <ProtectedRoute>
+                    <NotFound />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/clinic-admin/settings" 
+                element={
+                  <ProtectedRoute>
+                    <NotFound />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/clinic-admin/integrations" 
+                element={
+                  <ProtectedRoute>
+                    <NotFound />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/clinic-admin/subscription" 
+                element={
+                  <ProtectedRoute>
+                    <NotFound />
+                  </ProtectedRoute>
+                } 
+              />
+              
+              {/* Catch All Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
