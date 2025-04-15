@@ -18,7 +18,7 @@ export function DoctorIntegrationsTab({ doctor }: DoctorIntegrationsTabProps) {
   const isTelegramConnected = doctor.telegramId?.startsWith('@doctor') ?? false;
   
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div className="space-y-6">
       <TelegramIntegrationCard 
         telegramId={doctor.telegramId} 
         telegramBot={doctor.telegramBot || "@najot_doctor_bot"}
