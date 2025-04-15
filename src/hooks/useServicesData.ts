@@ -18,6 +18,38 @@ export function useServicesData() {
       price: 50000,
       durationMin: 15,
       doctors: ['doctor1', 'doctor2']
+    },
+    {
+      id: '2',
+      name: 'Концентрация гемоглобина (HGB)',
+      category: 'Анализы',
+      price: 28000,
+      durationMin: 10,
+      doctors: ['doctor1']
+    },
+    {
+      id: '3',
+      name: 'Глюкоза натощак',
+      category: 'Анализы',
+      price: 34000,
+      durationMin: 10,
+      doctors: ['doctor2']
+    },
+    {
+      id: '4',
+      name: 'ТТГ',
+      category: 'Гормоны',
+      price: 90000,
+      durationMin: 30,
+      doctors: ['doctor1', 'doctor3']
+    },
+    {
+      id: '5',
+      name: 'УЗИ щитовидной железы',
+      category: 'УЗИ',
+      price: 90000,
+      durationMin: 30,
+      doctors: ['doctor3']
     }
   ]);
 
@@ -41,7 +73,7 @@ export function useServicesData() {
       )
     );
     toast.success('Услуга обновлена');
-    return {} as Service; // Placeholder for future API return
+    return services.find(s => s.id === serviceId) as Service;
   };
 
   const deleteService = async (serviceId: string) => {
@@ -49,11 +81,30 @@ export function useServicesData() {
     toast.success('Услуга удалена');
   };
 
+  // Helper method to get services grouped by category
+  const getServicesByCategory = () => {
+    const servicesByCategory: Record<string, Service[]> = {};
+    
+    services.forEach(service => {
+      if (!servicesByCategory[service.category]) {
+        servicesByCategory[service.category] = [];
+      }
+      servicesByCategory[service.category].push(service);
+    });
+    
+    return Object.entries(servicesByCategory).map(([category, services]) => ({
+      category,
+      icon: mockCategories.find(c => c.name === category)?.icon || '🏥',
+      services
+    }));
+  };
+
   return {
     services,
     categories: mockCategories,
     addService,
     updateService,
-    deleteService
+    deleteService,
+    getServicesByCategory
   };
 }
