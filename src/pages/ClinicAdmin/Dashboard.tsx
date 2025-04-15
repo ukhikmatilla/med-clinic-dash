@@ -24,6 +24,7 @@ export function ClinicAdminDashboard() {
   
   const { 
     subscriptionInfo, 
+    pendingPlanChange,
     isLoading: isLoadingSubscription,
     extendSubscription,
     changePlan,
@@ -82,6 +83,7 @@ export function ClinicAdminDashboard() {
           
           <SubscriptionInfoCard 
             subscriptionInfo={subscriptionInfo}
+            pendingPlanChange={pendingPlanChange}
             isLoading={isLoadingSubscription}
             extendSubscription={extendSubscription}
             changePlan={changePlan}

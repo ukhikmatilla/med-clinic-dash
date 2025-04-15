@@ -22,6 +22,33 @@ export const formatExtensionRequestMessage = (clinicName: string, months: number
 };
 
 /**
+ * Format a notification message for a plan change request
+ */
+export const formatPlanChangeRequestMessage = (clinicName: string, currentPlan: string, requestedPlan: string): string => {
+  return `🔔 Новый запрос на смену тарифа!\n\nКлиника: ${clinicName}\nТекущий тариф: ${currentPlan}\nЗапрошенный тариф: ${requestedPlan}`;
+};
+
+/**
+ * Format a notification message for approved plan change
+ */
+export const formatPlanChangeApprovedMessage = (clinicName: string, newPlan: string): string => {
+  return `✅ Запрос на смену тарифа одобрен!\n\nКлиника: ${clinicName}\nНовый тариф: ${newPlan}`;
+};
+
+/**
+ * Format a notification message for rejected plan change
+ */
+export const formatPlanChangeRejectedMessage = (clinicName: string, requestedPlan: string, comment?: string): string => {
+  let message = `❌ Запрос на смену тарифа отклонен!\n\nКлиника: ${clinicName}\nЗапрошенный тариф: ${requestedPlan}`;
+  
+  if (comment) {
+    message += `\nКомментарий: ${comment}`;
+  }
+  
+  return message;
+};
+
+/**
  * Returns the correct Russian word form for months
  */
 export const getMonthWord = (months: number): string => {

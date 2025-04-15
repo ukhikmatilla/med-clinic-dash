@@ -1,5 +1,4 @@
 
-
 export interface Subscription {
   id: string;
   clinicId: string;
@@ -30,6 +29,17 @@ export interface SubscriptionExtensionRequest {
   clinicId: string;
   clinicName: string;
   requestedMonths: number;
+  requestedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+  adminComment?: string;
+}
+
+export interface PlanChangeRequest {
+  id: string;
+  clinicId: string;
+  clinicName: string;
+  currentPlan: string;
+  requestedPlan: string;
   requestedAt: string;
   status: 'pending' | 'approved' | 'rejected';
   adminComment?: string;

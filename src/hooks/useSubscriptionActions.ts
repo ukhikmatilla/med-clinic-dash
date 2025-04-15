@@ -19,6 +19,7 @@ export function useSubscriptionActions() {
     planName: "CRM + Telegram (10 врачей)",
     autoRenewal: true
   });
+  const [pendingPlanChange, setPendingPlanChange] = useState<{ requestedPlan: string } | null>(null);
 
   const extendSubscription = async (months: number): Promise<boolean> => {
     setIsLoading(true);
@@ -26,34 +27,19 @@ export function useSubscriptionActions() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Update subscription info (in a real app this would be from API response)
-      const currentExpiryDate = new Date(
-        parseInt(subscriptionInfo.expiryDate.split('.')[2]),
-        parseInt(subscriptionInfo.expiryDate.split('.')[1]) - 1,
-        parseInt(subscriptionInfo.expiryDate.split('.')[0])
-      );
-      
-      const newExpiryDate = new Date(currentExpiryDate);
-      newExpiryDate.setMonth(newExpiryDate.getMonth() + months);
-      
-      const formattedNewDate = `${newExpiryDate.getDate().toString().padStart(2, '0')}.${(newExpiryDate.getMonth() + 1).toString().padStart(2, '0')}.${newExpiryDate.getFullYear()}`;
-      
-      setSubscriptionInfo(prev => ({
-        ...prev,
-        expiryDate: formattedNewDate
-      }));
-      
+      // В реальном приложении здесь был бы запрос на продление,
+      // а не мгновенное продление
       toast({
-        title: "Подписка продлена",
-        description: `Подписка продлена до ${formattedNewDate}`
+        title: "Запрос отправлен",
+        description: `Запрос на продление подписки на ${months} месяцев отправлен`
       });
       
       return true;
     } catch (error) {
-      console.error("Error extending subscription:", error);
+      console.error("Error sending subscription extension request:", error);
       toast({
         title: "Ошибка",
-        description: "Не удалось продлить подписку",
+        description: "Не удалось отправить запрос на продление подписки",
         variant: "destructive"
       });
       
@@ -69,23 +55,21 @@ export function useSubscriptionActions() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Update subscription info
-      setSubscriptionInfo(prev => ({
-        ...prev,
-        planName: newPlanName
-      }));
+      // В реальном приложении здесь был бы запрос на смену тарифа
+      // вместо мгновенного изменения
+      setPendingPlanChange({ requestedPlan: newPlanName });
       
       toast({
-        title: "Тариф изменен",
-        description: `Новый тариф: ${newPlanName}`
+        title: "Запрос отправлен",
+        description: `Запрос на смену тарифа на "${newPlanName}" отправлен администратору`
       });
       
       return true;
     } catch (error) {
-      console.error("Error changing subscription plan:", error);
+      console.error("Error requesting plan change:", error);
       toast({
         title: "Ошибка",
-        description: "Не удалось изменить тариф",
+        description: "Не удалось отправить запрос на смену тарифа",
         variant: "destructive"
       });
       
@@ -131,6 +115,7 @@ export function useSubscriptionActions() {
 
   return {
     subscriptionInfo,
+    pendingPlanChange,
     isLoading,
     extendSubscription,
     changePlan,

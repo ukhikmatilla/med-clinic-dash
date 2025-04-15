@@ -1,8 +1,20 @@
 
 import { useState } from 'react';
-import { Subscription, PaymentHistory, InvoiceFormData, SubscriptionExtensionRequest } from '@/types/subscription';
+import { 
+  Subscription, 
+  PaymentHistory, 
+  InvoiceFormData, 
+  SubscriptionExtensionRequest,
+  PlanChangeRequest
+} from '@/types/subscription';
 import { useToast } from '@/hooks/use-toast';
-import { formatExtensionRequestMessage, sendTelegramNotification } from '@/utils/notificationUtils';
+import { 
+  formatExtensionRequestMessage, 
+  formatPlanChangeRequestMessage,
+  formatPlanChangeApprovedMessage,
+  formatPlanChangeRejectedMessage,
+  sendTelegramNotification 
+} from '@/utils/notificationUtils';
 
 // Мок-данные для подписки Najot Shifo
 const mockSubscription: Subscription = {
@@ -72,11 +84,34 @@ const mockExtensionRequests: SubscriptionExtensionRequest[] = [
   }
 ];
 
+// Мок-данные для запросов на смену тарифа
+const mockPlanChangeRequests: PlanChangeRequest[] = [
+  {
+    id: "pcr_1",
+    clinicId: "clinic_najot",
+    clinicName: "Najot Shifo",
+    currentPlan: "CRM + Telegram",
+    requestedPlan: "CRM Premium (20 врачей)",
+    requestedAt: "2025-04-15T09:15:00Z",
+    status: 'pending'
+  },
+  {
+    id: "pcr_2",
+    clinicId: "clinic_family",
+    clinicName: "Family Med",
+    currentPlan: "CRM Basic (5 врачей)",
+    requestedPlan: "CRM + Telegram (10 врачей)",
+    requestedAt: "2025-04-14T16:45:00Z",
+    status: 'pending'
+  }
+];
+
 export function useSubscriptionData() {
   const { toast } = useToast();
   const [subscription, setSubscription] = useState<Subscription>(mockSubscription);
   const [payments, setPayments] = useState<PaymentHistory[]>(mockPayments);
   const [extensionRequests, setExtensionRequests] = useState<SubscriptionExtensionRequest[]>(mockExtensionRequests);
+  const [planChangeRequests, setPlanChangeRequests] = useState<PlanChangeRequest[]>(mockPlanChangeRequests);
   const [isLoading, setIsLoading] = useState(false);
 
   // Функция для расчета оставшихся дней
@@ -90,6 +125,22 @@ export function useSubscriptionData() {
 
   // Дни до истечения подписки
   const daysRemaining = calculateDaysRemaining(subscription.expiryDate);
+
+  // Функция для проверки наличия ожидающего запроса на смену тарифа
+  const getPendingPlanChangeRequest = (clinicId: string): { requestedPlan: string, status: 'pending' } | null => {
+    const pendingRequest = planChangeRequests.find(
+      req => req.clinicId === clinicId && req.status === 'pending'
+    );
+    
+    if (pendingRequest) {
+      return {
+        requestedPlan: pendingRequest.requestedPlan,
+        status: 'pending'
+      };
+    }
+    
+    return null;
+  };
 
   // Мок функции для обновления подписки
   const updateSubscription = async (newData: Partial<Subscription>): Promise<Subscription> => {
@@ -134,6 +185,59 @@ export function useSubscriptionData() {
     } catch (error) {
       console.error("Error sending Telegram notification:", error);
     }
+    
+    setIsLoading(false);
+    
+    return true;
+  };
+
+  // Функция для создания запроса на смену тарифа
+  const requestChangePlan = async (newPlan: string): Promise<boolean> => {
+    setIsLoading(true);
+    
+    // Проверяем, что нет уже существующего ожидающего запроса
+    const existingRequest = planChangeRequests.find(
+      req => req.clinicId === subscription.clinicId && req.status === 'pending'
+    );
+    
+    if (existingRequest) {
+      toast({
+        title: "Запрос уже существует",
+        description: "У вас уже есть ожидающий подтверждения запрос на смену тарифа",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return false;
+    }
+    
+    // Имитация API запроса
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Создаем новый запрос на смену тарифа
+    const newRequest: PlanChangeRequest = {
+      id: `pcr_${planChangeRequests.length + 1}`,
+      clinicId: subscription.clinicId,
+      clinicName: subscription.clinicName,
+      currentPlan: subscription.planName,
+      requestedPlan: newPlan,
+      requestedAt: new Date().toISOString(),
+      status: 'pending'
+    };
+    
+    setPlanChangeRequests([newRequest, ...planChangeRequests]);
+    
+    // Отправляем уведомление в Telegram суперадмину
+    try {
+      const message = formatPlanChangeRequestMessage(subscription.clinicName, subscription.planName, newPlan);
+      await sendTelegramNotification(message);
+    } catch (error) {
+      console.error("Error sending Telegram notification:", error);
+    }
+    
+    toast({
+      title: "Запрос отправлен",
+      description: "Запрос на смену тарифа отправлен администратору системы"
+    });
     
     setIsLoading(false);
     
@@ -224,16 +328,104 @@ export function useSubscriptionData() {
     setIsLoading(false);
   };
 
-  // Функция для изменения тарифного плана
+  // Функция для обработки запроса на смену тарифа (подтверждение/отклонение)
+  const handlePlanChangeRequest = async (requestId: string, approve: boolean, comment?: string): Promise<void> => {
+    setIsLoading(true);
+    
+    // Имитация API запроса
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Находим запрос по ID
+    const request = planChangeRequests.find(req => req.id === requestId);
+    
+    if (!request) {
+      setIsLoading(false);
+      throw new Error("Запрос не найден");
+    }
+    
+    // Обновляем статус запроса
+    const updatedRequests = planChangeRequests.map(req => {
+      if (req.id === requestId) {
+        return {
+          ...req,
+          status: approve ? 'approved' as const : 'rejected' as const,
+          adminComment: comment
+        };
+      }
+      return req;
+    });
+    
+    setPlanChangeRequests(updatedRequests);
+    
+    // Определяем изменение лимита врачей в зависимости от нового тарифа
+    let newDoctorsLimit = subscription.doctorsLimit;
+    if (request.requestedPlan.includes("Basic")) {
+      newDoctorsLimit = 5;
+    } else if (request.requestedPlan.includes("Telegram")) {
+      newDoctorsLimit = 10;
+    } else if (request.requestedPlan.includes("Premium")) {
+      newDoctorsLimit = 20;
+    }
+    
+    // Если запрос одобрен, меняем тариф
+    if (approve) {
+      await updateSubscription({
+        planName: request.requestedPlan,
+        doctorsLimit: newDoctorsLimit
+      });
+      
+      // Отправляем уведомление в Telegram клинике
+      try {
+        const message = formatPlanChangeApprovedMessage(request.clinicName, request.requestedPlan);
+        await sendTelegramNotification(message, request.clinicId);
+      } catch (error) {
+        console.error("Error sending Telegram notification:", error);
+      }
+    } else {
+      // Отправляем уведомление в Telegram клинике об отказе
+      try {
+        const message = formatPlanChangeRejectedMessage(
+          request.clinicName, 
+          request.requestedPlan, 
+          comment
+        );
+        await sendTelegramNotification(message, request.clinicId);
+      } catch (error) {
+        console.error("Error sending Telegram notification:", error);
+      }
+    }
+    
+    toast({
+      title: approve ? "Запрос одобрен" : "Запрос отклонен",
+      description: approve 
+        ? `Тариф для клиники ${request.clinicName} изменен на ${request.requestedPlan}`
+        : `Запрос на смену тарифа от клиники ${request.clinicName} отклонен`
+    });
+    
+    setIsLoading(false);
+  };
+
+  // Функция для изменения тарифного плана для суперадмина (мгновенное изменение)
   const changePlan = async (newPlan: string): Promise<Subscription> => {
     setIsLoading(true);
     
     // Имитация API запроса
     await new Promise(resolve => setTimeout(resolve, 800));
     
+    // Определяем изменение лимита врачей в зависимости от нового тарифа
+    let newDoctorsLimit = subscription.doctorsLimit;
+    if (newPlan.includes("Basic")) {
+      newDoctorsLimit = 5;
+    } else if (newPlan.includes("Telegram")) {
+      newDoctorsLimit = 10;
+    } else if (newPlan.includes("Premium")) {
+      newDoctorsLimit = 20;
+    }
+    
     const updatedSubscription = {
       ...subscription,
-      planName: newPlan
+      planName: newPlan,
+      doctorsLimit: newDoctorsLimit
     };
     
     setSubscription(updatedSubscription);
@@ -302,14 +494,18 @@ export function useSubscriptionData() {
     subscription,
     payments,
     extensionRequests,
+    planChangeRequests,
     isLoading,
     daysRemaining,
     updateSubscription,
     extendSubscription,
     requestExtendSubscription,
+    requestChangePlan,
     changePlan,
     toggleAutoRenewal,
     generateInvoice,
-    handleExtensionRequest
+    handleExtensionRequest,
+    handlePlanChangeRequest,
+    getPendingPlanChangeRequest
   };
 }

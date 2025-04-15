@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExtendSubscriptionModal } from "@/components/subscription/ExtendSubscriptionModal";
 import { ChangePlanModal } from "@/components/subscription/ChangePlanModal";
+import { AlertTriangle } from "lucide-react";
 
 interface SubscriptionInfoCardProps {
   subscriptionInfo: {
@@ -12,6 +13,7 @@ interface SubscriptionInfoCardProps {
     planName: string;
     autoRenewal: boolean;
   };
+  pendingPlanChange?: { requestedPlan: string } | null;
   isLoading: boolean;
   extendSubscription: (months: number) => Promise<boolean>;
   changePlan: (planName: string) => Promise<boolean>;
@@ -20,6 +22,7 @@ interface SubscriptionInfoCardProps {
 
 export function SubscriptionInfoCard({
   subscriptionInfo,
+  pendingPlanChange = null,
   isLoading,
   extendSubscription,
   changePlan,
@@ -44,6 +47,16 @@ export function SubscriptionInfoCard({
           <p className="text-xs sm:text-sm">{subscriptionInfo.planName}</p>
         </div>
         
+        {pendingPlanChange && (
+          <div className="p-2 bg-amber-50 border border-amber-200 rounded text-xs sm:text-sm flex items-start gap-2">
+            <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <span className="font-medium text-amber-800">Запрос на смену тарифа</span>
+              <p className="text-amber-700">Ваш запрос на тариф "{pendingPlanChange.requestedPlan}" в обработке</p>
+            </div>
+          </div>
+        )}
+        
         <div>
           <h3 className="text-xs sm:text-sm font-medium mb-1">Автопродление</h3>
           <p className="text-xs sm:text-sm text-muted-foreground">
@@ -63,7 +76,7 @@ export function SubscriptionInfoCard({
             variant="outline" 
             className="text-xs sm:text-sm"
             onClick={() => setIsChangePlanModalOpen(true)}
-            disabled={isLoading}
+            disabled={isLoading || pendingPlanChange !== null}
           >
             🧩 Изменить тариф
           </Button>
@@ -91,6 +104,7 @@ export function SubscriptionInfoCard({
         onOpenChange={setIsChangePlanModalOpen}
         currentPlan={subscriptionInfo.planName}
         onChangePlan={changePlan}
+        isClinicAdmin={true}
       />
     </Card>
   );

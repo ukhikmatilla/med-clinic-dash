@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { 
   Dialog, 
@@ -8,23 +9,29 @@ import {
   DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Check, CreditCard } from "lucide-react";
+import { Check, CreditCard, AlertTriangle } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChangePlanModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentPlan: string;
-  onChangePlan: (planName: string) => Promise<boolean | void>; // Updated type to handle void return
+  onChangePlan: (planName: string) => Promise<boolean | void>; 
+  isClinicAdmin?: boolean;
+  pendingRequest?: { requestedPlan: string, status: 'pending' } | null;
 }
 
 export function ChangePlanModal({ 
   open, 
   onOpenChange, 
   currentPlan,
-  onChangePlan 
+  onChangePlan,
+  isClinicAdmin = false,
+  pendingRequest = null
 }: ChangePlanModalProps) {
+  const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState("CRM + Telegram (10 врачей)");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -41,9 +48,21 @@ export function ChangePlanModal({
       // Only close the modal if success is explicitly false
       if (success !== false) {
         onOpenChange(false);
+        
+        if (isClinicAdmin) {
+          toast({
+            title: "Запрос отправлен",
+            description: "Ваш запрос на смену тарифа отправлен администратору и ожидает подтверждения"
+          });
+        }
       }
     } catch (error) {
       console.error("Error changing plan:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отправить запрос на смену тарифа",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -76,9 +95,25 @@ export function ChangePlanModal({
         <DialogHeader>
           <DialogTitle>Изменение тарифа</DialogTitle>
           <DialogDescription>
-            Выберите тариф, который подходит для вашей клиники
+            {isClinicAdmin 
+              ? "Выберите тариф и отправьте запрос на изменение администратору" 
+              : "Выберите тариф, который подходит для клиники"}
           </DialogDescription>
         </DialogHeader>
+        
+        {pendingRequest && (
+          <div className="bg-amber-50 p-3 rounded-md border border-amber-200 mb-3">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5" />
+              <div>
+                <h3 className="font-medium text-amber-800">Запрос в обработке</h3>
+                <p className="text-sm text-amber-700">
+                  Запрос на смену тарифа на "{pendingRequest.requestedPlan}" ожидает подтверждения администратора
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="py-4">
           <RadioGroup value={selectedPlan} onValueChange={setSelectedPlan}>
@@ -128,10 +163,14 @@ export function ChangePlanModal({
           </Button>
           <Button 
             onClick={handleSubmit}
-            disabled={isSubmitting || selectedPlan === currentPlan}
+            disabled={isSubmitting || selectedPlan === currentPlan || pendingRequest !== null}
           >
             <CreditCard className="mr-2 h-4 w-4" />
-            {isSubmitting ? "Обновление..." : "Сменить тариф"}
+            {isSubmitting 
+              ? "Отправка..." 
+              : isClinicAdmin 
+                ? "Отправить запрос" 
+                : "Сменить тариф"}
           </Button>
         </DialogFooter>
       </DialogContent>

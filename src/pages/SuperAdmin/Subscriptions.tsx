@@ -7,6 +7,7 @@ import { SubscriptionCard } from "@/components/subscription/SubscriptionCard";
 import { PaymentsTable } from "@/components/subscription/PaymentsTable";
 import { SubscriptionAlert } from "@/components/subscription/SubscriptionAlert";
 import { PendingExtensionRequests } from "@/components/subscription/PendingExtensionRequests";
+import { PlanChangeRequests } from "@/components/subscription/PlanChangeRequests";
 import { useSubscriptionData } from "@/hooks/useSubscriptionData";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,13 +16,15 @@ export default function SuperAdminSubscriptions() {
     subscription, 
     payments, 
     extensionRequests,
+    planChangeRequests,
     daysRemaining, 
     isLoading,
     extendSubscription,
     changePlan,
     toggleAutoRenewal,
     generateInvoice,
-    handleExtensionRequest
+    handleExtensionRequest,
+    handlePlanChangeRequest
   } = useSubscriptionData();
   const { toast } = useToast();
   
@@ -102,6 +105,32 @@ export default function SuperAdminSubscriptions() {
       });
     }
   };
+  
+  // Обработчик подтверждения запроса на смену тарифа
+  const handleApprovePlanChange = async (requestId: string) => {
+    try {
+      await handlePlanChangeRequest(requestId, true);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось подтвердить запрос на смену тарифа",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  // Обработчик отклонения запроса на смену тарифа
+  const handleRejectPlanChange = async (requestId: string, comment?: string) => {
+    try {
+      await handlePlanChangeRequest(requestId, false, comment);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отклонить запрос на смену тарифа",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <SidebarLayout sidebar={<SuperAdminSidebar />}>
@@ -112,6 +141,14 @@ export default function SuperAdminSubscriptions() {
             Управление подпиской клиники {subscription.clinicName}
           </p>
         </div>
+
+        {/* Запросы на смену тарифа */}
+        <PlanChangeRequests 
+          requests={planChangeRequests}
+          onApprove={handleApprovePlanChange}
+          onReject={handleRejectPlanChange}
+          isLoading={isLoading}
+        />
 
         {/* Запросы на продление подписки */}
         <PendingExtensionRequests 
