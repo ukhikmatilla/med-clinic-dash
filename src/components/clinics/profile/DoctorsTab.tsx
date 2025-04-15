@@ -19,6 +19,8 @@ import {
 import { ViewDoctorDialog } from "./ViewDoctorDialog";
 import { useToast } from "@/hooks/use-toast";
 import { getDoctorsLimitByPlan } from "@/utils/subscriptionUtils";
+import { Service } from "@/hooks/doctors/types";
+import { mockServices } from "@/data/doctors/mockData";
 
 interface Doctor {
   id: string;
@@ -153,6 +155,7 @@ export function DoctorsTab({
         open={viewDoctorOpen}
         onOpenChange={setViewDoctorOpen}
         doctor={selectedDoctor}
+        services={mockServices}
       />
     </>
   );
