@@ -37,8 +37,8 @@ export function Doctors() {
     hasReachedLimit
   } = useDoctorsData(mockDoctors, { maxDoctors });
 
-  // Convert mockServices for compatibility with doctor form dialog ensuring number price
-  const formattedMockServices = mockServices.map(service => ({
+  // Convert mockServices for compatibility with doctor form dialog
+  const formattedMockServices: Service[] = mockServices.map(service => ({
     id: service.id,
     name: service.name,
     price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price,

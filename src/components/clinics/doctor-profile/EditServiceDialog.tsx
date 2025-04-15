@@ -77,7 +77,7 @@ export function EditServiceDialog({
   const handleSubmit = async (values: ServiceFormValues) => {
     setLoading(true);
     try {
-      // After transformation by zod, values.price is now a number
+      // Here values.price is now a number thanks to the zod transformation
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
         name: values.name,

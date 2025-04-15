@@ -2,7 +2,7 @@
 export interface Service {
   id: string;
   name: string;
-  price: number;  // Ensure price is consistently a number
+  price: number;  // Ensuring price is always a number
   category?: string;
   category_id?: string;
   durationMin?: number;

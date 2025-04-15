@@ -44,14 +44,14 @@ export function DoctorProfile() {
     );
   }
   
-  // Convert mockServices for proper type compatibility
-  const formattedServices = services.map(service => ({
+  // Convert services to ensure prices are numbers
+  const formattedServices: Service[] = services.map(service => ({
     ...service,
     price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price
   }));
   
-  // Convert mockServices for compatibility with doctor form dialog ensuring number price
-  const formattedMockServices = mockServices.map(service => ({
+  // Convert mockServices for compatibility with doctor form dialog
+  const formattedMockServices: Service[] = mockServices.map(service => ({
     id: service.id,
     name: service.name,
     price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price,
