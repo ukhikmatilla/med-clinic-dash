@@ -44,6 +44,12 @@ export function DoctorProfile() {
     );
   }
   
+  // Convert mockServices for proper type compatibility
+  const formattedServices = services.map(service => ({
+    ...service,
+    price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price
+  }));
+  
   // Convert mockServices for compatibility with doctor form dialog ensuring number price
   const formattedMockServices = mockServices.map(service => ({
     id: service.id,
@@ -51,7 +57,7 @@ export function DoctorProfile() {
     price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price,
     durationMin: service.durationMin,
     category: service.category
-  })) as Service[];
+  }));
   
   return (
     <SidebarLayout sidebar={<ClinicAdminSidebar />}>
@@ -84,7 +90,7 @@ export function DoctorProfile() {
           </TabsContent>
           
           <TabsContent value="services" className="mt-6">
-            <DoctorServicesTab doctor={doctor} services={services} />
+            <DoctorServicesTab doctor={doctor} services={formattedServices} />
           </TabsContent>
           
           <TabsContent value="schedule" className="mt-6">

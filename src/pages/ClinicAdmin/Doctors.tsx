@@ -44,7 +44,7 @@ export function Doctors() {
     price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price,
     durationMin: service.durationMin,
     category: service.category
-  })) as Service[];
+  }));
 
   // Calculate doctor counts for different statuses
   const doctorsCount = {
