@@ -45,13 +45,13 @@ export function DoctorProfile() {
   }
   
   // Convert mockServices for compatibility with doctor form dialog ensuring number price
-  const formattedMockServices: Service[] = mockServices.map(service => ({
+  const formattedMockServices = mockServices.map(service => ({
     id: service.id,
     name: service.name,
-    price: typeof service.price === 'string' ? parseInt(service.price) : service.price,
+    price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price,
     durationMin: service.durationMin,
     category: service.category
-  }));
+  })) as Service[];
   
   return (
     <SidebarLayout sidebar={<ClinicAdminSidebar />}>
