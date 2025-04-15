@@ -17,11 +17,17 @@ interface Service {
   price: string;
 }
 
+interface Bot {
+  id: string;
+  name: string;
+}
+
 interface Doctor {
   id: string;
   fullName: string;
   specialties: string[];
   telegramId: string | null;
+  telegramBot?: string;
   schedule: Record<string, string>;
   services: string[];
   status: "active" | "inactive";
@@ -32,6 +38,10 @@ interface DoctorFormDialogProps {
   onOpenChange: (open: boolean) => void;
   doctor?: Doctor | null;
   services: Service[];
+  availableBots?: Bot[];
+  subscriptionHasDoctorLimit?: boolean;
+  currentDoctorCount?: number;
+  maxDoctorsAllowed?: number;
   onSave: (doctor: DoctorFormValues, isEditing: boolean) => Promise<void>;
 }
 
@@ -40,17 +50,23 @@ export function DoctorFormDialog({
   onOpenChange,
   doctor,
   services,
+  availableBots = [{ id: "doctor_bot", name: "@najot_doctor_bot" }],
+  subscriptionHasDoctorLimit = false,
+  currentDoctorCount = 0,
+  maxDoctorsAllowed = 10,
   onSave,
 }: DoctorFormDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
   const isEditing = !!doctor;
+  const reachedDoctorLimit = !isEditing && subscriptionHasDoctorLimit && currentDoctorCount >= maxDoctorsAllowed;
   
   // Convert doctor to form values format if editing
   const initialValues = doctor ? {
     fullName: doctor.fullName,
     telegramId: doctor.telegramId || "",
+    telegramBot: doctor.telegramBot || availableBots[0]?.id || "",
     specialties: doctor.specialties.join(", "),
     schedule: Object.entries(doctor.schedule)
       .map(([day, time]) => `${day} ${time}`)
@@ -60,6 +76,15 @@ export function DoctorFormDialog({
   } : undefined;
   
   const handleSubmit = async (values: DoctorFormValues) => {
+    if (reachedDoctorLimit) {
+      toast({
+        title: "Ограничение по подписке",
+        description: `Ваш тариф позволяет добавить максимум ${maxDoctorsAllowed} врачей. Перейдите на расширенный тариф для добавления большего числа врачей.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -83,6 +108,18 @@ export function DoctorFormDialog({
     }
   };
   
+  const handleTelegramCheck = async (username: string): Promise<boolean> => {
+    // In a real app, this would be an API call to check if the Telegram username exists
+    console.log("Checking Telegram username:", username);
+    // Simulate API check
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // For demo purposes, let's say only usernames starting with '@doctor' are valid
+        resolve(username.startsWith('@doctor'));
+      }, 1000);
+    });
+  };
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
@@ -90,12 +127,32 @@ export function DoctorFormDialog({
           <DialogTitle>{isEditing ? "Редактировать врача" : "Добавить нового врача"}</DialogTitle>
         </DialogHeader>
         
-        <DoctorForm
-          initialData={initialValues}
-          services={services}
-          isSubmitting={isSubmitting}
-          onSubmit={handleSubmit}
-        />
+        {reachedDoctorLimit ? (
+          <div className="py-6 text-center">
+            <p className="text-destructive font-medium mb-2">
+              Достигнут лимит врачей по вашему тарифу
+            </p>
+            <p className="text-muted-foreground mb-4">
+              Ваш текущий тариф позволяет добавить максимум {maxDoctorsAllowed} врачей.
+              Для добавления большего количества врачей, пожалуйста, обновите ваш тариф.
+            </p>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Закрыть
+            </Button>
+            <Button className="ml-2" onClick={() => console.log("Navigate to subscription page")}>
+              Обновить тариф
+            </Button>
+          </div>
+        ) : (
+          <DoctorForm
+            initialData={initialValues}
+            services={services}
+            availableBots={availableBots}
+            isSubmitting={isSubmitting}
+            onSubmit={handleSubmit}
+            onTelegramCheck={handleTelegramCheck}
+          />
+        )}
         
         <DialogFooter className="sm:justify-between">
           <Button

@@ -9,22 +9,48 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Search, UserPlus, Filter } from "lucide-react";
+import { Search, UserPlus, Trash2, Eye, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog";
+import { ViewDoctorDialog } from "@/components/clinics/doctors/ViewDoctorDialog";
 import { DoctorFormValues } from "@/components/clinics/doctors/DoctorForm";
 import { useDoctorsData } from "@/hooks/useDoctorsData";
 import { mockDoctors, mockServices } from "@/data/doctors/mockData";
 import { mockSubscription } from "@/data/subscription/mockData";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function ClinicAdminDoctors() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [formDialogOpen, setFormDialogOpen] = useState(false);
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   
-  const { doctors, loading, addDoctor, updateDoctor } = useDoctorsData(mockDoctors);
+  // Get subscription details from mock data
+  const subscription = mockSubscription;
+  const maxDoctors = subscription.features?.maxDoctors || 10;
+  const subscriptionHasDoctorLimit = !!subscription.features?.maxDoctors;
+  
+  const { 
+    doctors, 
+    loading, 
+    addDoctor, 
+    updateDoctor,
+    deleteDoctor,
+    hasReachedLimit
+  } = useDoctorsData(mockDoctors, { maxDoctors });
   
   // Filter doctors based on search query and active tab
   const filteredDoctors = doctors.filter(doctor => {
@@ -43,6 +69,28 @@ export function ClinicAdminDoctors() {
     setFormDialogOpen(true);
   };
   
+  const handleEditDoctor = (doctor: any) => {
+    setSelectedDoctor(doctor);
+    setFormDialogOpen(true);
+  };
+  
+  const handleViewDoctor = (doctor: any) => {
+    setSelectedDoctor(doctor);
+    setViewDialogOpen(true);
+  };
+  
+  const handleDeleteClick = (doctor: any) => {
+    setSelectedDoctor(doctor);
+    setDeleteDialogOpen(true);
+  };
+  
+  const handleConfirmDelete = async () => {
+    if (selectedDoctor) {
+      await deleteDoctor(selectedDoctor.id);
+      setDeleteDialogOpen(false);
+    }
+  };
+  
   const handleSaveDoctor = async (values: DoctorFormValues, isEditing: boolean) => {
     if (isEditing && selectedDoctor) {
       await updateDoctor(selectedDoctor.id, values);
@@ -55,8 +103,19 @@ export function ClinicAdminDoctors() {
     <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
       <div className="p-2 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3">
-          <h1 className="text-xl sm:text-2xl font-bold">Врачи</h1>
-          <Button className="flex items-center" onClick={handleAddDoctor}>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold">Врачи</h1>
+            {subscriptionHasDoctorLimit && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {doctors.length} из {maxDoctors} врачей по вашему тарифу
+              </p>
+            )}
+          </div>
+          <Button 
+            className="flex items-center" 
+            onClick={handleAddDoctor} 
+            disabled={hasReachedLimit}
+          >
             <UserPlus className="mr-2 h-4 w-4" />
             Добавить врача
           </Button>
@@ -65,9 +124,22 @@ export function ClinicAdminDoctors() {
         <Tabs defaultValue="all" className="mb-4 sm:mb-6" onValueChange={setActiveTab}>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
             <TabsList className="mb-0">
-              <TabsTrigger value="all" className="text-xs sm:text-sm">Все врачи</TabsTrigger>
-              <TabsTrigger value="active" className="text-xs sm:text-sm">Активные</TabsTrigger>
-              <TabsTrigger value="inactive" className="text-xs sm:text-sm">Неактивные</TabsTrigger>
+              <TabsTrigger value="all" className="text-xs sm:text-sm">
+                Все врачи
+                <Badge className="ml-1.5 bg-secondary">{doctors.length}</Badge>
+              </TabsTrigger>
+              <TabsTrigger value="active" className="text-xs sm:text-sm">
+                Активные
+                <Badge className="ml-1.5 bg-secondary">
+                  {doctors.filter(d => d.status === "active").length}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="inactive" className="text-xs sm:text-sm">
+                Неактивные
+                <Badge className="ml-1.5 bg-secondary">
+                  {doctors.filter(d => d.status === "inactive").length}
+                </Badge>
+              </TabsTrigger>
             </TabsList>
             
             <div className="relative w-full sm:w-auto">
@@ -110,34 +182,63 @@ export function ClinicAdminDoctors() {
                             const scheduleString = Object.keys(doctor.schedule).length > 0
                               ? `${Object.keys(doctor.schedule)[0]}-${Object.keys(doctor.schedule)[Object.keys(doctor.schedule).length - 1]} ${Object.values(doctor.schedule)[0]}`
                               : "Не указано";
+                            
+                            const telegramConnected = doctor.telegramId?.startsWith('@doctor');
                               
                             return (
                               <tr key={doctor.id} className="border-t hover:bg-muted/20">
                                 <td className="py-3 px-4">{doctor.fullName}</td>
                                 <td className="py-3 px-4 text-sm">{doctor.specialties.join(", ")}</td>
-                                <td className="py-3 px-4 text-sm">{doctor.telegramId || "—"}</td>
+                                <td className="py-3 px-4 text-sm">
+                                  <div className="flex items-center">
+                                    {doctor.telegramId || "—"}
+                                    {doctor.telegramId && (
+                                      <Badge 
+                                        className="ml-2" 
+                                        variant={telegramConnected ? "success" : "destructive"}
+                                      >
+                                        {telegramConnected ? "✓" : "✗"}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </td>
                                 <td className="py-3 px-4 text-sm">{scheduleString}</td>
                                 <td className="py-3 px-4 text-sm text-center">
                                   {doctor.status === "active" ? (
-                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <Badge variant="success">
                                       Активен
-                                    </span>
+                                    </Badge>
                                   ) : (
-                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <Badge variant="destructive">
                                       Неактивен
-                                    </span>
+                                    </Badge>
                                   )}
                                 </td>
                                 <td className="py-3 px-4 text-sm text-right space-x-1">
                                   <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => {
-                                      setSelectedDoctor(doctor);
-                                      setFormDialogOpen(true);
-                                    }}
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => handleViewDoctor(doctor)}
+                                    title="Просмотр"
                                   >
-                                    Редактировать
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => handleEditDoctor(doctor)}
+                                    title="Редактировать"
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => handleDeleteClick(doctor)}
+                                    title="Удалить"
+                                    className="text-destructive hover:text-destructive/80"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
                                   </Button>
                                 </td>
                               </tr>
@@ -165,6 +266,8 @@ export function ClinicAdminDoctors() {
                     ? `${Object.keys(doctor.schedule)[0]}-${Object.keys(doctor.schedule)[Object.keys(doctor.schedule).length - 1]} ${Object.values(doctor.schedule)[0]}`
                     : "Не указано";
                     
+                  const telegramConnected = doctor.telegramId?.startsWith('@doctor');
+                    
                   return (
                     <Card key={doctor.id} className="bg-white">
                       <CardContent className="p-3">
@@ -176,14 +279,27 @@ export function ClinicAdminDoctors() {
                           <div className="flex space-x-1">
                             <Button
                               size="sm"
-                              variant="outline"
-                              className="h-7 px-2 text-xs"
-                              onClick={() => {
-                                setSelectedDoctor(doctor);
-                                setFormDialogOpen(true);
-                              }}
+                              variant="ghost"
+                              className="h-7 px-2"
+                              onClick={() => handleViewDoctor(doctor)}
                             >
-                              Редактировать
+                              <Eye className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 px-2"
+                              onClick={() => handleEditDoctor(doctor)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-7 px-2 text-destructive hover:text-destructive/80"
+                              onClick={() => handleDeleteClick(doctor)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </div>
                         </div>
@@ -191,19 +307,29 @@ export function ClinicAdminDoctors() {
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div>
                             <span className="text-muted-foreground">Telegram ID:</span>
-                            <div>{doctor.telegramId || "—"}</div>
+                            <div className="flex items-center">
+                              {doctor.telegramId || "—"}
+                              {doctor.telegramId && (
+                                <Badge 
+                                  className="ml-1 text-[10px] px-1" 
+                                  variant={telegramConnected ? "success" : "destructive"}
+                                >
+                                  {telegramConnected ? "✓" : "✗"}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                           <div>
                             <span className="text-muted-foreground">Статус:</span>
-                            <div className="flex items-center">
+                            <div className="flex items-center mt-0.5">
                               {doctor.status === "active" ? (
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-green-100 text-green-800">
+                                <Badge variant="success" className="text-[10px] px-1">
                                   Активен
-                                </span>
+                                </Badge>
                               ) : (
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs bg-red-100 text-red-800">
+                                <Badge variant="destructive" className="text-[10px] px-1">
                                   Неактивен
-                                </span>
+                                </Badge>
                               )}
                             </div>
                           </div>
@@ -235,8 +361,41 @@ export function ClinicAdminDoctors() {
           onOpenChange={setFormDialogOpen}
           doctor={selectedDoctor}
           services={mockServices}
+          subscriptionHasDoctorLimit={subscriptionHasDoctorLimit}
+          currentDoctorCount={doctors.length}
+          maxDoctorsAllowed={maxDoctors}
           onSave={handleSaveDoctor}
         />
+        
+        {/* View Doctor Dialog */}
+        <ViewDoctorDialog
+          open={viewDialogOpen}
+          onOpenChange={setViewDialogOpen}
+          doctor={selectedDoctor}
+          services={mockServices}
+        />
+        
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Удаление врача</AlertDialogTitle>
+              <AlertDialogDescription>
+                Вы уверены, что хотите удалить врача "{selectedDoctor?.fullName}"?
+                Это действие нельзя будет отменить.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Отмена</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmDelete}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Удалить
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </SidebarLayout>
   );

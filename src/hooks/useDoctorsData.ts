@@ -9,6 +9,7 @@ export interface Doctor {
   fullName: string;
   specialties: string[];
   telegramId: string | null;
+  telegramBot?: string;
   schedule: Record<string, string>;
   services: string[];
   status: "active" | "inactive";
@@ -20,10 +21,22 @@ export interface Service {
   price: string;
 }
 
-export function useDoctorsData(initialDoctors: Doctor[] = []) {
+export interface Bot {
+  id: string;
+  name: string;
+}
+
+export interface UseDoctorsDataOptions {
+  maxDoctors?: number;
+}
+
+export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctorsDataOptions = {}) {
   const [doctors, setDoctors] = useState<Doctor[]>(initialDoctors);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  const { maxDoctors } = options;
+  const hasReachedLimit = maxDoctors ? doctors.length >= maxDoctors : false;
 
   // Parse schedule string to Record format
   const parseSchedule = (scheduleStr: string): Record<string, string> => {
@@ -77,14 +90,33 @@ export function useDoctorsData(initialDoctors: Doctor[] = []) {
       fullName: values.fullName,
       specialties: values.specialties.split(',').map(s => s.trim()),
       telegramId: values.telegramId || null,
+      telegramBot: values.telegramBot,
       schedule: parseSchedule(values.schedule || ""),
       services: values.services || [],
       status: values.isActive ? "active" : "inactive"
     };
   };
 
+  // Get available bots
+  const getAvailableBots = async (): Promise<Bot[]> => {
+    // In a real app, this would be an API call
+    // For now, we'll return a static list
+    return [
+      { id: "doctor_bot", name: "@najot_doctor_bot" }
+    ];
+  };
+
   // Add a new doctor
   const addDoctor = async (values: DoctorFormValues) => {
+    if (maxDoctors && doctors.length >= maxDoctors) {
+      toast({
+        title: "Ограничение по подписке",
+        description: `Ваш тариф позволяет добавить максимум ${maxDoctors} врачей. Перейдите на расширенный тариф для добавления большего числа врачей.`,
+        variant: "destructive",
+      });
+      throw new Error("Doctor limit reached");
+    }
+    
     setLoading(true);
     try {
       // In a real app, this would be an API call
@@ -145,11 +177,22 @@ export function useDoctorsData(initialDoctors: Doctor[] = []) {
     }
   };
 
+  // Verify Telegram ID
+  const verifyTelegramId = async (telegramId: string): Promise<boolean> => {
+    // In a real app, this would be an API call
+    // For demo purposes, let's say only IDs starting with '@doctor' are valid
+    return telegramId.startsWith('@doctor');
+  };
+
   return {
     doctors,
     loading,
     addDoctor,
     updateDoctor,
-    deleteDoctor
+    deleteDoctor,
+    verifyTelegramId,
+    getAvailableBots,
+    hasReachedLimit,
+    maxDoctors
   };
 }

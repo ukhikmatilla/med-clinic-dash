@@ -14,7 +14,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Define the schema for doctor form validation
 const doctorFormSchema = z.object({
@@ -25,6 +33,7 @@ const doctorFormSchema = z.object({
     .refine(val => !val || val.startsWith('@'), {
       message: "Telegram ID должен начинаться с @",
     }),
+  telegramBot: z.string().optional(),
   specialties: z.string().min(2, {
     message: "Укажите минимум одну специальность",
   }),
@@ -41,28 +50,40 @@ interface Service {
   price: string;
 }
 
+interface Bot {
+  id: string;
+  name: string;
+}
+
 interface DoctorFormProps {
   initialData?: Partial<DoctorFormValues>;
   services: Service[];
+  availableBots?: Bot[];
   isSubmitting?: boolean;
   onSubmit: (values: DoctorFormValues) => void;
+  onTelegramCheck?: (username: string) => Promise<boolean>;
 }
 
 export function DoctorForm({
   initialData,
   services,
+  availableBots = [{ id: "doctor_bot", name: "@najot_doctor_bot" }],
   isSubmitting = false,
   onSubmit,
+  onTelegramCheck,
 }: DoctorFormProps) {
   const [selectedServices, setSelectedServices] = useState<string[]>(
     initialData?.services || []
   );
+  const [telegramVerified, setTelegramVerified] = useState<boolean | null>(null);
+  const [verifyingTelegram, setVerifyingTelegram] = useState(false);
 
   const form = useForm<DoctorFormValues>({
     resolver: zodResolver(doctorFormSchema),
     defaultValues: {
       fullName: initialData?.fullName || "",
       telegramId: initialData?.telegramId || "",
+      telegramBot: initialData?.telegramBot || (availableBots.length > 0 ? availableBots[0].id : ""),
       specialties: initialData?.specialties || "",
       schedule: initialData?.schedule || "",
       isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
@@ -86,6 +107,22 @@ export function DoctorForm({
     onSubmit(values);
   };
 
+  const handleTelegramBlur = async () => {
+    const telegramId = form.getValues("telegramId");
+    if (telegramId && onTelegramCheck) {
+      setVerifyingTelegram(true);
+      try {
+        const isVerified = await onTelegramCheck(telegramId);
+        setTelegramVerified(isVerified);
+      } catch (error) {
+        console.error("Error verifying Telegram ID:", error);
+        setTelegramVerified(false);
+      } finally {
+        setVerifyingTelegram(false);
+      }
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -104,15 +141,65 @@ export function DoctorForm({
             )}
           />
           
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="telegramId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Telegram ID</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        placeholder="Например: @doctor_name" 
+                        {...field} 
+                        onBlur={handleTelegramBlur}
+                      />
+                      {verifyingTelegram && (
+                        <div className="absolute right-3 top-2.5">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        </div>
+                      )}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {telegramVerified === false && (
+              <Alert variant="destructive" className="py-2">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Telegram ID не найден. Пригласите врача в бот.
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+          
           <FormField
             control={form.control}
-            name="telegramId"
+            name="telegramBot"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Telegram ID</FormLabel>
-                <FormControl>
-                  <Input placeholder="Например: @doctor_name" {...field} />
-                </FormControl>
+                <FormLabel>Бот для врача</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Выберите бота" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {availableBots.map((bot) => (
+                      <SelectItem key={bot.id} value={bot.id}>
+                        {bot.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -136,7 +223,7 @@ export function DoctorForm({
             control={form.control}
             name="schedule"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="md:col-span-2">
                 <FormLabel>Расписание</FormLabel>
                 <FormControl>
                   <Input placeholder="Например: Пн-Пт 09:00-17:00" {...field} />
