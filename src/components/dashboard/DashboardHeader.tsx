@@ -1,32 +1,47 @@
 
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { Bell, PlusCircle } from "lucide-react";
 
 interface DashboardHeaderProps {
+  clinicName: string;
   lastUpdated: string;
-  isRefreshing: boolean;
+  onAddAppointment: () => void;
   onRefresh: () => void;
+  isLoading: boolean;
 }
 
-export function DashboardHeader({ 
-  lastUpdated, 
-  isRefreshing, 
-  onRefresh 
+export function DashboardHeader({
+  clinicName,
+  lastUpdated,
+  onAddAppointment,
+  onRefresh,
+  isLoading
 }: DashboardHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-2">
-      <h1 className="text-xl sm:text-2xl font-bold">Дэшборд</h1>
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <span>Последнее обновление: {lastUpdated}</span>
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold">{clinicName}</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">
+          Центр высококачественной медицины | 
+          <span className="ml-1">Последнее обновление: {lastUpdated}</span>
+        </p>
+      </div>
+      
+      <div className="flex gap-2">
+        <Button className="flex items-center text-xs sm:text-sm" onClick={onAddAppointment}>
+          <PlusCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="whitespace-nowrap">Добавить приём</span>
+        </Button>
         <Button 
           variant="outline" 
-          size="sm" 
-          onClick={onRefresh} 
-          disabled={isRefreshing}
-          className="flex items-center"
+          className="relative"
+          onClick={onRefresh}
+          disabled={isLoading}
         >
-          <RefreshCw className={`h-3.5 w-3.5 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
-          Обновить
+          <Bell className="h-4 w-4" />
+          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+            2
+          </span>
         </Button>
       </div>
     </div>

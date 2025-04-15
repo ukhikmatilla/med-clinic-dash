@@ -20,7 +20,7 @@ export function useSubscriptionActions() {
     autoRenewal: true
   });
 
-  const extendSubscription = async (months: number) => {
+  const extendSubscription = async (months: number): Promise<boolean> => {
     setIsLoading(true);
     try {
       // Simulate API call
@@ -63,7 +63,7 @@ export function useSubscriptionActions() {
     }
   };
 
-  const changePlan = async (newPlanName: string) => {
+  const changePlan = async (newPlanName: string): Promise<boolean> => {
     setIsLoading(true);
     try {
       // Simulate API call
@@ -95,7 +95,7 @@ export function useSubscriptionActions() {
     }
   };
 
-  const toggleAutoRenewal = async () => {
+  const toggleAutoRenewal = async (): Promise<boolean> => {
     setIsLoading(true);
     try {
       // Simulate API call

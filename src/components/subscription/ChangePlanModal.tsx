@@ -5,18 +5,13 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogFooter 
+  DialogFooter,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardFooter, 
-  CardTitle, 
-  CardDescription 
-} from "@/components/ui/card";
 import { Check, CreditCard } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 interface ChangePlanModalProps {
   open: boolean;
@@ -27,65 +22,22 @@ interface ChangePlanModalProps {
 
 export function ChangePlanModal({ 
   open, 
-  onOpenChange,
+  onOpenChange, 
   currentPlan,
-  onChangePlan
+  onChangePlan 
 }: ChangePlanModalProps) {
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState("CRM + Telegram (10 врачей)");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const plans = [
-    {
-      id: "basic",
-      name: "Базовый",
-      description: "CRM + Telegram (5 врачей)",
-      price: "150,000",
-      features: [
-        "До 5 врачей",
-        "Базовая CRM",
-        "Telegram бот",
-        "Базовая отчетность"
-      ]
-    },
-    {
-      id: "standard",
-      name: "Стандарт",
-      description: "CRM + Telegram (10 врачей)",
-      price: "250,000",
-      features: [
-        "До 10 врачей",
-        "Расширенная CRM",
-        "Telegram бот",
-        "Расширенная отчетность",
-        "Интеграция с Google Calendar"
-      ]
-    },
-    {
-      id: "premium",
-      name: "Премиум",
-      description: "CRM + Telegram (без ограничений)",
-      price: "400,000",
-      features: [
-        "Неограниченное число врачей",
-        "Полная CRM",
-        "Telegram бот",
-        "Полная отчетность",
-        "Интеграция с Google Calendar",
-        "API для интеграций",
-        "Приоритетная поддержка"
-      ]
-    }
-  ];
-  
+
   const handleSubmit = async () => {
-    if (!selectedPlan) return;
-    
-    const planToChange = plans.find(p => p.id === selectedPlan);
-    if (!planToChange) return;
+    if (selectedPlan === currentPlan) {
+      onOpenChange(false);
+      return;
+    }
     
     setIsSubmitting(true);
     try {
-      const success = await onChangePlan(planToChange.description);
+      const success = await onChangePlan(selectedPlan);
       
       if (success) {
         onOpenChange(false);
@@ -97,65 +49,89 @@ export function ChangePlanModal({
     }
   };
 
+  const plans = [
+    {
+      id: "crm-basic",
+      name: "CRM Basic (5 врачей)",
+      price: "150,000",
+      features: ["Управление пациентами", "Календарь приёмов", "Базовая статистика"]
+    },
+    {
+      id: "crm-telegram",
+      name: "CRM + Telegram (10 врачей)",
+      price: "250,000",
+      features: ["Всё из CRM Basic", "Telegram бот для записи", "Уведомления пациентам", "Расширенная статистика"]
+    },
+    {
+      id: "crm-premium",
+      name: "CRM Premium (20 врачей)",
+      price: "400,000",
+      features: ["Всё из CRM + Telegram", "Интеграция с Google Calendar", "Финансовый учёт", "Техподдержка 24/7"]
+    }
+  ];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Изменить тариф</DialogTitle>
+          <DialogTitle>Изменение тарифа</DialogTitle>
+          <DialogDescription>
+            Выберите тариф, который подходит для вашей клиники
+          </DialogDescription>
         </DialogHeader>
         
-        <div className="py-4 space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Текущий тариф: <span className="font-medium">{currentPlan}</span>
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {plans.map(plan => (
-              <Card 
-                key={plan.id} 
-                className={`cursor-pointer transition-all ${selectedPlan === plan.id ? 'border-primary ring-2 ring-primary' : ''}`}
-                onClick={() => setSelectedPlan(plan.id)}
+        <div className="py-4">
+          <RadioGroup value={selectedPlan} onValueChange={setSelectedPlan}>
+            {plans.map((plan) => (
+              <div
+                key={plan.id}
+                className={`flex items-start space-x-3 space-y-0 rounded-md border p-3 ${
+                  selectedPlan === plan.name ? "border-primary" : ""
+                } ${plan.name === currentPlan ? "bg-muted" : ""}`}
               >
-                <CardHeader className="pb-2">
-                  <CardTitle>{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <p className="text-2xl font-bold mb-2">{plan.price} <span className="text-sm font-normal">сум/мес</span></p>
-                  <ul className="space-y-1">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="text-sm flex">
-                        <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                <RadioGroupItem value={plan.name} id={plan.id} />
+                <div className="flex flex-col">
+                  <Label
+                    htmlFor={plan.id}
+                    className="font-medium text-sm flex items-center"
+                  >
+                    {plan.name}
+                    {plan.name === currentPlan && (
+                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                        Текущий
+                      </span>
+                    )}
+                  </Label>
+                  <p className="text-[13px] text-muted-foreground">
+                    {plan.price} сум/месяц
+                  </p>
+                  <ul className="text-xs mt-1 space-y-1">
+                    {plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-start">
+                        <Check className="h-3 w-3 text-green-500 mr-1 mt-0.5" />
                         <span>{feature}</span>
                       </li>
                     ))}
                   </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    variant={selectedPlan === plan.id ? "default" : "outline"} 
-                    size="sm"
-                    className="w-full"
-                    onClick={() => setSelectedPlan(plan.id)}
-                  >
-                    {selectedPlan === plan.id ? "Выбрано" : "Выбрать"}
-                  </Button>
-                </CardFooter>
-              </Card>
+                </div>
+              </div>
             ))}
-          </div>
+          </RadioGroup>
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+          >
             Отмена
           </Button>
           <Button 
-            onClick={handleSubmit} 
-            disabled={!selectedPlan || isSubmitting}
+            onClick={handleSubmit}
+            disabled={isSubmitting || selectedPlan === currentPlan}
           >
             <CreditCard className="mr-2 h-4 w-4" />
-            {isSubmitting ? "Изменение..." : "Изменить тариф"}
+            {isSubmitting ? "Обновление..." : "Сменить тариф"}
           </Button>
         </DialogFooter>
       </DialogContent>
