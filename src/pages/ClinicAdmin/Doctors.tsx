@@ -40,8 +40,8 @@ export function ClinicAdminDoctors() {
   
   // Get subscription details from mock data
   const subscription = mockSubscription;
-  const maxDoctors = subscription.features?.maxDoctors || 10;
-  const subscriptionHasDoctorLimit = !!subscription.features?.maxDoctors;
+  const maxDoctors = subscription.doctorsLimit || 10;
+  const subscriptionHasDoctorLimit = !!subscription.doctorsLimit;
   
   const { 
     doctors, 
