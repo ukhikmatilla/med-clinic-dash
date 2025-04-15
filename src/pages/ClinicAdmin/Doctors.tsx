@@ -10,7 +10,7 @@ import { ViewDoctorDialog } from "@/components/clinics/doctors/ViewDoctorDialog"
 import { DeleteDoctorDialog } from "@/components/clinics/doctors/DeleteDoctorDialog";
 import { useDoctorsData } from "@/hooks/useDoctorsData";
 import { mockDoctors, mockServices } from "@/data/doctors/mockData";
-import { Doctor, Service } from "@/hooks/doctors/types";
+import { Doctor } from "@/hooks/doctors/types";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs } from "@/components/ui/tabs";
 
@@ -38,7 +38,7 @@ export function Doctors() {
   } = useDoctorsData(mockDoctors, { maxDoctors });
 
   // Convert mockServices for compatibility with doctor form dialog
-  const formattedMockServices: Service[] = mockServices.map(service => ({
+  const formattedMockServices = mockServices.map(service => ({
     id: service.id,
     name: service.name,
     price: typeof service.price === 'string' ? parseInt(String(service.price), 10) : service.price,

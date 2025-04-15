@@ -51,7 +51,7 @@ export function DoctorProfile() {
   }));
   
   // Convert mockServices for compatibility with doctor form dialog
-  const formattedMockServices: Service[] = mockServices.map(service => ({
+  const formattedMockServices = mockServices.map(service => ({
     id: service.id,
     name: service.name,
     price: typeof service.price === 'string' ? parseInt(String(service.price), 10) : service.price,
