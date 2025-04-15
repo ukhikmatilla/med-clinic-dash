@@ -11,18 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Calendar } from "@/components/ui/calendar";
-import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, FilePlus, Send } from "lucide-react";
+import { FilePlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { InvoiceFormData, SubscriptionPlan } from "@/types/subscription";
+import { InvoiceFormData } from "@/types/subscription";
 import { ru } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+import { DateRangePicker } from "./DateRangePicker";
 
 interface GenerateInvoiceModalProps {
   open: boolean;
@@ -97,87 +91,17 @@ export function GenerateInvoiceModal({
         <div className="py-4 space-y-4">
           <div className="space-y-2">
             <Label>Период</Label>
-            <div className="flex items-center gap-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !fromDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {fromDate ? format(fromDate, "dd.MM.yyyy", { locale: ru }) : "Выберите дату"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={fromDate}
-                    onSelect={(date) => date && setFromDate(date)}
-                    initialFocus
-                    locale={ru}
-                  />
-                </PopoverContent>
-              </Popover>
-              
-              <span>–</span>
-              
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !toDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {toDate ? format(toDate, "dd.MM.yyyy", { locale: ru }) : "Выберите дату"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={toDate}
-                    onSelect={(date) => date && setToDate(date)}
-                    initialFocus
-                    locale={ru}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="tariff">Тариф</Label>
-            <Input 
-              id="tariff" 
-              value={tariffName} 
-              onChange={(e) => setTariffName(e.target.value)}
-              className="bg-gray-100"
+            <DateRangePicker 
+              fromDate={fromDate}
+              toDate={toDate}
+              onFromDateChange={setFromDate}
+              onToDateChange={setToDate}
             />
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="price">Стоимость (сум)</Label>
-            <Input 
-              id="price" 
-              type="number" 
-              value={price} 
-              onChange={(e) => setPrice(Number(e.target.value))}
-            />
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="telegram"
-              checked={sendToTelegram}
-              onCheckedChange={setSendToTelegram}
-            />
-            <Label htmlFor="telegram">Отправить уведомление в Telegram</Label>
-          </div>
+          <TariffInput value={tariffName} onChange={setTariffName} />
+          <PriceInput value={price} onChange={setPrice} />
+          <TelegramOption checked={sendToTelegram} onChange={setSendToTelegram} />
           
           <div className="p-3 bg-blue-50 rounded-md">
             <p className="text-sm text-blue-700">
@@ -190,22 +114,70 @@ export function GenerateInvoiceModal({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Отмена
           </Button>
-          <Button 
-            type="button" 
-            onClick={handleSubmit} 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>Создание счёта...</>
-            ) : (
-              <>
-                <FilePlus className="mr-2 h-4 w-4" />
-                Создать счёт
-              </>
-            )}
-          </Button>
+          <SubmitButton isSubmitting={isSubmitting} onClick={handleSubmit} />
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// Компоненты формы
+function TariffInput({ value, onChange }: { value: string, onChange: (value: string) => void }) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="tariff">Тариф</Label>
+      <Input 
+        id="tariff" 
+        value={value} 
+        onChange={(e) => onChange(e.target.value)}
+        className="bg-gray-100"
+      />
+    </div>
+  );
+}
+
+function PriceInput({ value, onChange }: { value: number, onChange: (value: number) => void }) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="price">Стоимость (сум)</Label>
+      <Input 
+        id="price" 
+        type="number" 
+        value={value} 
+        onChange={(e) => onChange(Number(e.target.value))}
+      />
+    </div>
+  );
+}
+
+function TelegramOption({ checked, onChange }: { checked: boolean, onChange: (value: boolean) => void }) {
+  return (
+    <div className="flex items-center space-x-2">
+      <Switch
+        id="telegram"
+        checked={checked}
+        onCheckedChange={onChange}
+      />
+      <Label htmlFor="telegram">Отправить уведомление в Telegram</Label>
+    </div>
+  );
+}
+
+function SubmitButton({ isSubmitting, onClick }: { isSubmitting: boolean, onClick: () => void }) {
+  return (
+    <Button 
+      type="button" 
+      onClick={onClick} 
+      disabled={isSubmitting}
+    >
+      {isSubmitting ? (
+        <>Создание счёта...</>
+      ) : (
+        <>
+          <FilePlus className="mr-2 h-4 w-4" />
+          Создать счёт
+        </>
+      )}
+    </Button>
   );
 }
