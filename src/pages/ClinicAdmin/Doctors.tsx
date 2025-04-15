@@ -13,6 +13,7 @@ import { DoctorsHeader } from "@/components/clinics/doctors/DoctorsHeader";
 import { DoctorsToolbar } from "@/components/clinics/doctors/DoctorsToolbar";
 import { DoctorsList } from "@/components/clinics/doctors/DoctorsList";
 import { DeleteDoctorDialog } from "@/components/clinics/doctors/DeleteDoctorDialog";
+import { Service } from "@/hooks/doctors/types";
 
 export function ClinicAdminDoctors() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,9 +38,12 @@ export function ClinicAdminDoctors() {
   } = useDoctorsData(mockDoctors, { maxDoctors });
 
   // Convert mockServices for compatibility with doctor form dialog
-  const formattedMockServices = mockServices.map(service => ({
-    ...service,
-    price: service.price // Keep as number
+  const formattedMockServices: Service[] = mockServices.map(service => ({
+    id: service.id,
+    name: service.name,
+    price: service.price,
+    durationMin: service.durationMin,
+    category: service.category
   }));
   
   // Filter doctors based on search query and active tab

@@ -56,7 +56,7 @@ export function ClinicAdminDashboard() {
   };
   
   return (
-    <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
+    <SidebarLayout sidebar={<ClinicAdminSidebar />}>
       <div className="p-2 sm:p-6">
         <DashboardHeader 
           clinicName="Najot Shifo"

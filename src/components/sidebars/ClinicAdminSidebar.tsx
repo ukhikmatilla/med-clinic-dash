@@ -15,13 +15,20 @@ import {
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
-export function ClinicAdminSidebar() {
+interface ClinicAdminSidebarProps {
+  clinicName?: string;
+}
+
+export function ClinicAdminSidebar({ clinicName }: ClinicAdminSidebarProps) {
   const location = useLocation();
   const { profile } = useUserProfile();
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
+  
+  // Use provided clinicName or fall back to profile.clinic_name
+  const displayName = clinicName || profile?.clinic_name || "Медицинская CRM";
   
   return (
     <Sidebar className="border-r">
@@ -33,7 +40,7 @@ export function ClinicAdminSidebar() {
             </div>
             <div className="flex-1 overflow-hidden">
               <h3 className="text-lg font-semibold text-foreground truncate">
-                {profile?.clinic_name || "Медицинская CRM"}
+                {displayName}
               </h3>
               <p className="text-xs text-muted-foreground">
                 Панель администратора

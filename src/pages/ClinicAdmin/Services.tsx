@@ -70,7 +70,7 @@ export function ClinicAdminServices() {
   const servicesByCategory = getServicesByCategory();
   
   return (
-    <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
+    <SidebarLayout sidebar={<ClinicAdminSidebar />}>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Услуги</h1>

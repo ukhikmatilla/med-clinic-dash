@@ -14,6 +14,7 @@ import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog"
 import { useDoctorProfileData } from "@/hooks/useDoctorProfileData";
 import { mockServices } from "@/data/doctors/mockData";
 import { Loader2 } from "lucide-react";
+import { Service } from "@/hooks/doctors/types";
 
 export function DoctorProfile() {
   const { id } = useParams<{ id: string }>();
@@ -44,9 +45,12 @@ export function DoctorProfile() {
   }
   
   // Convert mockServices for compatibility with doctor form dialog
-  const formattedMockServices = mockServices.map(service => ({
-    ...service,
-    price: service.price // Keep as number
+  const formattedMockServices: Service[] = mockServices.map(service => ({
+    id: service.id,
+    name: service.name,
+    price: service.price,
+    durationMin: service.durationMin,
+    category: service.category
   }));
   
   return (
