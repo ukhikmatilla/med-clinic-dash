@@ -14,8 +14,8 @@ interface DoctorIntegrationsTabProps {
 }
 
 export function DoctorIntegrationsTab({ doctor }: DoctorIntegrationsTabProps) {
-  // Determine if Telegram is connected (in a real app, this would come from the API)
-  const isTelegramConnected = doctor.telegramId?.startsWith('@doctor') ?? false;
+  // Safely check if telegramId exists before trying to use startsWith
+  const isTelegramConnected = doctor.telegramId ? doctor.telegramId.startsWith('@doctor') : false;
   
   return (
     <div className="space-y-6">

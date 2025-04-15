@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Doctor } from "@/hooks/useDoctorsData";
-import { MoreHorizontal, Eye, Edit, Trash2, Check, X } from "lucide-react";
+import { MoreHorizontal, Eye, Edit, Trash2, Check, X, Clock, Award } from "lucide-react";
 
 interface DoctorsListProps {
   doctors: Doctor[];
@@ -47,8 +47,10 @@ export function DoctorsList({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[300px]">ФИО</TableHead>
+            <TableHead className="w-[250px]">ФИО</TableHead>
             <TableHead>Специальности</TableHead>
+            <TableHead>Стаж</TableHead>
+            <TableHead>Категория</TableHead>
             <TableHead>Telegram ID</TableHead>
             <TableHead>Статус</TableHead>
             <TableHead className="text-right"></TableHead>
@@ -64,12 +66,32 @@ export function DoctorsList({
               </TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-1">
-                  {doctor.specialties.map((specialty, index) => (
+                  {doctor.specialties && doctor.specialties.map((specialty, index) => (
                     <Badge key={index} variant="outline" className="mr-1">
                       {specialty}
                     </Badge>
                   ))}
                 </div>
+              </TableCell>
+              <TableCell>
+                {doctor.experience ? (
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 text-muted-foreground mr-1" />
+                    <span>{doctor.experience}</span>
+                  </div>
+                ) : (
+                  "—"
+                )}
+              </TableCell>
+              <TableCell>
+                {doctor.category ? (
+                  <div className="flex items-center">
+                    <Award className="h-4 w-4 text-muted-foreground mr-1" />
+                    <span>{doctor.category}</span>
+                  </div>
+                ) : (
+                  "—"
+                )}
               </TableCell>
               <TableCell>{doctor.telegramId || "—"}</TableCell>
               <TableCell>

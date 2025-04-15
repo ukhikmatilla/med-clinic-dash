@@ -16,7 +16,7 @@ interface DoctorBasicInfoProps {
 export function DoctorBasicInfo({
   fullName,
   telegramId,
-  specialties,
+  specialties = [],
   experience,
   category,
   initialConsultation,
@@ -45,11 +45,15 @@ export function DoctorBasicInfo({
       <div className="col-span-1 md:col-span-2">
         <h3 className="text-sm font-medium text-muted-foreground mb-1">Специальность(и)</h3>
         <div className="flex flex-wrap gap-2">
-          {specialties.map((specialty, index) => (
-            <Badge key={index} variant="outline">
-              {specialty}
-            </Badge>
-          ))}
+          {specialties && specialties.length > 0 ? (
+            specialties.map((specialty, index) => (
+              <Badge key={index} variant="outline">
+                {specialty}
+              </Badge>
+            ))
+          ) : (
+            <span className="text-muted-foreground italic">Не указаны</span>
+          )}
         </div>
       </div>
 

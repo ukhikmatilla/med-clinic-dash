@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { ClinicAdminSidebar } from "@/components/sidebars/ClinicAdminSidebar";
@@ -38,7 +39,7 @@ export function ClinicAdminDoctors() {
   // Filter doctors based on search query and active tab
   const filteredDoctors = doctors.filter(doctor => {
     const matchesSearch = doctor.fullName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      doctor.specialties.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
+      (doctor.specialties && doctor.specialties.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())));
     
     if (activeTab === "all") return matchesSearch;
     if (activeTab === "active") return matchesSearch && doctor.status === "active";
@@ -58,17 +59,20 @@ export function ClinicAdminDoctors() {
     setFormDialogOpen(true);
   };
   
-  const handleEditDoctor = (doctor: any) => {
+  const handleEditDoctor = (doctorId: string) => {
+    const doctor = doctors.find(d => d.id === doctorId);
     setSelectedDoctor(doctor);
     setFormDialogOpen(true);
   };
   
-  const handleViewDoctor = (doctor: any) => {
+  const handleViewDoctor = (doctorId: string) => {
+    const doctor = doctors.find(d => d.id === doctorId);
     setSelectedDoctor(doctor);
     setViewDialogOpen(true);
   };
   
-  const handleDeleteClick = (doctor: any) => {
+  const handleDeleteClick = (doctorId: string) => {
+    const doctor = doctors.find(d => d.id === doctorId);
     setSelectedDoctor(doctor);
     setDeleteDialogOpen(true);
   };
@@ -119,11 +123,21 @@ export function ClinicAdminDoctors() {
           </TabsContent>
           
           <TabsContent value="active" className="m-0">
-            {/* This content will be populated by the filtered doctors automatically */}
+            <DoctorsList 
+              doctors={filteredDoctors}
+              onViewDoctor={handleViewDoctor}
+              onEditDoctor={handleEditDoctor}
+              onDeleteDoctor={handleDeleteClick}
+            />
           </TabsContent>
           
           <TabsContent value="inactive" className="m-0">
-            {/* This content will be populated by the filtered doctors automatically */}
+            <DoctorsList 
+              doctors={filteredDoctors}
+              onViewDoctor={handleViewDoctor}
+              onEditDoctor={handleEditDoctor}
+              onDeleteDoctor={handleDeleteClick}
+            />
           </TabsContent>
         </Tabs>
         
