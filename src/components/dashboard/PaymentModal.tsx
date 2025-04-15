@@ -90,7 +90,7 @@ export function PaymentModal({
             <CheckCircle className="h-10 w-10 text-green-600" />
           </div>
           <h3 className="text-lg font-medium mb-1">Счет успешно создан</h3>
-          <p className="text-sm text-muted-foreground mb-6">
+          <p className="text-sm text-muted-foreground mb-6 max-w-[320px] mx-auto">
             Ссылка на оплату услуги "{serviceName}" отправлена пациенту в Telegram
           </p>
           <Button onClick={handleClose}>Закрыть</Button>
@@ -100,7 +100,7 @@ export function PaymentModal({
     
     return (
       <>
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 overflow-y-auto max-h-[60vh]">
           <div className="p-4 border rounded-lg">
             <div className="flex justify-between items-start mb-3">
               <div>
@@ -115,17 +115,17 @@ export function PaymentModal({
             <div className="text-sm space-y-1">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Услуга:</span>
-                <span>{serviceName}</span>
+                <span className="text-right max-w-[200px] break-words">{serviceName}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Пациент:</span>
-                <span>{patientName}</span>
+                <span className="text-right max-w-[200px] break-words">{patientName}</span>
               </div>
             </div>
           </div>
           
           <Tabs defaultValue="online">
-            <TabsList className="grid grid-cols-2 mb-4">
+            <TabsList className="grid grid-cols-2 mb-4 w-full">
               <TabsTrigger value="online">Онлайн оплата</TabsTrigger>
               <TabsTrigger value="cash">Наличные</TabsTrigger>
             </TabsList>
@@ -138,7 +138,7 @@ export function PaymentModal({
               >
                 <Label 
                   htmlFor="payme" 
-                  className={`flex flex-col items-center justify-center p-4 border rounded-lg cursor-pointer hover:bg-muted/50 ${paymentMethod === "payme" ? "border-primary bg-muted/50" : ""}`}
+                  className={`flex flex-col items-center justify-center p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors ${paymentMethod === "payme" ? "border-primary bg-muted/50" : ""}`}
                 >
                   <div className="font-bold text-blue-500 mb-2">Payme</div>
                   <RadioGroupItem value="payme" id="payme" className="sr-only" />
@@ -146,14 +146,14 @@ export function PaymentModal({
                 
                 <Label 
                   htmlFor="click" 
-                  className={`flex flex-col items-center justify-center p-4 border rounded-lg cursor-pointer hover:bg-muted/50 ${paymentMethod === "click" ? "border-primary bg-muted/50" : ""}`}
+                  className={`flex flex-col items-center justify-center p-4 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors ${paymentMethod === "click" ? "border-primary bg-muted/50" : ""}`}
                 >
                   <div className="font-bold text-green-600 mb-2">Click</div>
                   <RadioGroupItem value="click" id="click" className="sr-only" />
                 </Label>
               </RadioGroup>
               
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground max-w-[420px] break-words leading-relaxed">
                 Нажав кнопку, вы создадите счет и отправите ссылку на оплату пациенту в Telegram. 
                 Оплата будет учтена автоматически после подтверждения платёжной системы.
               </div>
@@ -162,10 +162,10 @@ export function PaymentModal({
             <TabsContent value="cash" className="space-y-4">
               <div className="p-4 bg-muted rounded-lg">
                 <h4 className="font-medium mb-2">Оплата наличными</h4>
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="text-sm text-muted-foreground mb-2 max-w-[420px] break-words leading-relaxed">
                   Отметьте приём как оплаченный наличными и распечатайте чек для пациента.
                 </p>
-                <Button className="w-full">
+                <Button className="w-full sm:w-auto px-4 py-2">
                   <CheckCircle className="mr-2 h-4 w-4" />
                   Отметить как оплаченный
                 </Button>
@@ -174,13 +174,14 @@ export function PaymentModal({
           </Tabs>
         </div>
         
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+        <DialogFooter className="flex-col space-y-2 sm:space-y-0 sm:flex-row mt-4">
+          <Button variant="outline" onClick={handleClose} className="w-full sm:w-auto">
             Отмена
           </Button>
           <Button 
             onClick={handleGenerateInvoice} 
             disabled={isProcessing}
+            className="w-full sm:w-auto px-6 py-2.5"
           >
             {isProcessing ? (
               <>Обработка...</>
