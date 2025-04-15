@@ -5,9 +5,10 @@ import { Bell, PlusCircle } from "lucide-react";
 interface DashboardHeaderProps {
   clinicName: string;
   lastUpdated: string;
-  onAddAppointment: () => void;
+  onAddAppointment?: () => void;
   onRefresh: () => void;
-  isLoading: boolean;
+  isLoading?: boolean;
+  isRefreshing?: boolean; // Added this prop
 }
 
 export function DashboardHeader({
@@ -15,7 +16,8 @@ export function DashboardHeader({
   lastUpdated,
   onAddAppointment,
   onRefresh,
-  isLoading
+  isLoading,
+  isRefreshing
 }: DashboardHeaderProps) {
   return (
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 sm:mb-6 gap-3 sm:gap-4">
@@ -28,15 +30,17 @@ export function DashboardHeader({
       </div>
       
       <div className="flex gap-2">
-        <Button className="flex items-center text-xs sm:text-sm" onClick={onAddAppointment}>
-          <PlusCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-          <span className="whitespace-nowrap">Добавить приём</span>
-        </Button>
+        {onAddAppointment && (
+          <Button className="flex items-center text-xs sm:text-sm" onClick={onAddAppointment}>
+            <PlusCircle className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="whitespace-nowrap">Добавить приём</span>
+          </Button>
+        )}
         <Button 
           variant="outline" 
           className="relative"
           onClick={onRefresh}
-          disabled={isLoading}
+          disabled={isLoading || isRefreshing}
         >
           <Bell className="h-4 w-4" />
           <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">

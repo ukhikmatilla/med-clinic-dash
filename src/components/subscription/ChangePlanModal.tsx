@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog, 
@@ -17,7 +16,7 @@ interface ChangePlanModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   currentPlan: string;
-  onChangePlan: (planName: string) => Promise<boolean>;
+  onChangePlan: (planName: string) => Promise<boolean | void>; // Updated type to handle void return
 }
 
 export function ChangePlanModal({ 
@@ -39,7 +38,8 @@ export function ChangePlanModal({
     try {
       const success = await onChangePlan(selectedPlan);
       
-      if (success) {
+      // Only close the modal if success is explicitly false
+      if (success !== false) {
         onOpenChange(false);
       }
     } catch (error) {

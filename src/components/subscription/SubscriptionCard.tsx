@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -24,8 +23,8 @@ interface SubscriptionCardProps {
   subscription: Subscription;
   daysRemaining: number;
   isLoading: boolean;
-  onExtend: (months: number) => Promise<void>;
-  onChangePlan: (plan: string) => Promise<void>;
+  onExtend: (months: number) => Promise<boolean | void>;
+  onChangePlan: (plan: string) => Promise<boolean | void>;
   onToggleAutoRenewal: () => Promise<void>;
   onGenerateInvoice: (data: InvoiceFormData) => Promise<void>;
 }

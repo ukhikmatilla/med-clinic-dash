@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog, 
@@ -14,7 +13,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 interface ExtendSubscriptionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onExtend: (months: number) => Promise<boolean>;
+  onExtend: (months: number) => Promise<boolean | void>; // Updated type to handle void return
 }
 
 export function ExtendSubscriptionModal({ 
@@ -31,7 +30,8 @@ export function ExtendSubscriptionModal({
       const months = parseInt(selectedMonths);
       const success = await onExtend(months);
       
-      if (success) {
+      // Only close the modal if success is explicitly false
+      if (success !== false) {
         onOpenChange(false);
       }
     } catch (error) {

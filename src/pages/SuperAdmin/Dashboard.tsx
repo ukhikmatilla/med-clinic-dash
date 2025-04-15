@@ -27,9 +27,10 @@ export function SuperAdminDashboard() {
       <div className="p-2 sm:p-6">
         {/* Header with refresh */}
         <DashboardHeader 
+          clinicName="Super Admin Dashboard"
           lastUpdated={lastUpdated}
-          isRefreshing={isRefreshing}
           onRefresh={handleRefresh}
+          isLoading={isRefreshing}
         />
         
         {/* Stats Cards */}
