@@ -77,15 +77,11 @@ export function EditServiceDialog({
   const handleSubmit = async (values: ServiceFormValues) => {
     setLoading(true);
     try {
-      // Ensure price is a number
-      const price = typeof values.price === 'string' 
-        ? parseInt(values.price.replace(/[^\d]/g, ''), 10) 
-        : values.price;
-      
+      // Price should already be a number after transformation by zod
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
         name: values.name,
-        price: price  // This is now guaranteed to be a number
+        price: values.price  // This is now guaranteed to be a number
       });
     } finally {
       setLoading(false);

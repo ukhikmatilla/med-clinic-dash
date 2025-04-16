@@ -2,185 +2,192 @@
 import { useState } from "react";
 import { SidebarLayout } from "@/components/layouts/SidebarLayout";
 import { ClinicAdminSidebar } from "@/components/sidebars/ClinicAdminSidebar";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog";
-import { ViewDoctorDialog } from "@/components/clinics/profile/ViewDoctorDialog";
-import { DoctorFormValues } from "@/components/clinics/doctors/DoctorForm";
-import { useDoctorsData } from "@/hooks/useDoctorsData";
-import { mockDoctors, mockServices } from "@/data/doctors/mockData";
-import { mockSubscription } from "@/data/subscription/mockData";
 import { DoctorsHeader } from "@/components/clinics/doctors/DoctorsHeader";
 import { DoctorsToolbar } from "@/components/clinics/doctors/DoctorsToolbar";
 import { DoctorsList } from "@/components/clinics/doctors/DoctorsList";
+import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog";
+import { ViewDoctorDialog } from "@/components/clinics/doctors/ViewDoctorDialog";
 import { DeleteDoctorDialog } from "@/components/clinics/doctors/DeleteDoctorDialog";
-import { Service } from "@/hooks/doctors/types";
+import { useDoctorsData } from "@/hooks/useDoctorsData";
+import { mockDoctors, mockServices } from "@/data/doctors/mockData";
+import { Doctor, Service } from "@/hooks/doctors/types";
+import { useToast } from "@/hooks/use-toast";
 
-export function ClinicAdminDoctors() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
-  const [formDialogOpen, setFormDialogOpen] = useState(false);
-  const [viewDialogOpen, setViewDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
+// Maximum number of doctors allowed in the demo for clinic admin
+const maxDoctors = 10;
+
+export function Doctors() {
+  const { toast } = useToast();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [isLoading, setIsLoading] = useState(false);
   
-  // Get subscription details from mock data
-  const subscription = mockSubscription;
-  const maxDoctors = subscription.doctorsLimit || 10;
-  const subscriptionHasDoctorLimit = !!subscription.doctorsLimit;
-  
-  const { 
-    doctors, 
-    loading, 
-    addDoctor, 
+  // Initialize doctors data with mock data
+  const {
+    doctors,
+    loading: doctorsLoading,
+    addDoctor,
     updateDoctor,
     deleteDoctor,
     hasReachedLimit
   } = useDoctorsData(mockDoctors, { maxDoctors });
 
-  // Convert mockServices for compatibility with doctor form dialog
-  const formattedMockServices: Service[] = mockServices.map(service => ({
+  // Convert mockServices for compatibility with doctor form dialog ensuring number price
+  const formattedMockServices = mockServices.map(service => ({
     id: service.id,
     name: service.name,
-    price: service.price,
+    price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price,
     durationMin: service.durationMin,
     category: service.category
-  }));
+  })) as Service[];
   
-  // Filter doctors based on search query and active tab
-  const filteredDoctors = doctors.filter(doctor => {
-    const matchesSearch = doctor.fullName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      (doctor.specialties && doctor.specialties.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())));
-    
-    if (activeTab === "all") return matchesSearch;
-    if (activeTab === "active") return matchesSearch && doctor.status === "active";
-    if (activeTab === "inactive") return matchesSearch && doctor.status === "inactive";
-    
-    return matchesSearch;
-  });
+  // Filter doctors based on search term and active/inactive status
+  const filteredDoctors = doctors
+    .filter(doctor => {
+      const matches = doctor.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                     doctor.specialties.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
+                     
+      if (activeFilter === "all") {
+        return matches;
+      } else if (activeFilter === "active") {
+        return matches && doctor.status === "active";
+      } else {
+        return matches && doctor.status === "inactive";
+      }
+    });
   
-  const doctorsCount = {
-    all: doctors.length,
-    active: doctors.filter(d => d.status === "active").length,
-    inactive: doctors.filter(d => d.status === "inactive").length
-  };
-  
+  // Open dialogs
   const handleAddDoctor = () => {
     setSelectedDoctor(null);
-    setFormDialogOpen(true);
+    setIsFormOpen(true);
   };
   
-  const handleEditDoctor = (doctorId: string) => {
-    const doctor = doctors.find(d => d.id === doctorId);
+  const handleEditDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor);
-    setFormDialogOpen(true);
+    setIsFormOpen(true);
   };
   
-  const handleViewDoctor = (doctorId: string) => {
-    const doctor = doctors.find(d => d.id === doctorId);
+  const handleViewDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor);
-    setViewDialogOpen(true);
+    setIsViewOpen(true);
   };
   
-  const handleDeleteClick = (doctorId: string) => {
-    const doctor = doctors.find(d => d.id === doctorId);
+  const handleDeleteDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor);
-    setDeleteDialogOpen(true);
+    setIsDeleteOpen(true);
   };
   
-  const handleConfirmDelete = async () => {
-    if (selectedDoctor) {
-      await deleteDoctor(selectedDoctor.id);
-      setDeleteDialogOpen(false);
+  // Handle form submission for add/edit doctor
+  const handleFormSubmit = async (values: any, isEditing: boolean) => {
+    setIsLoading(true);
+    
+    try {
+      if (isEditing && selectedDoctor) {
+        // Update existing doctor
+        await updateDoctor(selectedDoctor.id, values);
+        toast({
+          title: "Врач обновлен",
+          description: `Профиль врача ${values.fullName} был успешно обновлен`,
+        });
+      } else {
+        // Add new doctor
+        await addDoctor(values);
+        toast({
+          title: "Врач добавлен",
+          description: `Профиль врача ${values.fullName} был успешно создан`,
+        });
+      }
+      setIsFormOpen(false);
+    } catch (error) {
+      console.error("Error saving doctor:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось сохранить данные врача. Пожалуйста, попробуйте еще раз.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  const handleSaveDoctor = async (values: DoctorFormValues, isEditing: boolean) => {
-    if (isEditing && selectedDoctor) {
-      await updateDoctor(selectedDoctor.id, values);
-    } else {
-      await addDoctor(values);
+  // Handle doctor deletion
+  const handleConfirmDelete = async () => {
+    if (!selectedDoctor) return;
+    
+    setIsLoading(true);
+    
+    try {
+      await deleteDoctor(selectedDoctor.id);
+      setIsDeleteOpen(false);
+    } catch (error) {
+      console.error("Error deleting doctor:", error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось удалить врача. Пожалуйста, попробуйте еще раз.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
   
   return (
     <SidebarLayout sidebar={<ClinicAdminSidebar />}>
-      <div className="p-2 sm:p-6">
-        <DoctorsHeader 
-          totalDoctors={doctors.length}
-          maxDoctors={maxDoctors}
-          onAddDoctor={handleAddDoctor}
-          hasReachedLimit={hasReachedLimit}
+      <div className="p-6 space-y-6">
+        <DoctorsHeader onAddDoctor={handleAddDoctor} hasReachedLimit={hasReachedLimit} />
+        
+        <DoctorsToolbar 
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+          doctors={doctors}
         />
         
-        <Tabs defaultValue="all" className="mb-4 sm:mb-6" onValueChange={setActiveTab}>
-          <DoctorsToolbar 
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            doctorsCount={doctorsCount}
-            onAddDoctor={handleAddDoctor}
-            hasReachedLimit={hasReachedLimit}
-          />
-          
-          <TabsContent value="all" className="m-0">
-            <DoctorsList 
-              doctors={filteredDoctors}
-              onViewDoctor={handleViewDoctor}
-              onEditDoctor={handleEditDoctor}
-              onDeleteDoctor={handleDeleteClick}
-            />
-          </TabsContent>
-          
-          <TabsContent value="active" className="m-0">
-            <DoctorsList 
-              doctors={filteredDoctors}
-              onViewDoctor={handleViewDoctor}
-              onEditDoctor={handleEditDoctor}
-              onDeleteDoctor={handleDeleteClick}
-            />
-          </TabsContent>
-          
-          <TabsContent value="inactive" className="m-0">
-            <DoctorsList 
-              doctors={filteredDoctors}
-              onViewDoctor={handleViewDoctor}
-              onEditDoctor={handleEditDoctor}
-              onDeleteDoctor={handleDeleteClick}
-            />
-          </TabsContent>
-        </Tabs>
+        <DoctorsList 
+          doctors={filteredDoctors}
+          isLoading={doctorsLoading}
+          onEdit={handleEditDoctor}
+          onView={handleViewDoctor}
+          onDelete={handleDeleteDoctor}
+        />
         
-        {/* Doctor Form Dialog */}
+        {/* Add/Edit Doctor Dialog */}
         <DoctorFormDialog
-          open={formDialogOpen}
-          onOpenChange={setFormDialogOpen}
+          open={isFormOpen}
+          onOpenChange={setIsFormOpen}
           doctor={selectedDoctor}
           services={formattedMockServices}
-          subscriptionHasDoctorLimit={subscriptionHasDoctorLimit}
-          currentDoctorCount={doctors.length}
-          maxDoctorsAllowed={maxDoctors}
-          onSave={handleSaveDoctor}
+          loading={isLoading}
+          onSave={handleFormSubmit}
         />
         
         {/* View Doctor Dialog */}
-        <ViewDoctorDialog
-          open={viewDialogOpen}
-          onOpenChange={setViewDialogOpen}
-          doctor={selectedDoctor}
-          services={formattedMockServices}
-        />
+        {selectedDoctor && (
+          <ViewDoctorDialog
+            open={isViewOpen}
+            onOpenChange={setIsViewOpen}
+            doctor={selectedDoctor}
+          />
+        )}
         
-        {/* Delete Confirmation Dialog */}
-        <DeleteDoctorDialog
-          open={deleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
-          doctorName={selectedDoctor?.fullName}
-          onConfirm={handleConfirmDelete}
-        />
+        {/* Delete Doctor Dialog */}
+        {selectedDoctor && (
+          <DeleteDoctorDialog
+            open={isDeleteOpen}
+            onOpenChange={setIsDeleteOpen}
+            doctorName={selectedDoctor.fullName}
+            loading={isLoading}
+            onConfirm={handleConfirmDelete}
+          />
+        )}
       </div>
     </SidebarLayout>
   );
 }
 
-export default ClinicAdminDoctors;
+export default Doctors;

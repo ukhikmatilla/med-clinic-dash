@@ -11,7 +11,7 @@ export const ProtectedRoute = ({
   children,
   requiredRole
 }: ProtectedRouteProps) => {
-  const { user, loading } = useAuth();
+  const { user, userRole, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -27,8 +27,15 @@ export const ProtectedRoute = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If role check is required, implement it here
-  // For now, we just check if the user is authenticated
+  // If a required role is specified, check if the user has the required role
+  if (requiredRole && userRole !== requiredRole) {
+    // Redirect to appropriate dashboard based on role
+    if (userRole === 'super-admin') {
+      return <Navigate to="/super-admin" replace />;
+    } else {
+      return <Navigate to="/clinic-admin" replace />;
+    }
+  }
 
   return <>{children}</>;
 };
