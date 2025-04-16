@@ -1,78 +1,112 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Doctor, Service, Bot, UseDoctorsDataOptions, DoctorsDataActions } from "@/hooks/doctors/types";
 import { DoctorFormValues } from "@/components/clinics/doctors/DoctorForm";
-import { formValuesToDoctorData } from "@/hooks/doctors/utils";
-import { supabase } from "@/integrations/supabase/client";
 
-// Re-export types for backward compatibility
-export type { Doctor, Service, Bot, UseDoctorsDataOptions };
+// Type definitions
+export interface Doctor {
+  id: string;
+  fullName: string;
+  specialties: string[];
+  telegramId: string | null;
+  telegramBot?: string;
+  schedule: Record<string, string>;
+  services: string[];
+  status: "active" | "inactive";
+  experience?: string;
+  category?: string;
+  initialConsultation?: string;
+  followupConsultation?: string;
+}
 
-export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctorsDataOptions = {}): DoctorsDataActions {
+export interface Service {
+  id: string;
+  name: string;
+  price: string;
+}
+
+export interface Bot {
+  id: string;
+  name: string;
+}
+
+export interface UseDoctorsDataOptions {
+  maxDoctors?: number;
+}
+
+export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctorsDataOptions = {}) {
   const [doctors, setDoctors] = useState<Doctor[]>(initialDoctors);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const { maxDoctors } = options;
   const hasReachedLimit = maxDoctors ? doctors.length >= maxDoctors : false;
 
-  // Fetch doctors from Supabase on component mount
-  useEffect(() => {
-    async function fetchDoctors() {
-      setLoading(true);
-      
-      try {
-        const { data, error } = await supabase
-          .from('doctors')
-          .select(`
-            *,
-            doctor_services(service_id)
-          `);
+  // Parse schedule string to Record format
+  const parseSchedule = (scheduleStr: string): Record<string, string> => {
+    const schedule: Record<string, string> = {};
+    if (!scheduleStr) return schedule;
+
+    const parts = scheduleStr.split(", ");
+    parts.forEach(part => {
+      const match = part.match(/([А-Яа-я]+)[-–]?([А-Яа-я]+)?\s+(.+)/);
+      if (match) {
+        const [_, startDay, endDay, time] = match;
         
-        if (error) {
-          console.error("Error fetching doctors:", error);
-          setLoading(false);
-          return;
+        if (startDay && endDay) {
+          // Convert days range to individual days
+          const daysMap: Record<string, string> = {
+            'Пн': 'Понедельник',
+            'Вт': 'Вторник',
+            'Ср': 'Среда',
+            'Чт': 'Четверг',
+            'Пт': 'Пятница',
+            'Сб': 'Суббота',
+            'Вс': 'Воскресенье'
+          };
+          
+          const fullDays = Object.keys(daysMap);
+          const startIdx = fullDays.indexOf(startDay);
+          const endIdx = fullDays.indexOf(endDay);
+          
+          if (startIdx !== -1 && endIdx !== -1) {
+            for (let i = startIdx; i <= endIdx; i++) {
+              schedule[fullDays[i]] = time;
+            }
+          } else {
+            // If we can't parse the range, just add the original days
+            schedule[startDay] = time;
+            if (endDay) schedule[endDay] = time;
+          }
+        } else {
+          schedule[startDay] = time;
         }
-        
-        // Transform data to match our frontend model
-        const transformedDoctors: Doctor[] = data.map(doctor => ({
-          id: doctor.id,
-          fullName: doctor.full_name,
-          specialties: doctor.specialties || [],
-          telegramId: doctor.telegram_id,
-          telegramBot: doctor.telegram_bot,
-          schedule: typeof doctor.schedule === 'object' ? doctor.schedule as Record<string, string> : {},
-          services: doctor.doctor_services ? doctor.doctor_services.map((ds: any) => ds.service_id) : [],
-          status: (doctor.status === 'active' || doctor.status === 'inactive') 
-            ? doctor.status as "active" | "inactive" 
-            : "active",
-          experience: doctor.experience || "",
-          category: doctor.category || "",
-          initialConsultation: doctor.initial_consultation || "",
-          followupConsultation: doctor.followup_consultation || ""
-        }));
-        
-        setDoctors(transformedDoctors);
-      } catch (error) {
-        console.error("Unexpected error:", error);
-      } finally {
-        setLoading(false);
       }
-    }
+    });
     
-    // Only fetch if we don't have initial doctors
-    if (initialDoctors.length === 0) {
-      fetchDoctors();
-    } else {
-      setLoading(false);
-    }
-  }, [initialDoctors]);
+    return schedule;
+  };
+
+  // Convert form values to Doctor format
+  const formValuesToDoctorData = (values: DoctorFormValues, doctorId?: string): Doctor => {
+    return {
+      id: doctorId || `doctor_${Date.now()}`,
+      fullName: values.fullName,
+      specialties: values.specialties.split(',').map(s => s.trim()),
+      telegramId: values.telegramId || null,
+      telegramBot: values.telegramBot,
+      schedule: parseSchedule(values.schedule || ""),
+      services: values.services || [],
+      status: values.isActive ? "active" : "inactive",
+      experience: values.experience,
+      category: values.category
+    };
+  };
 
   // Get available bots
   const getAvailableBots = async (): Promise<Bot[]> => {
-    // For now, return a static list
+    // In a real app, this would be an API call
+    // For now, we'll return a static list
     return [
       { id: "doctor_bot", name: "@najot_doctor_bot" }
     ];
@@ -91,65 +125,9 @@ export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctor
     
     setLoading(true);
     try {
-      // Prepare doctor data for Supabase
-      const doctorData = {
-        full_name: values.fullName,
-        telegram_id: values.telegramId || null,
-        telegram_bot: values.telegramBot || "@najot_doctor_bot",
-        specialties: values.specialties ? values.specialties.split(',').map(s => s.trim()) : [],
-        experience: values.experience || "",
-        category: values.category || "",
-        schedule: parseSchedule(values.schedule),
-        status: values.isActive ? "active" : "inactive",
-        initial_consultation: "",
-        followup_consultation: ""
-      };
-      
-      // Insert into Supabase
-      const { data, error } = await supabase
-        .from('doctors')
-        .insert(doctorData)
-        .select('*')
-        .single();
-      
-      if (error) {
-        throw error;
-      }
-      
-      // If services are specified, link them to the doctor
-      if (values.services && values.services.length > 0 && data) {
-        const doctorServiceEntries = values.services.map(serviceId => ({
-          doctor_id: data.id,
-          service_id: serviceId
-        }));
-        
-        const { error: linkError } = await supabase
-          .from('doctor_services')
-          .insert(doctorServiceEntries);
-        
-        if (linkError) {
-          console.error("Error linking services to doctor:", linkError);
-        }
-      }
-      
-      // Create doctor object for frontend
-      const newDoctor: Doctor = {
-        id: data.id,
-        fullName: data.full_name,
-        specialties: data.specialties || [],
-        telegramId: data.telegram_id,
-        telegramBot: data.telegram_bot,
-        schedule: typeof data.schedule === 'object' ? data.schedule as Record<string, string> : {},
-        services: values.services || [],
-        status: (data.status === 'active' || data.status === 'inactive') 
-          ? data.status as "active" | "inactive" 
-          : "active",
-        experience: data.experience || "",
-        category: data.category || "",
-        initialConsultation: data.initial_consultation || "",
-        followupConsultation: data.followup_consultation || ""
-      };
-      
+      // In a real app, this would be an API call
+      // For now, we'll just update the local state
+      const newDoctor = formValuesToDoctorData(values);
       setDoctors(prev => [...prev, newDoctor]);
       
       return newDoctor;
@@ -165,60 +143,7 @@ export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctor
   const updateDoctor = async (doctorId: string, values: DoctorFormValues) => {
     setLoading(true);
     try {
-      // Prepare doctor data for Supabase
-      const doctorData = {
-        full_name: values.fullName,
-        telegram_id: values.telegramId || null,
-        telegram_bot: values.telegramBot || "@najot_doctor_bot",
-        specialties: values.specialties ? values.specialties.split(',').map(s => s.trim()) : [],
-        experience: values.experience || "",
-        category: values.category || "",
-        schedule: parseSchedule(values.schedule),
-        status: values.isActive ? "active" : "inactive"
-      };
-      
-      // Update in Supabase
-      const { data, error } = await supabase
-        .from('doctors')
-        .update(doctorData)
-        .eq('id', doctorId)
-        .select('*')
-        .single();
-      
-      if (error) {
-        throw error;
-      }
-      
-      // If services are specified, update the doctor_services table
-      if (values.services !== undefined) {
-        // First, delete existing relationships
-        const { error: deleteError } = await supabase
-          .from('doctor_services')
-          .delete()
-          .eq('doctor_id', doctorId);
-        
-        if (deleteError) {
-          console.error("Error removing existing doctor-service links:", deleteError);
-        }
-        
-        // Then, add new relationships
-        if (values.services.length > 0) {
-          const doctorServiceEntries = values.services.map(serviceId => ({
-            doctor_id: doctorId,
-            service_id: serviceId
-          }));
-          
-          const { error: insertError } = await supabase
-            .from('doctor_services')
-            .insert(doctorServiceEntries);
-          
-          if (insertError) {
-            console.error("Error linking services to doctor:", insertError);
-          }
-        }
-      }
-      
-      // Create updated doctor object for frontend
+      // In a real app, this would be an API call
       const updatedDoctor = formValuesToDoctorData(values, doctorId);
       
       setDoctors(prev => 
@@ -238,16 +163,7 @@ export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctor
   const deleteDoctor = async (doctorId: string) => {
     setLoading(true);
     try {
-      // Delete from Supabase (doctor_services entries will be deleted due to ON DELETE CASCADE)
-      const { error } = await supabase
-        .from('doctors')
-        .delete()
-        .eq('id', doctorId);
-      
-      if (error) {
-        throw error;
-      }
-      
+      // In a real app, this would be an API call
       setDoctors(prev => prev.filter(doc => doc.id !== doctorId));
       
       toast({
@@ -273,25 +189,6 @@ export function useDoctorsData(initialDoctors: Doctor[] = [], options: UseDoctor
     // For demo purposes, let's say only IDs starting with '@doctor' are valid
     return telegramId.startsWith('@doctor');
   };
-
-  // Helper function to parse schedule string to object
-  function parseSchedule(scheduleStr: string): Record<string, string> {
-    if (!scheduleStr) return {};
-    
-    const schedule: Record<string, string> = {};
-    const entries = scheduleStr.split(',').map(s => s.trim());
-    
-    entries.forEach(entry => {
-      const parts = entry.split(' ');
-      if (parts.length >= 2) {
-        const day = parts[0];
-        const time = parts.slice(1).join(' ');
-        schedule[day] = time;
-      }
-    });
-    
-    return schedule;
-  }
 
   return {
     doctors,

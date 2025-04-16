@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,15 +21,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-// Updated form schema
+// Form schema
 const serviceFormSchema = z.object({
   name: z.string().min(2, "Название услуги должно содержать не менее 2 символов"),
   price: z.string().min(1, "Укажите цену услуги")
-    .transform((val) => {
-      // Convert string price to number by removing non-numeric characters
-      const numericValue = val.replace(/[^\d]/g, '');
-      return numericValue ? parseInt(numericValue, 10) : 0;
-    })
 });
 
 type ServiceFormValues = z.infer<typeof serviceFormSchema>;
@@ -37,8 +32,8 @@ type ServiceFormValues = z.infer<typeof serviceFormSchema>;
 interface EditServiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  service: { id: string; name: string; price: number } | null;
-  onSave: (data: { id: string; name: string; price: number }) => void;
+  service: { id: string; name: string; price: string } | null;
+  onSave: (data: { id: string; name: string; price: string }) => void;
 }
 
 export function EditServiceDialog({ 
@@ -50,42 +45,38 @@ export function EditServiceDialog({
   const isEditing = !!service;
   const [loading, setLoading] = useState(false);
   
-  // Format price for display in the form
-  const formatPriceForDisplay = (price: number): string => {
-    return price ? new Intl.NumberFormat('ru-RU').format(price) + ' сум' : '';
-  };
-  
   // Set up form
   const form = useForm<ServiceFormValues>({
     resolver: zodResolver(serviceFormSchema),
     defaultValues: {
       name: service?.name || "",
-      price: service?.price ? formatPriceForDisplay(service.price) : ""
+      price: service?.price || ""
     }
   });
   
   // Reset form when dialog opens/closes or service changes
-  useEffect(() => {
+  useState(() => {
     if (open) {
       form.reset({
         name: service?.name || "",
-        price: service?.price ? formatPriceForDisplay(service.price) : ""
+        price: service?.price || ""
       });
     }
-  }, [open, service, form]);
+  });
   
   const handleSubmit = async (values: ServiceFormValues) => {
     setLoading(true);
     try {
-      // Price should already be a number after transformation by zod
+      // In a real application, this would make an API call
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
+      
       onSave({
         id: service?.id || `new-service-${Date.now()}`,
         name: values.name,
-        price: values.price  // This is now guaranteed to be a number
+        price: values.price
       });
     } finally {
       setLoading(false);
-      onOpenChange(false);
     }
   };
   

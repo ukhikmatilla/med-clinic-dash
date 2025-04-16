@@ -10,10 +10,6 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 
-// Auth Provider
-import { AuthProvider } from "./contexts/AuthContext";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
-
 // Super Admin Pages
 import SuperAdminDashboard from "./pages/SuperAdmin/Dashboard";
 import SuperAdminClinics from "./pages/SuperAdmin/Clinics";
@@ -40,165 +36,37 @@ const App = () => {
       <TooltipProvider>
         <Sonner />
         <BrowserRouter>
-          <AuthProvider>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              
-              {/* Super Admin Routes */}
-              <Route 
-                path="/super-admin" 
-                element={
-                  <ProtectedRoute requiredRole="super-admin">
-                    <SuperAdminDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/super-admin/clinics" 
-                element={
-                  <ProtectedRoute requiredRole="super-admin">
-                    <SuperAdminClinics />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/super-admin/clinic/:id" 
-                element={
-                  <ProtectedRoute requiredRole="super-admin">
-                    <SuperAdminClinicProfile />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/super-admin/integrations" 
-                element={
-                  <ProtectedRoute requiredRole="super-admin">
-                    <SuperAdminIntegrations />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/super-admin/subscriptions" 
-                element={
-                  <ProtectedRoute requiredRole="super-admin">
-                    <SuperAdminSubscriptions />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/super-admin/reports" 
-                element={
-                  <ProtectedRoute requiredRole="super-admin">
-                    <SuperAdminReports />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/super-admin/reports-fin" 
-                element={
-                  <ProtectedRoute requiredRole="super-admin">
-                    <SuperAdminFinancialReport />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/super-admin/reports-sub" 
-                element={
-                  <ProtectedRoute requiredRole="super-admin">
-                    <SuperAdminSubscriptionsReport />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/super-admin/reports-active" 
-                element={
-                  <ProtectedRoute requiredRole="super-admin">
-                    <SuperAdminActivityReport />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Clinic Admin Routes */}
-              <Route 
-                path="/clinic-admin" 
-                element={
-                  <ProtectedRoute requiredRole="clinic-admin">
-                    <ClinicAdminDashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/clinic-admin/doctors" 
-                element={
-                  <ProtectedRoute requiredRole="clinic-admin">
-                    <ClinicAdminDoctors />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/clinic-admin/doctor/:id" 
-                element={
-                  <ProtectedRoute requiredRole="clinic-admin">
-                    <DoctorProfile />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/clinic-admin/services" 
-                element={
-                  <ProtectedRoute requiredRole="clinic-admin">
-                    <ClinicAdminServices />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/clinic-admin/schedule" 
-                element={
-                  <ProtectedRoute requiredRole="clinic-admin">
-                    <NotFound />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/clinic-admin/schedule/:id" 
-                element={
-                  <ProtectedRoute requiredRole="clinic-admin">
-                    <NotFound />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/clinic-admin/settings" 
-                element={
-                  <ProtectedRoute requiredRole="clinic-admin">
-                    <NotFound />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/clinic-admin/integrations" 
-                element={
-                  <ProtectedRoute requiredRole="clinic-admin">
-                    <NotFound />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/clinic-admin/subscription" 
-                element={
-                  <ProtectedRoute requiredRole="clinic-admin">
-                    <NotFound />
-                  </ProtectedRoute>
-                } 
-              />
-              
-              {/* Catch All Route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AuthProvider>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            {/* Super Admin Routes */}
+            <Route path="/super-admin" element={<SuperAdminDashboard />} />
+            <Route path="/super-admin/clinics" element={<SuperAdminClinics />} />
+            <Route path="/super-admin/clinic/:id" element={<SuperAdminClinicProfile />} />
+            <Route path="/super-admin/integrations" element={<SuperAdminIntegrations />} />
+            <Route path="/super-admin/subscriptions" element={<SuperAdminSubscriptions />} />
+            <Route path="/super-admin/reports" element={<SuperAdminReports />} />
+            <Route path="/super-admin/reports-fin" element={<SuperAdminFinancialReport />} />
+            <Route path="/super-admin/reports-sub" element={<SuperAdminSubscriptionsReport />} />
+            <Route path="/super-admin/reports-active" element={<SuperAdminActivityReport />} />
+            
+            {/* Clinic Admin Routes */}
+            <Route path="/clinic-admin" element={<ClinicAdminDashboard />} />
+            <Route path="/clinic-admin/doctors" element={<ClinicAdminDoctors />} />
+            <Route path="/clinic-admin/doctor/:id" element={<DoctorProfile />} />
+            <Route path="/clinic-admin/services" element={<ClinicAdminServices />} />
+            <Route path="/clinic-admin/schedule" element={<NotFound />} />
+            <Route path="/clinic-admin/schedule/:id" element={<NotFound />} />
+            <Route path="/clinic-admin/settings" element={<NotFound />} />
+            <Route path="/clinic-admin/integrations" element={<NotFound />} />
+            <Route path="/clinic-admin/subscription" element={<NotFound />} />
+            
+            {/* Catch All Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Card, 
@@ -14,8 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
-import { Loader2 } from "lucide-react";
 
 export function Register() {
   const [email, setEmail] = useState("");
@@ -26,19 +24,6 @@ export function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { signUp, user, userRole, loading: authLoading } = useAuth();
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (user && !authLoading) {
-      // Redirect based on user's actual role
-      if (userRole === 'super-admin') {
-        navigate('/super-admin', { replace: true });
-      } else {
-        navigate('/clinic-admin', { replace: true });
-      }
-    }
-  }, [user, authLoading, navigate, userRole]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,46 +40,25 @@ export function Register() {
     setIsLoading(true);
 
     try {
-      // Include additional user data for clinic admins
-      const userData = role === "clinic-admin" ? { 
-        role, 
-        clinic_name: clinicName 
-      } : { role };
-      
-      const { success, error } = await signUp(email, password, userData);
-      
-      if (success) {
+      // This would be your actual registration logic
+      // For demo purposes, we'll just redirect to login
+      setTimeout(() => {
         toast({
           title: "Регистрация успешна",
-          description: "Проверьте вашу почту для подтверждения аккаунта",
+          description: "Теперь вы можете войти в систему",
         });
         navigate("/login");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Ошибка регистрации",
-          description: error?.message || "Что-то пошло не так. Пожалуйста, попробуйте снова.",
-        });
-      }
+        setIsLoading(false);
+      }, 1000);
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Ошибка регистрации",
         description: "Что-то пошло не так. Пожалуйста, попробуйте снова.",
       });
-    } finally {
       setIsLoading(false);
     }
   };
-
-  // Show loading state if auth state is being checked
-  if (authLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-medical-gray">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-medical-gray p-4">
@@ -169,10 +133,7 @@ export function Register() {
           </CardContent>
           <CardFooter className="flex flex-col">
             <Button type="submit" className="w-full mb-2" disabled={isLoading}>
-              {isLoading ? 
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Загрузка...</> : 
-                "Зарегистрироваться"
-              }
+              {isLoading ? "Загрузка..." : "Зарегистрироваться"}
             </Button>
             <p className="text-xs text-center text-muted-foreground mt-2">
               Уже есть аккаунт?{" "}

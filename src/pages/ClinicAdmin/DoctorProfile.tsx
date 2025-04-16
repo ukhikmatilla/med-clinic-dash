@@ -14,7 +14,6 @@ import { DoctorFormDialog } from "@/components/clinics/doctors/DoctorFormDialog"
 import { useDoctorProfileData } from "@/hooks/useDoctorProfileData";
 import { mockServices } from "@/data/doctors/mockData";
 import { Loader2 } from "lucide-react";
-import { Service } from "@/hooks/doctors/types";
 
 export function DoctorProfile() {
   const { id } = useParams<{ id: string }>();
@@ -24,7 +23,7 @@ export function DoctorProfile() {
   
   if (isLoading) {
     return (
-      <SidebarLayout sidebar={<ClinicAdminSidebar />}>
+      <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
         <div className="p-6 flex justify-center items-center min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -34,7 +33,7 @@ export function DoctorProfile() {
   
   if (!doctor) {
     return (
-      <SidebarLayout sidebar={<ClinicAdminSidebar />}>
+      <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
         <div className="p-6">
           <div className="text-center py-8 text-muted-foreground">
             Врач не найден
@@ -44,17 +43,8 @@ export function DoctorProfile() {
     );
   }
   
-  // Convert mockServices for compatibility with doctor form dialog ensuring number price
-  const formattedMockServices = mockServices.map(service => ({
-    id: service.id,
-    name: service.name,
-    price: typeof service.price === 'string' ? parseInt(service.price, 10) : service.price,
-    durationMin: service.durationMin,
-    category: service.category
-  })) as Service[];
-  
   return (
-    <SidebarLayout sidebar={<ClinicAdminSidebar />}>
+    <SidebarLayout sidebar={<ClinicAdminSidebar clinicName="Najot Shifo" />}>
       <div className="p-2 sm:p-6 space-y-6">
         <DoctorProfileHeader 
           doctor={doctor}
@@ -101,7 +91,7 @@ export function DoctorProfile() {
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
           doctor={doctor}
-          services={formattedMockServices}
+          services={mockServices}
           onSave={async (values, isEditing) => {
             // In a real app, this would update the doctor data
             console.log("Updating doctor:", values);

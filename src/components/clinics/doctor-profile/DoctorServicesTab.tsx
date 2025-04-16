@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Edit, Plus } from "lucide-react";
 import { EditServiceDialog } from "@/components/clinics/doctor-profile/EditServiceDialog";
-import { Service } from "@/hooks/doctors/types";
+import { Service } from "@/hooks/useDoctorsData";
 import { useToast } from "@/hooks/use-toast";
 
 interface Doctor {
@@ -15,7 +15,7 @@ interface Doctor {
 interface DoctorServiceItem {
   id: string;
   name: string;
-  price: number;
+  price: string;
 }
 
 interface DoctorServicesTabProps {
@@ -47,11 +47,6 @@ export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) 
     setIsEditDialogOpen(false);
   };
   
-  // Format price for display
-  const formatPrice = (price: number): string => {
-    return new Intl.NumberFormat('ru-RU').format(price) + ' сум';
-  };
-  
   return (
     <>
       <Card>
@@ -76,7 +71,7 @@ export function DoctorServicesTab({ doctor, services }: DoctorServicesTabProps) 
                 {services.map((service) => (
                   <TableRow key={service.id}>
                     <TableCell>{service.name}</TableCell>
-                    <TableCell className="text-right">{formatPrice(service.price)}</TableCell>
+                    <TableCell className="text-right">{service.price}</TableCell>
                     <TableCell>
                       <Button 
                         variant="ghost" 
